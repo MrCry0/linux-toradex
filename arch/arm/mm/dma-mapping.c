@@ -340,7 +340,12 @@ static void *__alloc_remap_buffer(struct device *dev, size_t size, gfp_t gfp,
 				 pgprot_t prot, struct page **ret_page,
 				 const void *caller, bool want_vaddr);
 
+#if IS_ENABLED(CONFIG_VIDEO_TW68)
+#define DEFAULT_DMA_COHERENT_POOL_SIZE SZ_32M
+#else
 #define DEFAULT_DMA_COHERENT_POOL_SIZE	SZ_256K
+#endif
+
 static struct gen_pool *atomic_pool __ro_after_init;
 
 static size_t atomic_pool_size __initdata = DEFAULT_DMA_COHERENT_POOL_SIZE;
