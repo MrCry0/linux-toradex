@@ -41,6 +41,13 @@
 #include "mxc_v4l2_capture.h"
 #include "ipu_prp_sw.h"
 
+#if 0
+#undef dev_dbg
+#define dev_dbg(dev, format, arg...) {dev_printk(KERN_ERR, dev, format, ##arg);}
+#undef pr_debug
+#define pr_debug(fmt, ...) printk(KERN_ERR pr_fmt(fmt), ##__VA_ARGS__)
+#endif
+
 #define init_MUTEX(sem)         sema_init(sem, 1)
 
 static struct platform_device_id imx_v4l2_devtype[] = {
@@ -990,7 +997,7 @@ static int mxc_v4l2_g_ctrl(cam_data *cam, struct v4l2_control *c)
 			status = vidioc_int_g_ctrl(cam->sensor, c);
 			cam->bright = c->value;
 		} else {
-			pr_err("ERROR: v4l2 capture: slave not found!\n");
+			pr_err("ERROR: v4l2 capture: slave not found! V4L2_CID_BRIGHTNESS\n");
 			status = -ENODEV;
 		}
 		break;
@@ -1000,7 +1007,7 @@ static int mxc_v4l2_g_ctrl(cam_data *cam, struct v4l2_control *c)
 			status = vidioc_int_g_ctrl(cam->sensor, c);
 			cam->hue = c->value;
 		} else {
-			pr_err("ERROR: v4l2 capture: slave not found!\n");
+			pr_err("ERROR: v4l2 capture: slave not found! V4L2_CID_HUE\n");
 			status = -ENODEV;
 		}
 		break;
@@ -1010,7 +1017,7 @@ static int mxc_v4l2_g_ctrl(cam_data *cam, struct v4l2_control *c)
 			status = vidioc_int_g_ctrl(cam->sensor, c);
 			cam->contrast = c->value;
 		} else {
-			pr_err("ERROR: v4l2 capture: slave not found!\n");
+			pr_err("ERROR: v4l2 capture: slave not found! V4L2_CID_CONTRAST\n");
 			status = -ENODEV;
 		}
 		break;
@@ -1020,7 +1027,7 @@ static int mxc_v4l2_g_ctrl(cam_data *cam, struct v4l2_control *c)
 			status = vidioc_int_g_ctrl(cam->sensor, c);
 			cam->saturation = c->value;
 		} else {
-			pr_err("ERROR: v4l2 capture: slave not found!\n");
+			pr_err("ERROR: v4l2 capture: slave not found! V4L2_CID_SATURATION\n");
 			status = -ENODEV;
 		}
 		break;
@@ -1030,7 +1037,7 @@ static int mxc_v4l2_g_ctrl(cam_data *cam, struct v4l2_control *c)
 			status = vidioc_int_g_ctrl(cam->sensor, c);
 			cam->red = c->value;
 		} else {
-			pr_err("ERROR: v4l2 capture: slave not found!\n");
+			pr_err("ERROR: v4l2 capture: slave not found! V4L2_CID_RED_BALANCE\n");
 			status = -ENODEV;
 		}
 		break;
@@ -1040,7 +1047,7 @@ static int mxc_v4l2_g_ctrl(cam_data *cam, struct v4l2_control *c)
 			status = vidioc_int_g_ctrl(cam->sensor, c);
 			cam->blue = c->value;
 		} else {
-			pr_err("ERROR: v4l2 capture: slave not found!\n");
+			pr_err("ERROR: v4l2 capture: slave not found! V4L2_CID_BLUE_BALANCE\n");
 			status = -ENODEV;
 		}
 		break;
@@ -1050,7 +1057,7 @@ static int mxc_v4l2_g_ctrl(cam_data *cam, struct v4l2_control *c)
 			status = vidioc_int_g_ctrl(cam->sensor, c);
 			cam->ae_mode = c->value;
 		} else {
-			pr_err("ERROR: v4l2 capture: slave not found!\n");
+			pr_err("ERROR: v4l2 capture: slave not found! V4L2_CID_BLACK_LEVEL\n");
 			status = -ENODEV;
 		}
 		break;
@@ -1160,7 +1167,7 @@ static int mxc_v4l2_s_ctrl(cam_data *cam, struct v4l2_control *c)
 			cam->hue = c->value;
 			ret = vidioc_int_s_ctrl(cam->sensor, c);
 		} else {
-			pr_err("ERROR: v4l2 capture: slave not found!\n");
+			pr_err("ERROR: v4l2 capture: slave not found! V4L2_CID_HUE\n");
 			ret = -ENODEV;
 		}
 		break;
@@ -1169,7 +1176,7 @@ static int mxc_v4l2_s_ctrl(cam_data *cam, struct v4l2_control *c)
 			cam->contrast = c->value;
 			ret = vidioc_int_s_ctrl(cam->sensor, c);
 		} else {
-			pr_err("ERROR: v4l2 capture: slave not found!\n");
+			pr_err("ERROR: v4l2 capture: slave not found! V4L2_CID_CONTRAST\n");
 			ret = -ENODEV;
 		}
 		break;
@@ -1178,7 +1185,7 @@ static int mxc_v4l2_s_ctrl(cam_data *cam, struct v4l2_control *c)
 			cam->bright = c->value;
 			ret = vidioc_int_s_ctrl(cam->sensor, c);
 		} else {
-			pr_err("ERROR: v4l2 capture: slave not found!\n");
+			pr_err("ERROR: v4l2 capture: slave not found! V4L2_CID_BRIGHTNESS\n");
 			ret = -ENODEV;
 		}
 		break;
@@ -1187,7 +1194,7 @@ static int mxc_v4l2_s_ctrl(cam_data *cam, struct v4l2_control *c)
 			cam->saturation = c->value;
 			ret = vidioc_int_s_ctrl(cam->sensor, c);
 		} else {
-			pr_err("ERROR: v4l2 capture: slave not found!\n");
+			pr_err("ERROR: v4l2 capture: slave not found! V4L2_CID_SATURATION\n");
 			ret = -ENODEV;
 		}
 		break;
@@ -1196,7 +1203,7 @@ static int mxc_v4l2_s_ctrl(cam_data *cam, struct v4l2_control *c)
 			cam->red = c->value;
 			ret = vidioc_int_s_ctrl(cam->sensor, c);
 		} else {
-			pr_err("ERROR: v4l2 capture: slave not found!\n");
+			pr_err("ERROR: v4l2 capture: slave not found! V4L2_CID_RED_BALANCE\n");
 			ret = -ENODEV;
 		}
 		break;
@@ -1205,7 +1212,7 @@ static int mxc_v4l2_s_ctrl(cam_data *cam, struct v4l2_control *c)
 			cam->blue = c->value;
 			ret = vidioc_int_s_ctrl(cam->sensor, c);
 		} else {
-			pr_err("ERROR: v4l2 capture: slave not found!\n");
+			pr_err("ERROR: v4l2 capture: slave not found! V4L2_CID_BLUE_BALANCE\n");
 			ret = -ENODEV;
 		}
 		break;
@@ -1214,7 +1221,7 @@ static int mxc_v4l2_s_ctrl(cam_data *cam, struct v4l2_control *c)
 			cam->ae_mode = c->value;
 			ret = vidioc_int_s_ctrl(cam->sensor, c);
 		} else {
-			pr_err("ERROR: v4l2 capture: slave not found!\n");
+			pr_err("ERROR: v4l2 capture: slave not found! V4L2_CID_EXPOSURE\n");
 			ret = -ENODEV;
 		}
 		break;
@@ -1615,7 +1622,7 @@ static int mxc_v4l_open(struct file *file)
 
 	if (cam->sensor == NULL ||
 	    cam->sensor->type != v4l2_int_type_slave) {
-		pr_err("ERROR: v4l2 capture: slave not found!\n");
+		pr_err("ERROR: v4l2 capture: slave not found! V4L2_CID_HUE\n");
 		return -EAGAIN;
 	}
 
@@ -2296,7 +2303,7 @@ static long mxc_v4l_do_ioctl(struct file *file,
 		if (cam->sensor)
 			retval = vidioc_int_g_parm(cam->sensor, parm);
 		else {
-			pr_err("ERROR: v4l2 capture: slave not found!\n");
+			pr_err("ERROR: v4l2 capture: slave not found! VIDIOC_G_PARM\n");
 			retval = -ENODEV;
 		}
 		break;
@@ -2308,7 +2315,7 @@ static long mxc_v4l_do_ioctl(struct file *file,
 		if (cam->sensor)
 			retval = mxc_v4l2_s_param(cam, parm);
 		else {
-			pr_err("ERROR: v4l2 capture: slave not found!\n");
+			pr_err("ERROR: v4l2 capture: slave not found! VIDIOC_S_PARM\n");
 			retval = -ENODEV;
 		}
 		break;
@@ -2332,7 +2339,7 @@ static long mxc_v4l_do_ioctl(struct file *file,
 		if (cam->sensor)
 			retval = mxc_v4l2_g_std(cam, e);
 		else {
-			pr_err("ERROR: v4l2 capture: slave not found!\n");
+			pr_err("ERROR: v4l2 capture: slave not found! VIDIOC_G_STD\n");
 			retval = -ENODEV;
 		}
 		break;
@@ -2437,7 +2444,7 @@ static long mxc_v4l_do_ioctl(struct file *file,
 		if (cam->sensor)
 			retval = vidioc_int_enum_fmt_cap(cam->sensor, f);
 		else {
-			pr_err("ERROR: v4l2 capture: slave not found!\n");
+			pr_err("ERROR: v4l2 capture: slave not found! VIDIOC_ENUM_FMT\n");
 			retval = -ENODEV;
 		}
 		break;
@@ -2447,7 +2454,7 @@ static long mxc_v4l_do_ioctl(struct file *file,
 		if (cam->sensor)
 			retval = vidioc_int_enum_framesizes(cam->sensor, fsize);
 		else {
-			pr_err("ERROR: v4l2 capture: slave not found!\n");
+			pr_err("ERROR: v4l2 capture: slave not found! VIDIOC_ENUM_FRAMESIZES\n");
 			retval = -ENODEV;
 		}
 		break;
@@ -2458,7 +2465,7 @@ static long mxc_v4l_do_ioctl(struct file *file,
 			retval = vidioc_int_enum_frameintervals(cam->sensor,
 								fival);
 		} else {
-			pr_err("ERROR: v4l2 capture: slave not found!\n");
+			pr_err("ERROR: v4l2 capture: slave not found! VIDIOC_ENUM_FRAMEINTERVALS\n");
 			retval = -ENODEV;
 		}
 		break;
@@ -2470,7 +2477,7 @@ static long mxc_v4l_do_ioctl(struct file *file,
 		if (cam->sensor)
 			retval = vidioc_int_g_chip_ident(cam->sensor, (int *)p);
 		else {
-			pr_err("ERROR: v4l2 capture: slave not found!\n");
+			pr_err("ERROR: v4l2 capture: slave not found! VIDIOC_DBG_G_CHIP_IDENT\n");
 			retval = -ENODEV;
 		}
 		break;
