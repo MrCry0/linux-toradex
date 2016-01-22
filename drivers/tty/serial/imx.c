@@ -2387,6 +2387,18 @@ static int imx_uart_probe(struct platform_device *pdev)
 
 	clk_disable_unprepare(sport->clk_ipg);
 
+	/* if DTE mode is requested, make sure DTE mode is selected
+	   and then disable DCDDELT/RIDELT interrupts */
+	if (!imx_uart_is_imx1(sport) && sport->dte_mode) {
+		u32 ucr3, ufcr;
+		ufcr = imx_uart_readl(sport, UFCR);
+		ufcr |= UFCR_DCEDTE;
+		imx_uart_writel(sport, ufcr, UFCR);
+		ucr3 = imx_uart_readl(sport, UCR3);
+		ucr3 &= ~(UCR3_DCD | UCR3_RI);
+		imx_uart_writel(sport, ucr3, UCR3);
+	}
+
 	/*
 	 * Allocate the IRQ(s) i.MX1 has three interrupts whereas later
 	 * chips only have one interrupt.
