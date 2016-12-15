@@ -44,6 +44,34 @@
 
 #include "../pci.h"
 
+//#define CONFIG_MACH_APALIS_T30
+#define CONFIG_MACH_APALIS_TK1
+#if defined(CONFIG_MACH_APALIS_T30) || defined(CONFIG_MACH_APALIS_TK1)
+#include <linux/gpio.h>
+
+#include "../../../include/dt-bindings/gpio/tegra-gpio.h"
+
+#ifdef CONFIG_MACH_APALIS_T30
+#define APALIS_GPIO7	TEGRA_GPIO(S, 7)
+
+#define LAN_RESET_N	-1
+
+#define PEX_PERST_N	APALIS_GPIO7
+
+#define RESET_MOCI_N	TEGRA_GPIO(I, 4)
+#endif
+
+#ifdef CONFIG_MACH_APALIS_TK1
+#define APALIS_GPIO7	TEGRA_GPIO(DD, 1)
+
+#define LAN_RESET_N	TEGRA_GPIO(S, 2)
+
+#define PEX_PERST_N	APALIS_GPIO7
+
+#define RESET_MOCI_N	TEGRA_GPIO(U, 4)
+#endif
+#endif
+
 #define INT_PCI_MSI_NR (8 * 32)
 
 /* register definitions */
@@ -409,6 +437,26 @@ struct tegra_pcie_bus {
 	unsigned int nr;
 };
 
+#if defined(CONFIG_MACH_APALIS_T30) || defined(CONFIG_MACH_APALIS_TK1)
+/* To disable the PCIe switch reset errata workaround */
+int g_pex_perst = 1;
+
+/* To disable the PCIe switch reset errata workaround */
+static int __init disable_pex_perst(char *s)
+{
+	if (!(*s) || !strcmp(s, "0"))
+		g_pex_perst = 0;
+
+	return 0;
+}
+__setup("pex_perst=", disable_pex_perst);
+#endif /* CONFIG_MACH_APALIS_T30 || CONFIG_MACH_APALIS_TK1 */
+
+static inline struct tegra_pcie *sys_to_pcie(struct pci_sys_data *sys)
+{
+	return sys->private_data;
+}
+
 static inline void afi_writel(struct tegra_pcie *pcie, u32 value,
 			      unsigned long offset)
 {
@@ -546,6 +594,27 @@ static void tegra_pcie_port_reset(struct tegra_pcie_port *port)
 	unsigned long ctrl = tegra_pcie_port_get_pex_ctrl(port);
 	unsigned long value;
 
+#if defined(CONFIG_MACH_APALIS_T30) || defined(CONFIG_MACH_APALIS_TK1)
+	/*
+	 * Reset PLX PEX 8605 PCIe Switch plus PCIe devices on Apalis Evaluation
+	 * Board
+	 */
+	if (g_pex_perst)
+		gpio_request(PEX_PERST_N, "PEX_PERST_N");
+	gpio_request(RESET_MOCI_N, "RESET_MOCI_N");
+	if (g_pex_perst)
+		gpio_direction_output(PEX_PERST_N, 0);
+	gpio_direction_output(RESET_MOCI_N, 0);
+
+#ifdef CONFIG_MACH_APALIS_TK1
+	/* Reset I210 Gigabit Ethernet Controller */
+	if (LAN_RESET_N) {
+		gpio_request(LAN_RESET_N, "LAN_RESET_N");
+		gpio_direction_output(LAN_RESET_N, 0);
+	}
+#endif /* CONFIG_MACH_APALIS_TK1 */
+#endif /* CONFIG_MACH_APALIS_T30 || CONFIG_MACH_APALIS_TK1 */
+
 	/* pulse reset signal */
 	if (port->reset_gpio) {
 		gpiod_set_value(port->reset_gpio, 1);
@@ -564,6 +633,25 @@ static void tegra_pcie_port_reset(struct tegra_pcie_port *port)
 		value |= AFI_PEX_CTRL_RST;
 		afi_writel(port->pcie, value, ctrl);
 	}
+
+#if defined(CONFIG_MACH_APALIS_T30) || defined(CONFIG_MACH_APALIS_TK1)
+	/* Must be asserted for 100 ms after power and clocks are stable */
+	if (g_pex_perst)
+		gpio_set_value(PEX_PERST_N, 1);
+	/*
+	 * Err_5: PEX_REFCLK_OUTpx/nx Clock Outputs is not Guaranteed Until
+	 * 900 us After PEX_PERST# De-assertion
+	 */
+	if (g_pex_perst)
+		mdelay(1);
+	gpio_set_value(RESET_MOCI_N, 1);
+
+#ifdef CONFIG_MACH_APALIS_TK1
+	/* Release I210 Gigabit Ethernet Controller Reset */
+	if (LAN_RESET_N)
+		gpio_set_value(LAN_RESET_N, 1);
+#endif /* CONFIG_MACH_APALIS_TK1 */
+#endif /* CONFIG_MACH_APALIS_T30 || CONFIG_MACH_APALIS_TK1 */
 }
 
 static void tegra_pcie_enable_rp_features(struct tegra_pcie_port *port)
