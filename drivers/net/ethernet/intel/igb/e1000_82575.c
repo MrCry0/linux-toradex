@@ -593,6 +593,7 @@ static s32 igb_get_invariants_82575(struct e1000_hw *hw)
 	case E1000_DEV_ID_I350_SGMII:
 		mac->type = e1000_i350;
 		break;
+	case E1000_DEV_ID_I210_TOOLS_ONLY:
 	case E1000_DEV_ID_I210_COPPER:
 	case E1000_DEV_ID_I210_FIBER:
 	case E1000_DEV_ID_I210_SERDES:
@@ -601,6 +602,7 @@ static s32 igb_get_invariants_82575(struct e1000_hw *hw)
 	case E1000_DEV_ID_I210_SERDES_FLASHLESS:
 		mac->type = e1000_i210;
 		break;
+	case E1000_DEV_ID_I211_TOOLS_ONLY:
 	case E1000_DEV_ID_I211_COPPER:
 		mac->type = e1000_i211;
 		break;
