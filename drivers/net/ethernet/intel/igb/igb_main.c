@@ -36,6 +36,7 @@
 #include <linux/dca.h>
 #endif
 #include <linux/i2c.h>
+#include <linux/ctype.h>
 #include "igb.h"
 
 #define MAJ 5
@@ -60,6 +61,9 @@ static const char igb_driver_string[] =
 				"Intel(R) Gigabit Ethernet Network Driver";
 static const char igb_copyright[] =
 				"Copyright (c) 2007-2014 Intel Corporation.";
+
+static char g_mac_addr[ETH_ALEN];
+static int g_usr_mac = 0;
 
 static const struct e1000_info *igb_info_tbl[] = {
 	[board_82575] = &e1000_82575_info,
@@ -248,6 +252,37 @@ MODULE_VERSION(DRV_VERSION);
 static int debug = -1;
 module_param(debug, int, 0);
 MODULE_PARM_DESC(debug, "Debug level (0=none,...,16=all)");
+
+/* Retrieve user set MAC address */
+static int __init setup_igb_mac(char *macstr)
+{
+	int i, j;
+	unsigned char result, value;
+
+	for (i = 0; i < ETH_ALEN; i++) {
+		result = 0;
+
+		if (i != 5 && *(macstr + 2) != ':')
+			return -1;
+
+		for (j = 0; j < 2; j++) {
+			if (isxdigit(*macstr) && (value = isdigit(*macstr) ?
+			    *macstr - '0' : toupper(*macstr) - 'A' + 10) < 16) {
+				result = result * 16 + value;
+				macstr++;
+			} else
+				return -1;
+		}
+
+		macstr++;
+		g_mac_addr[i] = result;
+	}
+
+	g_usr_mac = 1;
+
+	return 0;
+}
+__setup("igb_mac=", setup_igb_mac);
 
 struct igb_reg_info {
 	u32 ofs;
@@ -3182,7 +3217,7 @@ static int igb_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	case e1000_i210:
 	case e1000_i211:
 		if (igb_get_flash_presence_i210(hw)) {
-			if (hw->nvm.ops.validate(hw) < 0) {
+			if ((hw->nvm.ops.validate(hw) < 0) && !g_usr_mac) {
 				dev_err(&pdev->dev,
 					"The NVM Checksum Is Not Valid\n");
 				err = -EIO;
@@ -3205,12 +3240,31 @@ static int igb_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 			dev_err(&pdev->dev, "NVM Read Error\n");
 	}
 
+	if (g_usr_mac && (g_usr_mac < 3)) {
+		/* Get user set MAC address */
+		if (g_usr_mac == 2) {
+			/* 0x100000 offset for 2nd Ethernet MAC */
+			g_mac_addr[3] += 0x10;
+			if (g_mac_addr[3] < 0x10)
+				dev_warn(&pdev->dev,
+					 "MAC addr byte 3 (0x%02x) wrap around"
+					 "\n",
+					 g_mac_addr[3]);
+		}
+		memcpy(hw->mac.addr, g_mac_addr, ETH_ALEN);
+		g_usr_mac++;
+	}
+
 	memcpy(netdev->dev_addr, hw->mac.addr, netdev->addr_len);
 
 	if (!is_valid_ether_addr(netdev->dev_addr)) {
-		dev_err(&pdev->dev, "Invalid MAC Address\n");
-		err = -EIO;
-		goto err_eeprom;
+		/* Use Toradex OUI as default */
+		char default_mac_addr[ETH_ALEN] = {
+			0x0, 0x14, 0x2d, 0x0, 0x0, 0x0
+		};
+		dev_warn(&pdev->dev, "using Toradex OUI as default igb MAC\n");
+		memcpy(hw->mac.addr, default_mac_addr, ETH_ALEN);
+		memcpy(netdev->dev_addr, hw->mac.addr, netdev->addr_len);
 	}
 
 	igb_set_default_mac_filter(adapter);
