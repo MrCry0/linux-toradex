@@ -49,6 +49,7 @@
 #define SDHCI_MISC_CTRL_ENABLE_SDR50			0x10
 #define SDHCI_MISC_CTRL_ENABLE_SDHCI_SPEC_300		0x20
 #define SDHCI_MISC_CTRL_ENABLE_DDR50			0x200
+#define SDHCI_MISC_CTRL_ENABLE_EXT_LOOPBACK		0x20000
 
 #define SDHCI_TEGRA_VENDOR_DLLCAL_CFG			0x1b0
 #define SDHCI_TEGRA_DLLCAL_CALIBRATE			BIT(31)
@@ -391,6 +392,16 @@ static void tegra_sdhci_reset(struct sdhci_host *host, u8 mask)
 	}
 
 	clk_ctrl |= tegra_host->default_trim << SDHCI_CLOCK_CTRL_TRIM_SHIFT;
+
+#define CONFIG_MACH_APALIS_TK1
+#ifdef CONFIG_MACH_APALIS_TK1
+	/*
+	 * Disable the external loopback and use the internal loopback as per
+	 * SDMMC_VENDOR_MISC_CNTRL_0 register's SDMMC_SPARE1 bits being set to
+	 * 0xfffd according to the TRM.
+	 */
+	misc_ctrl &= ~SDHCI_MISC_CTRL_ENABLE_EXT_LOOPBACK;
+#endif /* CONFIG_MACH_APALIS_TK1 */
 
 	sdhci_writel(host, misc_ctrl, SDHCI_TEGRA_VENDOR_MISC_CTRL);
 	sdhci_writel(host, clk_ctrl, SDHCI_TEGRA_VENDOR_CLOCK_CTRL);
