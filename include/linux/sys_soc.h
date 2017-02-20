@@ -15,6 +15,7 @@ struct soc_device_attribute {
 	const char *serial_number;
 	const char *soc_id;
 	const void *data;
+	const char *unique_id;
 };
 
 /**
