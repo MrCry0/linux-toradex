@@ -2127,7 +2127,12 @@ static int __maybe_unused flexcan_suspend(struct device *device)
 			if (err)
 				return err;
 		} else {
-			flexcan_chip_stop(dev);
+			err = flexcan_chip_disable(priv);
+			if (err) {
+				netif_device_attach(dev);
+				netif_start_queue(dev);
+				return err;
+			}
 
 			err = pm_runtime_force_suspend(device);
 			if (err)
