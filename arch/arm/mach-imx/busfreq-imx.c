@@ -185,6 +185,8 @@ int unregister_busfreq_notifier(struct notifier_block *nb)
 }
 EXPORT_SYMBOL(unregister_busfreq_notifier);
 
+#ifdef CONFIG_ARM_IMX6Q_CPUFREQ
+
 static struct clk *origin_step_parent;
 
 /*
@@ -213,6 +215,16 @@ static void imx6ull_lower_cpu_rate(bool enter)
 		clk_set_parent(pll1_bypass_clk, pll1_clk);
 	}
 }
+#else
+static void imx6ull_lower_cpu_rate(bool enter)
+{
+	/* this stub should never be called.
+	   configure with CONFIG_ARM_IMX6Q_CPUFREQ
+	*/
+	(void) enter;
+	BUG();
+}
+#endif
 
 /*
  * enter_lpm_imx6_up and exit_lpm_imx6_up is used by
