@@ -3,6 +3,7 @@
 // Copyright 2016 Freescale Semiconductor, Inc.
 
 #include "imx6ul.dtsi"
+#include <dt-bindings/input/input.h>
 #include "imx6ull-pinfunc.h"
 #include "imx6ull-pinfunc-snvs.h"
 
