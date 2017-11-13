@@ -1724,14 +1724,12 @@
 					regulator-name = "+V3.3_ETH(ldo9)";
 					regulator-min-microvolt = <3300000>;
 					regulator-max-microvolt = <3300000>;
-					regulator-always-on;
 				};
 
 				ldo10 {
 					regulator-name = "+V3.3_ETH(ldo10)";
 					regulator-min-microvolt = <3300000>;
 					regulator-max-microvolt = <3300000>;
-					regulator-always-on;
 				};
 
 				ldo11 {
@@ -2043,23 +2041,5 @@
 				};
 			};
 		};
-	};
-};
-
-&gpio {
-	/* I210 Gigabit Ethernet Controller Reset */
-	lan-reset-n {
-		gpio-hog;
-		gpios = <TEGRA_GPIO(S, 2) GPIO_ACTIVE_HIGH>;
-		output-high;
-		line-name = "LAN_RESET_N";
-	};
-
-	/* Control MXM3 pin 26 Reset Module Output Carrier Input */
-	reset-moci-ctrl {
-		gpio-hog;
-		gpios = <TEGRA_GPIO(U, 4) GPIO_ACTIVE_HIGH>;
-		output-high;
-		line-name = "RESET_MOCI_CTRL";
 	};
 };

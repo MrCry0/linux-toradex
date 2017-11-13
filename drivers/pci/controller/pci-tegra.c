@@ -64,7 +64,11 @@
 #ifdef CONFIG_MACH_APALIS_TK1
 #define APALIS_GPIO7	TEGRA_GPIO(DD, 1)
 
+#define LAN_DEV_OFF_N	TEGRA_GPIO(O, 6)
+
 #define LAN_RESET_N	TEGRA_GPIO(S, 2)
+
+#define LAN_WAKE_N	TEGRA_GPIO(O, 5)
 
 #define PEX_PERST_N	APALIS_GPIO7
 
@@ -414,6 +418,14 @@ struct tegra_pcie {
 	struct regulator_bulk_data *supplies;
 	unsigned int num_supplies;
 
+#ifdef CONFIG_MACH_APALIS_T30
+	int pci_reset_status;
+#endif
+#ifdef CONFIG_MACH_APALIS_TK1
+	struct regulator	*regulator_apalis_tk1_ldo9;
+	struct regulator	*regulator_apalis_tk1_ldo10;
+#endif /* CONFIG_MACH_APALIS_TK1 */
+
 	const struct tegra_pcie_soc *soc;
 	struct dentry *debugfs;
 };
@@ -595,22 +607,82 @@ static void tegra_pcie_port_reset(struct tegra_pcie_port *port)
 	unsigned long value;
 
 #if defined(CONFIG_MACH_APALIS_T30) || defined(CONFIG_MACH_APALIS_TK1)
+#ifdef CONFIG_MACH_APALIS_T30
 	/*
-	 * Reset PLX PEX 8605 PCIe Switch plus PCIe devices on Apalis Evaluation
-	 * Board
+	 * Apalis PCIe aka port 1 and Apalis Type Specific 4 Lane PCIe aka port
+	 * 0 share the same RESET_MOCI therefore only assert it once for both
+	 * ports to avoid loosing the previously brought up port again.
 	 */
-	if (g_pex_perst)
-		gpio_request(PEX_PERST_N, "PEX_PERST_N");
-	gpio_request(RESET_MOCI_N, "RESET_MOCI_N");
-	if (g_pex_perst)
-		gpio_direction_output(PEX_PERST_N, 0);
-	gpio_direction_output(RESET_MOCI_N, 0);
-
+	if ((port->index == 1) || (port->index == 0)) {
+	    /* only do it once per init cycle */
+	    if (port->pcie->pci_reset_status % 2 == 0) {
+#endif
 #ifdef CONFIG_MACH_APALIS_TK1
-	/* Reset I210 Gigabit Ethernet Controller */
-	if (LAN_RESET_N) {
-		gpio_request(LAN_RESET_N, "LAN_RESET_N");
-		gpio_direction_output(LAN_RESET_N, 0);
+	if (port->index == 0) { /* Apalis PCIe */
+#endif
+		/*
+		 * Reset PLX PEX 8605 PCIe Switch plus PCIe devices on Apalis Evaluation
+		 * Board
+		 */
+		if (g_pex_perst)
+			gpio_request(PEX_PERST_N, "PEX_PERST_N");
+		gpio_request(RESET_MOCI_N, "RESET_MOCI_N");
+		if (g_pex_perst)
+			gpio_direction_output(PEX_PERST_N, 0);
+		gpio_direction_output(RESET_MOCI_N, 0);
+#ifdef CONFIG_MACH_APALIS_T30
+	    }
+#endif
+	}
+#ifdef CONFIG_MACH_APALIS_TK1
+	if (port->index == 1) { /* I210 Gigabit Ethernet Controller (On-module) */
+		/* Reset I210 Gigabit Ethernet Controller */
+		if (LAN_RESET_N >= 0) {
+			gpio_request(LAN_RESET_N, "LAN_RESET_N");
+			gpio_direction_output(LAN_RESET_N, 0);
+		}
+
+		/*
+		 * Make sure we don't get any back feeding from LAN_WAKE_N resp.
+		 * DEV_OFF_N
+		 */
+		gpio_request(LAN_WAKE_N, "LAN_WAKE_N");
+		gpio_request(LAN_DEV_OFF_N, "LAN_DEV_OFF_N");
+		gpio_direction_output(LAN_WAKE_N, 0);
+		gpio_direction_output(LAN_DEV_OFF_N, 0);
+
+		/* Make sure LDO9 and LDO10 are initially disabled @ 0V */
+		if (regulator_is_enabled(port->pcie->regulator_apalis_tk1_ldo9)) {
+			value = regulator_enable(port->pcie->regulator_apalis_tk1_ldo9);
+			if (regulator_disable(port->pcie->regulator_apalis_tk1_ldo9) < 0)
+				pr_err("failed disabling +V3.3_ETH(ldo9)\n");
+		}
+		if (regulator_is_enabled(port->pcie->regulator_apalis_tk1_ldo10)) {
+			value = regulator_enable(port->pcie->regulator_apalis_tk1_ldo10);
+			if (regulator_disable(port->pcie->regulator_apalis_tk1_ldo10) <0)
+				pr_err("failed disabling +V3.3_ETH(ldo10)\n");
+		}
+
+		mdelay(100);
+
+		/* Make sure LAN_WAKE_N gets re-configured as a GPIO input */
+		gpio_direction_input(LAN_WAKE_N);
+
+		/* Make sure controller gets enabled by disabling DEV_OFF_N */
+		gpio_set_value(LAN_DEV_OFF_N, 1);
+
+		/*
+		 * Enable LDO9 and LDO10 for +V3.3_ETH on patched prototype
+		 * V1.0A and sample V1.0B and newer modules
+		 */
+		if (regulator_enable(port->pcie->regulator_apalis_tk1_ldo9) < 0) {
+			pr_err("pcie: couldn't enable regulator +V3.3_ETH(ldo9)\n");
+			return;
+		}
+		if (regulator_enable(port->pcie->regulator_apalis_tk1_ldo10) < 0) {
+			pr_err("pcie: couldn't enable regulator +V3.3_ETH(ldo10)\n");
+			return;
+		}
 	}
 #endif /* CONFIG_MACH_APALIS_TK1 */
 #endif /* CONFIG_MACH_APALIS_T30 || CONFIG_MACH_APALIS_TK1 */
@@ -635,21 +707,38 @@ static void tegra_pcie_port_reset(struct tegra_pcie_port *port)
 	}
 
 #if defined(CONFIG_MACH_APALIS_T30) || defined(CONFIG_MACH_APALIS_TK1)
-	/* Must be asserted for 100 ms after power and clocks are stable */
-	if (g_pex_perst)
-		gpio_set_value(PEX_PERST_N, 1);
-	/*
-	 * Err_5: PEX_REFCLK_OUTpx/nx Clock Outputs is not Guaranteed Until
-	 * 900 us After PEX_PERST# De-assertion
-	 */
-	if (g_pex_perst)
-		mdelay(1);
-	gpio_set_value(RESET_MOCI_N, 1);
+#ifdef CONFIG_MACH_APALIS_T30
+	if ((port->index == 1) || (port->index == 0)) {
+	    /* only do it once per init cycle */
+	    if (port->pcie->pci_reset_status % 2 == 0) {
+#endif
+#ifdef CONFIG_MACH_APALIS_TK1
+	if (port->index == 0) { /* Apalis PCIe */
+#endif
+		/* Must be asserted for 100 ms after power and clocks are stable */
+		if (g_pex_perst)
+			gpio_set_value(PEX_PERST_N, 1);
+		/*
+		 * Err_5: PEX_REFCLK_OUTpx/nx Clock Outputs is not Guaranteed Until
+		 * 900 us After PEX_PERST# De-assertion
+		 */
+		if (g_pex_perst)
+			mdelay(1);
+		gpio_set_value(RESET_MOCI_N, 1);
+#ifdef CONFIG_MACH_APALIS_T30
+	    }
+	    port->pcie->pci_reset_status++;
+#endif
+	}
 
 #ifdef CONFIG_MACH_APALIS_TK1
-	/* Release I210 Gigabit Ethernet Controller Reset */
-	if (LAN_RESET_N)
-		gpio_set_value(LAN_RESET_N, 1);
+	mdelay(5);
+
+	if (port->index == 1) { /* I210 Gigabit Ethernet Controller (On-module) */
+		/* Release I210 Gigabit Ethernet Controller Reset */
+		if (LAN_RESET_N >= 0)
+			gpio_set_value(LAN_RESET_N, 1);
+	}
 #endif /* CONFIG_MACH_APALIS_TK1 */
 #endif /* CONFIG_MACH_APALIS_T30 || CONFIG_MACH_APALIS_TK1 */
 }
@@ -1381,6 +1470,24 @@ static int tegra_pcie_power_on(struct tegra_pcie *pcie)
 		dev_err(dev, "failed to enable PLLE clock: %d\n", err);
 		goto disable_cml_clk;
 	}
+
+#ifdef CONFIG_MACH_APALIS_TK1
+	if (pcie->regulator_apalis_tk1_ldo9 == NULL) {
+		pcie->regulator_apalis_tk1_ldo9 = regulator_get(pcie->dev, "+V3.3_ETH(ldo9)");
+		if (IS_ERR(pcie->regulator_apalis_tk1_ldo9)) {
+			pr_err("pcie: couldn't get regulator +V3.3_ETH(ldo9)\n");
+			pcie->regulator_apalis_tk1_ldo9 = 0;
+		}
+	}
+
+	if (pcie->regulator_apalis_tk1_ldo10 == NULL) {
+		pcie->regulator_apalis_tk1_ldo10 = regulator_get(pcie->dev, "+V3.3_ETH(ldo10)");
+		if (IS_ERR(pcie->regulator_apalis_tk1_ldo10)) {
+			pr_err("pcie: couldn't get regulator +V3.3_ETH(ldo10)\n");
+			pcie->regulator_apalis_tk1_ldo10 = 0;
+		}
+	}
+#endif /* CONFIG_MACH_APALIS_TK1 */
 
 	reset_control_deassert(pcie->afi_rst);
 
