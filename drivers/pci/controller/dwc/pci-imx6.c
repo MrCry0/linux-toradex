@@ -111,6 +111,7 @@ struct imx6_pcie {
 	struct clk		*pciex2_per;
 	struct clk		*pcie_inbound_axi;
 	struct clk		*pcie;
+	struct clk		*pcie_ext;
 	struct clk		*pcie_aux;
 	struct clk		*phy_per;
 	struct clk		*misc_per;
@@ -1156,6 +1157,12 @@ static void imx6_pcie_deassert_core_reset(struct imx6_pcie *imx6_pcie)
 				ret);
 			return;
 		}
+	}
+
+	ret = clk_prepare_enable(imx6_pcie->pcie_ext);
+	if (ret) {
+		dev_err(dev, "unable to enable pcie_ext clock\n");
+		return;
 	}
 
 	switch (imx6_pcie->drvdata->variant) {
@@ -2526,6 +2533,13 @@ static int imx6_pcie_probe(struct platform_device *pdev)
 	if (IS_ERR(imx6_pcie->pcie)) {
 		dev_err(dev, "pcie clock source missing or invalid\n");
 		return PTR_ERR(imx6_pcie->pcie);
+	}
+
+	imx6_pcie->pcie_ext = devm_clk_get_optional(&pdev->dev, "pcie_ext");
+	if (IS_ERR(imx6_pcie->pcie_ext)) {
+		dev_err(&pdev->dev,
+			"pcie_ext clock source missing or invalid\n");
+		return PTR_ERR(imx6_pcie->pcie_ext);
 	}
 
 	switch (imx6_pcie->drvdata->variant) {
