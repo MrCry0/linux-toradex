@@ -8,6 +8,7 @@
 #include <linux/module.h>
 #include <linux/platform_device.h>
 #include <linux/component.h>
+#include <linux/of_gpio.h>
 #include <drm/drm_of.h>
 #include <drm/drmP.h>
 #include <drm/drm_crtc_helper.h>
@@ -159,6 +160,19 @@ static int cdns_mhdp_imx_bind(struct device *dev, struct device *master,
 
 	match = of_match_node(cdns_mhdp_imx_dt_ids, pdev->dev.of_node);
 	plat_data = match->data;
+
+	imx_mhdp->hdmi_ctrl_gpio = of_get_named_gpio(dev->of_node, "hdmi-ctrl-gpios", 0);
+	if (gpio_is_valid(imx_mhdp->hdmi_ctrl_gpio)) {
+		ret = gpio_request(imx_mhdp->hdmi_ctrl_gpio, "HDMI_CTRL");
+		if (ret < 0) {
+			dev_err(dev, "request HDMI CTRL GPIO failed: %d\n", ret);
+			return ret;
+		}
+
+		/* Set signals depending on HDP device type, 0 DP, 1 HDMI */
+		gpio_direction_output(imx_mhdp->hdmi_ctrl_gpio, !plat_data->is_dp);
+	}
+
 	encoder = &imx_mhdp->encoder;
 
 	encoder->possible_crtcs = drm_of_find_possible_crtcs(drm, dev->of_node);
@@ -171,8 +185,10 @@ static int cdns_mhdp_imx_bind(struct device *dev, struct device *master,
 	 * not been registered yet.  Defer probing, and hope that
 	 * the required CRTC is added later.
 	 */
-	if (encoder->possible_crtcs == 0)
-		return -EPROBE_DEFER;
+	if (encoder->possible_crtcs == 0) {
+		ret = -EPROBE_DEFER;
+		goto err_free_hdmi_gpio;
+	}
 
 	drm_encoder_helper_add(encoder, &cdns_mhdp_imx_encoder_helper_funcs);
 	drm_encoder_init(drm, encoder, &cdns_mhdp_imx_encoder_funcs,
@@ -188,9 +204,16 @@ static int cdns_mhdp_imx_bind(struct device *dev, struct device *master,
 	 * which would have called the encoder cleanup.  Do it manually.
 	 */
 	if (ret < 0)
-		drm_encoder_cleanup(encoder);
+		goto err_cleanup_encoder;
 
 	return ret;
+
+err_cleanup_encoder:
+        drm_encoder_cleanup(encoder);
+err_free_hdmi_gpio:
+       if (gpio_is_valid(imx_mhdp->hdmi_ctrl_gpio))
+               gpio_free(imx_mhdp->hdmi_ctrl_gpio);
+        return ret;
 }
 
 static void cdns_mhdp_imx_unbind(struct device *dev, struct device *master,

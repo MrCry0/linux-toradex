@@ -52,6 +52,7 @@ struct imx_mhdp_device {
 	struct imx_hdp_clks clks;
 	const struct firmware *fw;
 	const char *firmware_name;
+	int hdmi_ctrl_gpio;
 
 	int bus_type;
 
