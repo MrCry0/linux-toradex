@@ -178,6 +178,20 @@ config MFD_AC100
 	  This driver include only the core APIs. You have to select individual
 	  components like codecs or RTC under the corresponding menus.
 
+config MFD_APALIS_TK1_K20
+	tristate "K20 on Apalis TK1"
+	depends on SPI_MASTER
+	select MFD_CORE
+	help
+	  The Kinetis MK20DN512 companion micro controller found on Apalis TK1
+	  supports CAN, resistive touch, GPIOs and analog inputs.
+
+config APALIS_TK1_K20_EZP
+	bool "K20 on Apalis TK1 programming via EZ Port"
+	depends on MFD_APALIS_TK1_K20
+	help
+		Support for flashing new K20 firmware using EZ-Port functionality.
+
 config MFD_AXP20X
 	tristate
 	select MFD_CORE

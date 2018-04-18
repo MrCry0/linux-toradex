@@ -1419,6 +1419,12 @@ config GPIO_74X164
 	  shift registers. This driver can be used to provide access
 	  to more gpio outputs.
 
+config GPIO_APALIS_TK1_K20
+	tristate "GPIOs of K20 MCU on Apalis TK1"
+	depends on MFD_APALIS_TK1_K20
+	help
+	  This enables support for GPIOs of K20 MCU found on Apalis TK1.
+
 config GPIO_MAX3191X
 	tristate "Maxim MAX3191x industrial serializer"
 	select CRC8

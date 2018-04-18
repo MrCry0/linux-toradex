@@ -88,6 +88,12 @@ config CAN_LEDS
 	  Say Y here if you are working on a system with led-class supported
 	  LEDs and you want to use them as canbus activity indicators.
 
+config CAN_APALIS_TK1_K20
+	tristate "Apalis TK1 K20 CAN controllers"
+	depends on MFD_APALIS_TK1_K20
+	---help---
+	  Driver for the Apalis TK1 K20 CAN controllers.
+
 config CAN_AT91
 	tristate "Atmel AT91 onchip CAN controller"
 	depends on (ARCH_AT91 || COMPILE_TEST) && HAS_IOMEM

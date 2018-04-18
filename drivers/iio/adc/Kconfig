@@ -207,6 +207,12 @@ config AD799X
 	  To compile this driver as a module, choose M here: the module will be
 	  called ad799x.
 
+config APALIS_TK1_K20_ADC
+	tristate "ADCs of K20 MCU on Apalis TK1"
+	depends on MFD_APALIS_TK1_K20
+	help
+	  This enables support for ADCs of K20 MCU found on Apalis TK1.
+
 config ASPEED_ADC
 	tristate "Aspeed ADC"
 	depends on ARCH_ASPEED || COMPILE_TEST
