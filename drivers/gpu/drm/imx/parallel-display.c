@@ -230,6 +230,9 @@ static int imx_pd_bind(struct device *dev, struct device *master, void *data)
 	if (ret && ret != -ENODEV)
 		return ret;
 
+	if (imxpd->bridge && imxpd->bridge->timings)
+		imxpd->bus_flags = imxpd->bridge->timings->input_bus_flags;
+
 	imxpd->dev = dev;
 
 	ret = imx_pd_register(drm, imxpd);
