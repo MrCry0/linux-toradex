@@ -18,6 +18,7 @@ graph bindings specified in Documentation/devicetree/bindings/graph.txt.
 
 Optional properties:
 - vdd-supply: Power supply for DAC
+- de-active: data-enable pulse is active low/high/ignored
 
 Example
 -------
