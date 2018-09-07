@@ -106,14 +106,25 @@
 		};
 	};
 
-	panel: panel {
-		/*
-		 * edt,et057090dhu: EDT 5.7" LCD TFT
-		 * edt,et070080dh6: EDT 7.0" LCD TFT
-		 */
-		compatible = "edt,et057090dhu";
-		backlight = <&backlight>;
-		power-supply = <&reg_3v3_sw>;
+	panel_dpi: panel-dpi {
+		compatible = "panel-dpi";
+
+		width-mm = <115>;
+		height-mm = <86>;
+
+		data-mapping = "rgb24";
+
+		panel-timing {
+			clock-frequency = <25175000>;
+			hactive = <640>;
+			vactive = <480>;
+			hsync-len = <30>;
+			hfront-porch = <16>;
+			hback-porch = <114>;
+			vsync-len = <3>;
+			vfront-porch = <10>;
+			vback-porch = <32>;
+		};
 
 		port {
 			lcd_panel_in: endpoint {
