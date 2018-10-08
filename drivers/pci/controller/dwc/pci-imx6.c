@@ -100,9 +100,9 @@ struct imx6_pcie_drvdata {
 
 struct imx6_pcie {
 	struct dw_pcie		*pci;
-	int			clkreq_gpio;
-	int			dis_gpio;
-	int			reset_gpio;
+	struct gpio_desc	*clkreq_gpiod;
+	struct gpio_desc	*dis_gpiod;
+	struct gpio_desc	*reset_gpiod;
 	bool			gpio_active_high;
 	struct clk		*pcie_bus;
 	struct clk		*pcie_phy;
@@ -1159,6 +1159,13 @@ static void imx6_pcie_deassert_core_reset(struct imx6_pcie *imx6_pcie)
 		}
 	}
 
+	if (imx6_pcie->clkreq_gpiod)
+		gpiod_set_value_cansleep(imx6_pcie->clkreq_gpiod, 1);
+
+	mdelay(2);
+	if (imx6_pcie->dis_gpiod)
+		gpiod_set_value_cansleep(imx6_pcie->dis_gpiod, 0);
+
 	ret = clk_prepare_enable(imx6_pcie->pcie_ext);
 	if (ret) {
 		dev_err(dev, "unable to enable pcie_ext clock\n");
@@ -1177,12 +1184,13 @@ static void imx6_pcie_deassert_core_reset(struct imx6_pcie *imx6_pcie)
 	}
 
 	/* Some boards don't have PCIe reset GPIO. */
-	if (gpio_is_valid(imx6_pcie->reset_gpio)) {
-		gpio_set_value_cansleep(imx6_pcie->reset_gpio,
-					imx6_pcie->gpio_active_high);
-		msleep(100);
-		gpio_set_value_cansleep(imx6_pcie->reset_gpio,
+	if (imx6_pcie->reset_gpiod) {
+		gpiod_set_value_cansleep(imx6_pcie->reset_gpiod,
 					!imx6_pcie->gpio_active_high);
+		msleep(100);
+		gpiod_set_value_cansleep(imx6_pcie->reset_gpiod,
+					imx6_pcie->gpio_active_high);
+		msleep(20);
 	}
 
 	switch (imx6_pcie->drvdata->variant) {
@@ -1872,8 +1880,8 @@ static int imx6_pcie_host_init(struct pcie_port *pp)
 	struct dw_pcie *pci = to_dw_pcie_from_pp(pp);
 	struct imx6_pcie *imx6_pcie = to_imx6_pcie(pci);
 
-	if (gpio_is_valid(imx6_pcie->dis_gpio))
-		gpio_set_value_cansleep(imx6_pcie->dis_gpio, 1);
+	if (imx6_pcie->dis_gpiod)
+		gpiod_set_value_cansleep(imx6_pcie->dis_gpiod, 1);
 
 	imx6_pcie_assert_core_reset(imx6_pcie);
 	imx6_pcie_init_phy(imx6_pcie);
@@ -2474,24 +2482,22 @@ static int imx6_pcie_probe(struct platform_device *pdev)
 	}
 
 	/* Fetch GPIOs */
-	imx6_pcie->clkreq_gpio = of_get_named_gpio(node, "clkreq-gpio", 0);
-	if (gpio_is_valid(imx6_pcie->clkreq_gpio)) {
-		devm_gpio_request_one(&pdev->dev, imx6_pcie->clkreq_gpio,
-				      GPIOF_OUT_INIT_LOW, "PCIe CLKREQ");
-	} else if (imx6_pcie->clkreq_gpio == -EPROBE_DEFER) {
-		return imx6_pcie->clkreq_gpio;
+	imx6_pcie->clkreq_gpiod = devm_gpiod_get_optional(dev, "clkreq",
+							GPIOD_OUT_LOW);
+	if (IS_ERR(imx6_pcie->clkreq_gpiod)) {
+		ret = PTR_ERR(imx6_pcie->clkreq_gpiod);
+		if (ret != -EPROBE_DEFER)
+			dev_err(&pdev->dev, "unable to get clkreq gpio\n");
+		return ret;
 	}
 
-	imx6_pcie->dis_gpio = of_get_named_gpio(node, "disable-gpio", 0);
-	if (gpio_is_valid(imx6_pcie->dis_gpio)) {
-		ret = devm_gpio_request_one(&pdev->dev, imx6_pcie->dis_gpio,
-					    GPIOF_OUT_INIT_LOW, "PCIe DIS");
-		if (ret) {
+	imx6_pcie->dis_gpiod = devm_gpiod_get_optional(dev, "disable",
+							GPIOD_OUT_LOW);
+	if (IS_ERR(imx6_pcie->dis_gpiod)) {
+		ret = PTR_ERR(imx6_pcie->dis_gpiod);
+		if (ret != -EPROBE_DEFER)
 			dev_err(&pdev->dev, "unable to get disable gpio\n");
-			return ret;
-		}
-	} else if (imx6_pcie->dis_gpio == -EPROBE_DEFER) {
-		return imx6_pcie->dis_gpio;
+		return ret;
 	}
 
 	imx6_pcie->epdev_on = devm_regulator_get(&pdev->dev,
@@ -2499,21 +2505,17 @@ static int imx6_pcie_probe(struct platform_device *pdev)
 	if (IS_ERR(imx6_pcie->epdev_on))
 		return -EPROBE_DEFER;
 
-	imx6_pcie->reset_gpio = of_get_named_gpio(node, "reset-gpio", 0);
 	imx6_pcie->gpio_active_high = of_property_read_bool(node,
 						"reset-gpio-active-high");
-	if (gpio_is_valid(imx6_pcie->reset_gpio)) {
-		ret = devm_gpio_request_one(dev, imx6_pcie->reset_gpio,
-				imx6_pcie->gpio_active_high ?
-					GPIOF_OUT_INIT_HIGH :
-					GPIOF_OUT_INIT_LOW,
-				"PCIe reset");
-		if (ret) {
+	imx6_pcie->reset_gpiod = devm_gpiod_get_optional(dev, "reset",
+					imx6_pcie->gpio_active_high ?
+						GPIOD_OUT_LOW :
+						GPIOD_OUT_HIGH);
+	if (IS_ERR(imx6_pcie->reset_gpiod)) {
+		ret = PTR_ERR(imx6_pcie->reset_gpiod);
+		if (ret != -EPROBE_DEFER)
 			dev_err(dev, "unable to get reset gpio\n");
-			return ret;
-		}
-	} else if (imx6_pcie->reset_gpio == -EPROBE_DEFER) {
-		return imx6_pcie->reset_gpio;
+		return ret;
 	}
 
 	/* Fetch clocks */
