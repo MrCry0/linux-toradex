@@ -52,13 +52,30 @@
 		clock-frequency = <16000000>;
 	};
 
-	panel: panel {
-		compatible = "edt,et057090dhu";
+	panel_dpi: panel-dpi {
+		compatible = "panel-dpi";
 		backlight = <&bl>;
 		power-supply = <&reg_3v3>;
 
+		width-mm = <115>;
+		height-mm = <86>;
+
+		data-mapping = "rgb24";
+
+		panel-timing {
+			clock-frequency = <25175000>;
+			hactive = <640>;
+			vactive = <480>;
+			hsync-len = <30>;
+			hfront-porch = <16>;
+			hback-porch = <114>;
+			vsync-len = <3>;
+			vfront-porch = <10>;
+			vback-porch = <32>;
+		};
+
 		port {
-			panel_in: endpoint {
+			lcd_panel_in: endpoint {
 				remote-endpoint = <&lcdif_out>;
 			};
 		};
@@ -143,7 +160,7 @@
 
 	port {
 		lcdif_out: endpoint {
-			remote-endpoint = <&panel_in>;
+			remote-endpoint = <&lcd_panel_in>;
 		};
 	};
 };
