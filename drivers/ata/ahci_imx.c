@@ -144,6 +144,7 @@ struct imx_ahci_priv {
 	struct clk *per_clk4;
 	struct clk *per_clk5;
 	void __iomem *phy_base;
+	struct clk *sata_ext;
 	int clkreq_gpio;
 	struct regmap *gpr;
 	bool no_device;
@@ -910,9 +911,13 @@ static int imx_sata_enable(struct ahci_host_priv *hpriv)
 	if (ret)
 		return ret;
 
-	ret = clk_prepare_enable(imxpriv->sata_ref_clk);
+	ret = clk_prepare_enable(imxpriv->sata_ext);
 	if (ret < 0)
 		goto disable_regulator;
+
+	ret = clk_prepare_enable(imxpriv->sata_ref_clk);
+	if (ret < 0)
+		goto disable_ext;
 
 	if (imxpriv->type == AHCI_IMX6Q || imxpriv->type == AHCI_IMX6QP) {
 		/*
@@ -957,6 +962,8 @@ static int imx_sata_enable(struct ahci_host_priv *hpriv)
 
 disable_clk:
 	clk_disable_unprepare(imxpriv->sata_ref_clk);
+disable_ext:
+	clk_disable_unprepare(imxpriv->sata_ext);
 disable_regulator:
 	ahci_platform_disable_regulators(hpriv);
 
@@ -995,6 +1002,8 @@ static void imx_sata_disable(struct ahci_host_priv *hpriv)
 	}
 
 	clk_disable_unprepare(imxpriv->sata_ref_clk);
+
+	clk_disable_unprepare(imxpriv->sata_ext);
 
 	ahci_platform_disable_regulators(hpriv);
 }
@@ -1477,6 +1486,12 @@ static int imx_ahci_probe(struct platform_device *pdev)
 	if (IS_ERR(imxpriv->sata_clk)) {
 		dev_err(dev, "can't get sata clock.\n");
 		return PTR_ERR(imxpriv->sata_clk);
+	}
+
+	imxpriv->sata_ext = devm_clk_get(dev, "sata_ext");
+	if (IS_ERR(imxpriv->sata_ext)) {
+		dev_err(dev, "can't get sata_ext clock.\n");
+		return PTR_ERR(imxpriv->sata_ext);
 	}
 
 	imxpriv->sata_ref_clk = devm_clk_get(dev, "sata_ref");
