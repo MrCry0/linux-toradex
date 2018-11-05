@@ -60,7 +60,7 @@
 		width-mm = <115>;
 		height-mm = <86>;
 
-		data-mapping = "rgb24";
+		data-mapping = "bgr666";
 
 		panel-timing {
 			clock-frequency = <25175000>;

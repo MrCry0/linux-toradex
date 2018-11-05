@@ -99,7 +99,6 @@
 		compatible = "fsl,imx-parallel-display";
 		#address-cells = <1>;
 		#size-cells = <0>;
-		interface-pix-fmt = "bgr666";
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_ipu1_lcdif>;
 		status = "okay";
@@ -127,7 +126,7 @@
 		width-mm = <115>;
 		height-mm = <86>;
 
-		data-mapping = "rgb24";
+		data-mapping = "bgr666";
 
 		panel-timing {
 			clock-frequency = <25175000>;
