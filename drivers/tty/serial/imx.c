@@ -2084,7 +2084,7 @@ static struct console imx_uart_console = {
 	.data		= &imx_uart_uart_driver,
 };
 
-#define IMX_CONSOLE	&imx_uart_console
+#define IMX_CONSOLE	(&imx_uart_console)
 
 #ifdef CONFIG_OF
 static void imx_uart_console_early_putchar(struct uart_port *port, int ch)
@@ -2377,8 +2377,17 @@ static int imx_uart_probe(struct platform_device *pdev)
 static int imx_uart_remove(struct platform_device *pdev)
 {
 	struct imx_port *sport = platform_get_drvdata(pdev);
+	int ret;
 
-	return uart_remove_one_port(&imx_uart_uart_driver, &sport->port);
+	ret = uart_remove_one_port(&imx_uart_uart_driver, &sport->port);
+
+	if (IS_ENABLED(CONFIG_SERIAL_IMX_CONSOLE) && IMX_CONSOLE->index >= 0) {
+		clk_unprepare(sport->clk_ipg);
+		clk_unprepare(sport->clk_per);
+		IMX_CONSOLE->index = -1;
+	}
+
+	return ret;
 }
 
 static void imx_uart_restore_context(struct imx_port *sport)
