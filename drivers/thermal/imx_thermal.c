@@ -584,10 +584,10 @@ static void imx_init_temp_grade(struct platform_device *pdev, u32 ocotp_mem0)
 	}
 
 	/*
-	 * Set the critical trip point at 5 °C under max
+	 * Set the critical trip point at max
 	 * Set the passive trip point at 10 °C under max (changeable via sysfs)
 	 */
-	data->temp_critical = data->temp_max - (1000 * 5);
+	data->temp_critical = data->temp_max;
 	data->temp_passive = data->temp_max - (1000 * 10);
 }
 
