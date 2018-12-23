@@ -300,6 +300,14 @@ static inline struct clk_hw *imx_clk_hw_divider2(const char *name, const char *p
 			reg, shift, width, 0, &imx_ccm_lock);
 }
 
+static inline struct clk_hw *imx_clk_hw_divider2_flags(const char *name,
+		const char *parent,
+		void __iomem *reg, u8 shift, u8 width, unsigned long flags)
+{
+	return clk_hw_register_divider(NULL, name, parent,
+			flags, reg, shift, width, 0, &imx_ccm_lock);
+}
+
 static inline struct clk *imx_clk_divider2_flags(const char *name,
 		const char *parent, void __iomem *reg, u8 shift, u8 width,
 		unsigned long flags)

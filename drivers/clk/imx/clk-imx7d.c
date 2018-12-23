@@ -704,7 +704,7 @@ static void __init imx7d_clocks_init(struct device_node *ccm_node)
 	hws[IMX7D_MAIN_AXI_ROOT_DIV] = imx_clk_hw_divider2("axi_post_div", "axi_pre_div", base + 0x8800, 0, 6);
 	hws[IMX7D_DISP_AXI_ROOT_DIV] = imx_clk_hw_divider2("disp_axi_post_div", "disp_axi_pre_div", base + 0x8880, 0, 6);
 	hws[IMX7D_ENET_AXI_ROOT_DIV] = imx_clk_hw_divider2("enet_axi_post_div", "enet_axi_pre_div", base + 0x8900, 0, 6);
-	hws[IMX7D_NAND_USDHC_BUS_ROOT_CLK] = imx_clk_hw_divider2("nand_usdhc_root_clk", "nand_usdhc_pre_div", base + 0x8980, 0, 6);
+	hws[IMX7D_NAND_USDHC_BUS_ROOT_CLK] = imx_clk_hw_divider2_flags("nand_usdhc_root_clk", "nand_usdhc_pre_div", base + 0x8980, 0, 6, CLK_IS_CRITICAL | CLK_OPS_PARENT_ENABLE | CLK_SET_RATE_PARENT);
 	hws[IMX7D_AHB_CHANNEL_ROOT_DIV] = imx_clk_hw_divider2("ahb_root_clk", "ahb_pre_div", base + 0x9000, 0, 6);
 	hws[IMX7D_IPG_ROOT_CLK] = imx_clk_hw_divider_flags("ipg_root_clk", "ahb_root_clk", base + 0x9080, 0, 2, CLK_IS_CRITICAL | CLK_OPS_PARENT_ENABLE | CLK_SET_RATE_PARENT);
 	hws[IMX7D_DRAM_ROOT_DIV] = imx_clk_hw_divider2("dram_post_div", "dram_cg", base + 0x9880, 0, 3);
