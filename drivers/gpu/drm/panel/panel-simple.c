@@ -2070,6 +2070,29 @@ static const struct panel_desc lg_lp129qe = {
 	},
 };
 
+static const struct drm_display_mode lg_lp156wf1_mode = {
+	.clock = 138500,
+	.hdisplay = 1920,
+	.hsync_start = 1920 + 48,
+	.hsync_end = 1920 + 48 + 32,
+	.htotal = 1920 + 48 + 32 + 80,
+	.vdisplay = 1080,
+	.vsync_start = 1080 + 3,
+	.vsync_end =  1080 + 3 + 5,
+	.vtotal =  1080 + 3 + 5 + 23,
+	.vrefresh = 60,
+};
+
+static const struct panel_desc lg_lp156wf1 = {
+	.modes = &lg_lp156wf1_mode,
+	.num_modes = 1,
+	.bpc = 6,
+	.size = {
+		.width = 345,
+		.height = 194,
+	},
+};
+
 static const struct drm_display_mode mitsubishi_aa070mc01_mode = {
 	.clock = 30400,
 	.hdisplay = 800,
@@ -3337,6 +3360,9 @@ static const struct of_device_id platform_of_match[] = {
 	}, {
 		.compatible = "lg,lp129qe",
 		.data = &lg_lp129qe,
+	}, {
+		.compatible = "lg,lp156wf1",
+		.data = &lg_lp156wf1,
 	}, {
 		.compatible = "logicpd,type28",
 		.data = &logicpd_type_28,
