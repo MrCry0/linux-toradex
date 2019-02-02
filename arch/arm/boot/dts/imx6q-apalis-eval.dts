@@ -86,7 +86,7 @@
 		#size-cells = <0>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_ipu1_lcdif>;
-		status = "okay";
+		status = "disabled";
 
 		port@0 {
 			reg = <0>;
@@ -139,6 +139,7 @@
 		height-mm = <137>;
 
 		data-mapping = "vesa-24";
+		status = "disabled";
 
 		panel-timing {
 			clock-frequency = <68930000>;
@@ -249,7 +250,7 @@
 };
 
 &ldb {
-	status = "okay";
+	status = "disabled";
 
 	lvds-channel@0 {
 		status = "okay";
