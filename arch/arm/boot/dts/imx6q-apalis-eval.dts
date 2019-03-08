@@ -108,10 +108,13 @@
 	panel_dpi: panel-dpi {
 		compatible = "panel-dpi";
 
+		backlight = <&backlight>;
+
 		width-mm = <115>;
 		height-mm = <86>;
 
 		data-mapping = "rgb24";
+		status = "disabled";
 
 		panel-timing {
 			clock-frequency = <25175000>;
@@ -134,6 +137,8 @@
 
 	panel_lvds: panel-lvds {
 		compatible = "panel-lvds";
+
+		backlight = <&backlight>;
 
 		width-mm = <218>;
 		height-mm = <137>;
