@@ -713,7 +713,7 @@ struct cdns_mhdp_device {
 		} hdmi;
 	};
 	const struct cdns_plat_data *plat_data;
-
+	struct i2c_adapter *ddc;        /* optional regular DDC I2C bus */
 };
 
 u32 cdns_mhdp_bus_read(struct cdns_mhdp_device *mhdp, u32 offset);
