@@ -19,10 +19,6 @@
 	};
 };
 
-&cpu0 {
-	clock-frequency = <792000000>;
-};
-
 &iomuxc {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_gpio1 &pinctrl_gpio2 &pinctrl_gpio3
