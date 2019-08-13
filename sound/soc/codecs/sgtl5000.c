@@ -1514,8 +1514,34 @@ err:
 	return ret;
 }
 
+static int sgtl5000_suspend(struct snd_soc_component *component)
+{
+	struct sgtl5000_priv *sgtl5000 = snd_soc_component_get_drvdata(component);
+
+	clk_disable_unprepare(sgtl5000->mclk);
+
+	return 0;
+}
+
+static int sgtl5000_resume(struct snd_soc_component *component)
+{
+	int ret;
+	struct sgtl5000_priv *sgtl5000 = snd_soc_component_get_drvdata(component);
+
+	ret = clk_prepare_enable(sgtl5000->mclk);
+	if (ret)
+		dev_err(component->dev, "Error enabling clock %d\n", ret);
+
+	/* Need 8 clocks before I2C accesses */
+	udelay(1);
+
+	return ret;
+}
+
 static const struct snd_soc_component_driver sgtl5000_driver = {
 	.probe			= sgtl5000_probe,
+	.suspend		= sgtl5000_suspend,
+	.resume			= sgtl5000_resume,
 	.set_bias_level		= sgtl5000_set_bias_level,
 	.controls		= sgtl5000_snd_controls,
 	.num_controls		= ARRAY_SIZE(sgtl5000_snd_controls),
