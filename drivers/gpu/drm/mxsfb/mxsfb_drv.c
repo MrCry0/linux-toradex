@@ -91,6 +91,25 @@ static const struct mxsfb_devdata mxsfb_devdata[] = {
 	},
 };
 
+/*
+ * There are non-atomic versions of clk_enable()/clk_disable() callbacks
+ * used in IMX8QM/IMX8QXP, so we can't manage axi clk in interrupt handlers
+ */
+#if defined(CONFIG_ARCH_FSL_IMX8QM) || defined(CONFIG_ARCH_FSL_IMX8QXP)
+#  define mxsfb_enable_axi_clk(mxsfb) 0
+#  define mxsfb_disable_axi_clk(mxsfb)
+#else
+static inline int mxsfb_enable_axi_clk(struct mxsfb_drm_private *mxsfb)
+{
+	return clk_prepare_enable(mxsfb->clk_axi);
+}
+
+static inline void mxsfb_disable_axi_clk(struct mxsfb_drm_private *mxsfb)
+{
+	clk_disable_unprepare(mxsfb->clk_axi);
+}
+#endif
+
 static struct mxsfb_drm_private *
 drm_pipe_to_mxsfb_drm_private(struct drm_simple_display_pipe *pipe)
 {
@@ -276,14 +295,14 @@ static int mxsfb_pipe_enable_vblank(struct drm_simple_display_pipe *pipe)
 	struct mxsfb_drm_private *mxsfb = drm_pipe_to_mxsfb_drm_private(pipe);
 	int ret = 0;
 
-	ret = clk_prepare_enable(mxsfb->clk_axi);
+	ret = mxsfb_enable_axi_clk(mxsfb);
 	if (ret)
 		return ret;
 
 	/* Clear and enable VBLANK IRQ */
 	writel(CTRL1_CUR_FRAME_DONE_IRQ, mxsfb->base + LCDC_CTRL1 + REG_CLR);
 	writel(CTRL1_CUR_FRAME_DONE_IRQ_EN, mxsfb->base + LCDC_CTRL1 + REG_SET);
-	clk_disable_unprepare(mxsfb->clk_axi);
+	mxsfb_disable_axi_clk(mxsfb);
 
 	return ret;
 }
@@ -292,13 +311,13 @@ static void mxsfb_pipe_disable_vblank(struct drm_simple_display_pipe *pipe)
 {
 	struct mxsfb_drm_private *mxsfb = drm_pipe_to_mxsfb_drm_private(pipe);
 
-	if (clk_prepare_enable(mxsfb->clk_axi))
+	if (mxsfb_enable_axi_clk(mxsfb))
 		return;
 
 	/* Disable and clear VBLANK IRQ */
 	writel(CTRL1_CUR_FRAME_DONE_IRQ_EN, mxsfb->base + LCDC_CTRL1 + REG_CLR);
 	writel(CTRL1_CUR_FRAME_DONE_IRQ, mxsfb->base + LCDC_CTRL1 + REG_CLR);
-	clk_disable_unprepare(mxsfb->clk_axi);
+	mxsfb_disable_axi_clk(mxsfb);
 }
 
 static struct drm_simple_display_pipe_funcs mxsfb_funcs = {
@@ -467,12 +486,16 @@ static irqreturn_t mxsfb_irq_handler(int irq, void *data)
 	struct mxsfb_drm_private *mxsfb = drm->dev_private;
 	u32 reg;
 
+	mxsfb_enable_axi_clk(mxsfb);
+
 	reg = readl(mxsfb->base + LCDC_CTRL1);
 
 	if (reg & CTRL1_CUR_FRAME_DONE_IRQ)
 		drm_crtc_handle_vblank(&mxsfb->pipe.crtc);
 
 	writel(CTRL1_CUR_FRAME_DONE_IRQ, mxsfb->base + LCDC_CTRL1 + REG_CLR);
+
+	mxsfb_disable_axi_clk(mxsfb);
 
 	return IRQ_HANDLED;
 }
