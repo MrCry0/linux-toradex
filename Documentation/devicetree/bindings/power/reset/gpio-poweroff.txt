@@ -31,6 +31,9 @@ Optional properties:
 - inactive-delay-ms: Delay (default 100) to wait after driving gpio inactive
 - timeout-ms: Time to wait before asserting a WARN_ON(1). If nothing is
               specified, 3000 ms is used.
+- force-mode: Force replacing pm_power_off kernel hook.
+  If this optional property is not specified, the driver will fail to
+  load if someone has registered the pm_power_off hook earlier.
 
 Examples:
 
