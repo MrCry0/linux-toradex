@@ -24,6 +24,7 @@ static struct gpio_desc *reset_gpio;
 static u32 timeout = DEFAULT_TIMEOUT_MS;
 static u32 active_delay = 100;
 static u32 inactive_delay = 100;
+static void (*next_pm_power_off)(void);
 
 static void gpio_poweroff_do_poweroff(void)
 {
@@ -43,20 +44,41 @@ static void gpio_poweroff_do_poweroff(void)
 	/* give it some time */
 	mdelay(timeout);
 
+	/*
+	 * The kernel should not reach this code. If it does, fall back to
+	 * the next registered power off method.
+	 */
+	if (next_pm_power_off)
+		next_pm_power_off();
+
 	WARN_ON(1);
 }
 
 static int gpio_poweroff_probe(struct platform_device *pdev)
 {
 	bool input = false;
+	bool force = false;
 	enum gpiod_flags flags;
 
-	/* If a pm_power_off function has already been added, leave it alone */
+
+	force = device_property_read_bool(&pdev->dev, "force-mode");
+
+	/*
+	 * If a pm_power_off function has already been added, leave it alone,
+	 * if force-mode is not enabled.
+	 */
 	if (pm_power_off != NULL) {
-		dev_err(&pdev->dev,
-			"%s: pm_power_off function already registered",
-		       __func__);
-		return -EBUSY;
+		if (force) {
+			dev_warn(&pdev->dev,
+				 "%s: pm_power_off function replaced",
+				 __func__);
+			next_pm_power_off = pm_power_off;
+		} else {
+			dev_err(&pdev->dev,
+				"%s: pm_power_off function already registered",
+				__func__);
+			return -EBUSY;
+		}
 	}
 
 	input = device_property_read_bool(&pdev->dev, "input");
@@ -81,7 +103,7 @@ static int gpio_poweroff_probe(struct platform_device *pdev)
 static int gpio_poweroff_remove(struct platform_device *pdev)
 {
 	if (pm_power_off == &gpio_poweroff_do_poweroff)
-		pm_power_off = NULL;
+		pm_power_off = next_pm_power_off;
 
 	return 0;
 }
