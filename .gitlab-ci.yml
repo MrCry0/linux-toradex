@@ -1,0 +1,69 @@
+image: $CI_IMAGE
+
+variables:
+# uncomment for the pipeline debug purpose 
+# CI_DEBUG_TRACE: "true"
+  
+# Please choose possible 32/64 builder image and appropriate compiler
+  CI_IMAGE: gitlab.int.toradex.com:4567/yuiry.erofeev/linux-toradex/ci-kernel-builder:latest
+  #CI_IMAGE: gitlab.int.toradex.com:4567/yuiry.erofeev/linux-toradex/ci-kernel-builder:aarch64
+  #CI_IMAGE: gitlab.int.toradex.com:4567/yuiry.erofeev/linux-toradex/ci-kernel-builder:aarch64-linaro
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""
+  
+# Kernel Configuration Section 
+# Supplementary Tool Section 
+ # Artifacts configuring section  
+  KERNEL_CONFIG_BUILD_LOG_FILE_NAME: build_config.log
+  KERNEL_BUILD_LOG_FILE_NAME: build.log
+  KERNEL_CONFIGURATION_FILE: .config
+# Defining temporary build folder to do outside of the box builds.  Absolute path
+  TEMP_BUILD_FOLDER: /builds/temp-builds
+  
+stages:
+  - build-product
+
+.build_base:
+  stage: build-product
+  variables:
+   GIT_STRATEGY: fetch
+#  To run just on merge request 
+#  only:
+#     - merge_requests
+#  when: manual
+  script: | 
+    #set -o xtrace
+    cd $CI_PROJECT_DIR
+    echo -e "Compiler used to build binaries is"
+    which ${CROSS_COMPILE}gcc
+    ${CROSS_COMPILE}gcc --version
+    echo -e "Arch is \e[36m$ARCH\e[39m"
+    # due to specific of the kernel build we need to use the latest configuration from the nightly builds. We are getting $Version dynamically , as a variable , based on parsing URL page with Nightly builds ID  
+    rm -f index.html 
+    wget http://10.1.8.33:83/image-oe-torizon-master-matrix/Nightly/artifacts/
+    version=$( cat index.html| grep ^"<a" | sed -e 's/[<>="//]/ /g' | awk '{ print $3}' | sort -nrk1,1 | head -1)
+    wget http://10.1.8.33:83/image-oe-torizon-master-matrix/Nightly/artifacts/$version/$KERNEL_FILE_PATH/images/kernel-config 
+    mkdir -p $TEMP_BUILD_FOLDER
+    cp kernel-config $TEMP_BUILD_FOLDER/$KERNEL_CONFIGURATION_FILE
+    ##### 
+    make O=$TEMP_BUILD_FOLDER -j3 2>&1 | tee $KERNEL_BUILD_LOG_FILE_NAME
+  artifacts:
+    when: always
+    name: "$CI_COMMIT_REF_NAME" 
+    paths:
+      - $KERNEL_BUILD_LOG_FILE_NAME
+      #As we do not generate config for 5.x and use generated one,  we have just kernel config and kernel build log
+      - kernel-config
+  allow_failure: true
+  after_script:
+    - set -o xtrace
+    - rm -rf $TEMP_BUILD_FOLDER
+
+      # If you need additional products build just copy-paste build_******_product section with new config name 
+build_default_defconfig :
+  extends: .build_base
+  variables:
+    # Defining the path, which we will use to take a config file  to build a kernel 
+   KERNEL_FILE_PATH:  colibri-imx7_torizon-core-docker
+  stage: build-product
