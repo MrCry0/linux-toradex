@@ -207,6 +207,7 @@
 
 #define UARTMODIR_IREN		0x00020000
 #define UARTMODIR_RTSWATER_S	0x8
+#define UARTMODIR_RTSWATER_M	0x0000ff00
 #define UARTMODIR_TXCTSSRC	0x00000020
 #define UARTMODIR_TXCTSC	0x00000010
 #define UARTMODIR_RXRTSE	0x00000008
@@ -1646,8 +1647,10 @@ static void lpuart32_setup_watermark(struct lpuart_port *sport)
 
 	/* set RTS watermark */
 	if (!uart_console(&sport->port)) {
-		val = lpuart32_read(&sport->port, UARTMODIR);
-		val = (sport->rxfifo_size >> 1) << UARTMODIR_RTSWATER_S;
+		val = lpuart32_read(&sport->port, UARTMODIR) &
+				~UARTMODIR_RTSWATER_M;
+		val |= ((sport->rxfifo_size >> 1) << UARTMODIR_RTSWATER_S) &
+				UARTMODIR_RTSWATER_M;
 		lpuart32_write(&sport->port, val, UARTMODIR);
 	}
 
