@@ -82,6 +82,7 @@ static u32 psci_function_id[PSCI_FN_MAX];
 
 static u32 psci_cpu_suspend_feature;
 static bool psci_system_reset2_supported;
+static struct notifier_block psci_restart_handler;
 
 static inline bool psci_has_ext_power_state(void)
 {
@@ -250,7 +251,8 @@ static int get_set_conduit_method(struct device_node *np)
 	return 0;
 }
 
-static void psci_sys_reset(enum reboot_mode reboot_mode, const char *cmd)
+static int psci_sys_reset(struct notifier_block *this,
+			    unsigned long reboot_mode, void *cmd)
 {
 	if ((reboot_mode == REBOOT_WARM || reboot_mode == REBOOT_SOFT) &&
 	    psci_system_reset2_supported) {
@@ -263,6 +265,8 @@ static void psci_sys_reset(enum reboot_mode reboot_mode, const char *cmd)
 	} else {
 		invoke_psci_fn(PSCI_0_2_FN_SYSTEM_RESET, 0, 0, 0);
 	}
+
+	return NOTIFY_DONE;
 }
 
 static void psci_sys_poweroff(void)
@@ -411,6 +415,8 @@ static void __init psci_init_smccc(void)
 
 static void __init psci_0_2_set_functions(void)
 {
+	int ret;
+
 	pr_info("Using standard PSCI v0.2 function IDs\n");
 	psci_ops.get_version = psci_get_version;
 
@@ -431,7 +437,14 @@ static void __init psci_0_2_set_functions(void)
 
 	psci_ops.migrate_info_type = psci_migrate_info_type;
 
-	arm_pm_restart = psci_sys_reset;
+	psci_restart_handler.notifier_call = psci_sys_reset;
+	psci_restart_handler.priority = 160;
+
+	ret = register_restart_handler(&psci_restart_handler);
+	if (ret) {
+		pr_err("Cannot register restart handler, %d\n", ret);
+		return;
+	}
 
 	pm_power_off = psci_sys_poweroff;
 }
