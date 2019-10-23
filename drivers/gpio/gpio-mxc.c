@@ -588,6 +588,37 @@ static void mxc_gpio_free(struct gpio_chip *chip, unsigned offset)
 	pm_runtime_put(chip->parent);
 }
 
+#ifdef CONFIG_GPIO_MXC_PAD_WAKEUP
+/*
+ * parse pad wakeup info from dtb, each pad has to provide
+ * <pin_id, type, line>, these info should be put in each
+ * gpio node and with a "pad-wakeup-num" to indicate the
+ * total lines are with pad wakeup enabled.
+ */
+static int setup_pad_wakeup(struct mxc_gpio_port *port,
+			    struct device_node *np)
+{
+	int i;
+	int err = 0;
+
+	for (i = 0; i < port->pad_wakeup_num; i++) {
+		if ((err = of_property_read_u32_index(np, "pad-wakeup",
+			i * 3 + 0, &port->pad_wakeup[i].pin_id)))
+			return err;
+		if ((err = of_property_read_u32_index(np, "pad-wakeup",
+			i * 3 + 1, &port->pad_wakeup[i].type)))
+			return err;
+		if ((err = of_property_read_u32_index(np, "pad-wakeup",
+			i * 3 + 2, &port->pad_wakeup[i].line)))
+			return err;
+	}
+	err = imx_scu_irq_group_enable(IMX_SC_IRQ_GROUP_WAKE, IMX_SC_IRQ_PAD, true);
+
+
+	return err;
+}
+#endif
+
 static int mxc_gpio_probe(struct platform_device *pdev)
 {
 	struct device_node *np = pdev->dev.of_node;
@@ -595,9 +626,6 @@ static int mxc_gpio_probe(struct platform_device *pdev)
 	int irq_count;
 	int irq_base = 0;
 	int err;
-#ifdef CONFIG_GPIO_MXC_PAD_WAKEUP
-	int i;
-#endif
 
 	mxc_gpio_get_hw(pdev);
 
@@ -637,30 +665,18 @@ static int mxc_gpio_probe(struct platform_device *pdev)
 	}
 
 #ifdef CONFIG_GPIO_MXC_PAD_WAKEUP
-	/*
-	 * parse pad wakeup info from dtb, each pad has to provide
-	 * <pin_id, type, line>, these info should be put in each
-	 * gpio node and with a "pad-wakeup-num" to indicate the
-	 * total lines are with pad wakeup enabled.
-	 */
-	if (!of_property_read_u32(np, "pad-wakeup-num", &port->pad_wakeup_num)) {
-		if (port->pad_wakeup_num != 0) {
-			if (!gpio_ipc_handle) {
-				err = imx_scu_get_handle(&gpio_ipc_handle);
-				if (err)
-					return err;
-			}
-			for (i = 0; i < port->pad_wakeup_num; i++) {
-				of_property_read_u32_index(np, "pad-wakeup",
-					i * 3 + 0, &port->pad_wakeup[i].pin_id);
-				of_property_read_u32_index(np, "pad-wakeup",
-					i * 3 + 1, &port->pad_wakeup[i].type);
-				of_property_read_u32_index(np, "pad-wakeup",
-					i * 3 + 2, &port->pad_wakeup[i].line);
-			}
-			err = imx_scu_irq_group_enable(IMX_SC_IRQ_GROUP_WAKE, IMX_SC_IRQ_PAD, true);
+	if (!of_property_read_u32(np, "pad-wakeup-num", &port->pad_wakeup_num)
+	    && port->pad_wakeup_num != 0) {
+		if (!gpio_ipc_handle) {
+			err = imx_scu_get_handle(&gpio_ipc_handle);
 			if (err)
-				dev_warn(&pdev->dev, "Enable irq failed, GPIO pad wakeup NOT supported\n");
+				goto out_clk_disable;
+		}
+
+		err = setup_pad_wakeup(port, np);
+		if (err) {
+			dev_warn(&pdev->dev, "Enable irq failed, GPIO pad wakeup NOT supported\n");
+			goto out_clk_disable;
 		}
 	}
 #endif
@@ -672,7 +688,7 @@ static int mxc_gpio_probe(struct platform_device *pdev)
 	pm_runtime_enable(&pdev->dev);
 	err = pm_runtime_get_sync(&pdev->dev);
 	if (err < 0)
-		goto out_pm_dis;
+		goto out_pm_disable;
 
 	/* disable the interrupt and clear the status */
 	if (!noclearirq) {
@@ -704,7 +720,7 @@ static int mxc_gpio_probe(struct platform_device *pdev)
 			 port->base + GPIO_GDIR, NULL,
 			 BGPIOF_READ_OUTPUT_REG_SET);
 	if (err)
-		goto out_bgio;
+		goto out_pm_put;
 
 	if (of_property_read_bool(np, "gpio-ranges")) {
 		port->gc.request = gpiochip_generic_request;
@@ -725,19 +741,19 @@ static int mxc_gpio_probe(struct platform_device *pdev)
 
 	err = devm_gpiochip_add_data(&pdev->dev, &port->gc, port);
 	if (err)
-		goto out_bgio;
+		goto out_pm_put;
 
 	irq_base = devm_irq_alloc_descs(&pdev->dev, -1, 0, 32, numa_node_id());
 	if (irq_base < 0) {
 		err = irq_base;
-		goto out_bgio;
+		goto out_pm_put;
 	}
 
 	port->domain = irq_domain_add_legacy(np, 32, irq_base, 0,
 					     &irq_domain_simple_ops, NULL);
 	if (!port->domain) {
 		err = -ENODEV;
-		goto out_bgio;
+		goto out_pm_put;
 	}
 
 	/* gpio-mxc can be a generic irq chip */
@@ -752,12 +768,15 @@ static int mxc_gpio_probe(struct platform_device *pdev)
 
 	return 0;
 
-out_pm_dis:
-	pm_runtime_disable(&pdev->dev);
-	clk_disable_unprepare(port->clk);
 out_irqdomain_remove:
 	irq_domain_remove(port->domain);
-out_bgio:
+out_pm_put:
+	pm_runtime_put(&pdev->dev);
+out_pm_disable:
+	pm_runtime_disable(&pdev->dev);
+#ifdef CONFIG_GPIO_MXC_PAD_WAKEUP
+out_clk_disable:
+#endif
 	clk_disable_unprepare(port->clk);
 	dev_info(&pdev->dev, "%s failed with errno %d\n", __func__, err);
 	return err;
