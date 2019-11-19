@@ -646,6 +646,7 @@ static const struct bd718xx_regulator_data bd71847_regulators[] = {
 			.linear_range_selectors = bd718xx_ldo1_volt_range_sel,
 			.enable_reg = BD718XX_REG_LDO1_VOLT,
 			.enable_mask = BD718XX_LDO_EN,
+			.enable_time = 1000,
 			.owner = THIS_MODULE,
 		},
 		.init = {
@@ -668,6 +669,7 @@ static const struct bd718xx_regulator_data bd71847_regulators[] = {
 			.n_voltages = ARRAY_SIZE(ldo_2_volts),
 			.enable_reg = BD718XX_REG_LDO2_VOLT,
 			.enable_mask = BD718XX_LDO_EN,
+			.enable_time = 1000,
 			.owner = THIS_MODULE,
 		},
 		.init = {
@@ -691,6 +693,7 @@ static const struct bd718xx_regulator_data bd71847_regulators[] = {
 			.vsel_mask = BD718XX_LDO3_MASK,
 			.enable_reg = BD718XX_REG_LDO3_VOLT,
 			.enable_mask = BD718XX_LDO_EN,
+			.enable_time = 1000,
 			.owner = THIS_MODULE,
 		},
 		.init = {
@@ -714,6 +717,7 @@ static const struct bd718xx_regulator_data bd71847_regulators[] = {
 			.vsel_mask = BD718XX_LDO4_MASK,
 			.enable_reg = BD718XX_REG_LDO4_VOLT,
 			.enable_mask = BD718XX_LDO_EN,
+			.enable_time = 1000,
 			.owner = THIS_MODULE,
 		},
 		.init = {
@@ -740,6 +744,7 @@ static const struct bd718xx_regulator_data bd71847_regulators[] = {
 			.linear_range_selectors = bd71847_ldo5_volt_range_sel,
 			.enable_reg = BD718XX_REG_LDO5_VOLT,
 			.enable_mask = BD718XX_LDO_EN,
+			.enable_time = 1000,
 			.owner = THIS_MODULE,
 		},
 		.init = {
@@ -765,6 +770,7 @@ static const struct bd718xx_regulator_data bd71847_regulators[] = {
 			.vsel_mask = BD718XX_LDO6_MASK,
 			.enable_reg = BD718XX_REG_LDO6_VOLT,
 			.enable_mask = BD718XX_LDO_EN,
+			.enable_time = 1000,
 			.owner = THIS_MODULE,
 		},
 		.init = {
@@ -987,6 +993,7 @@ static const struct bd718xx_regulator_data bd71837_regulators[] = {
 			.linear_range_selectors = bd718xx_ldo1_volt_range_sel,
 			.enable_reg = BD718XX_REG_LDO1_VOLT,
 			.enable_mask = BD718XX_LDO_EN,
+			.enable_time = 1000,
 			.owner = THIS_MODULE,
 		},
 		.init = {
@@ -1009,6 +1016,7 @@ static const struct bd718xx_regulator_data bd71837_regulators[] = {
 			.n_voltages = ARRAY_SIZE(ldo_2_volts),
 			.enable_reg = BD718XX_REG_LDO2_VOLT,
 			.enable_mask = BD718XX_LDO_EN,
+			.enable_time = 1000,
 			.owner = THIS_MODULE,
 		},
 		.init = {
@@ -1032,6 +1040,7 @@ static const struct bd718xx_regulator_data bd71837_regulators[] = {
 			.vsel_mask = BD718XX_LDO3_MASK,
 			.enable_reg = BD718XX_REG_LDO3_VOLT,
 			.enable_mask = BD718XX_LDO_EN,
+			.enable_time = 1000,
 			.owner = THIS_MODULE,
 		},
 		.init = {
@@ -1055,6 +1064,7 @@ static const struct bd718xx_regulator_data bd71837_regulators[] = {
 			.vsel_mask = BD718XX_LDO4_MASK,
 			.enable_reg = BD718XX_REG_LDO4_VOLT,
 			.enable_mask = BD718XX_LDO_EN,
+			.enable_time = 1000,
 			.owner = THIS_MODULE,
 		},
 		.init = {
@@ -1080,6 +1090,7 @@ static const struct bd718xx_regulator_data bd71837_regulators[] = {
 			.vsel_mask = BD71837_LDO5_MASK,
 			.enable_reg = BD718XX_REG_LDO5_VOLT,
 			.enable_mask = BD718XX_LDO_EN,
+			.enable_time = 1000,
 			.owner = THIS_MODULE,
 		},
 		.init = {
@@ -1107,6 +1118,7 @@ static const struct bd718xx_regulator_data bd71837_regulators[] = {
 			.vsel_mask = BD718XX_LDO6_MASK,
 			.enable_reg = BD718XX_REG_LDO6_VOLT,
 			.enable_mask = BD718XX_LDO_EN,
+			.enable_time = 1000,
 			.owner = THIS_MODULE,
 		},
 		.init = {
@@ -1132,6 +1144,7 @@ static const struct bd718xx_regulator_data bd71837_regulators[] = {
 			.vsel_mask = BD71837_LDO7_MASK,
 			.enable_reg = BD71837_REG_LDO7_VOLT,
 			.enable_mask = BD718XX_LDO_EN,
+			.enable_time = 1000,
 			.owner = THIS_MODULE,
 		},
 		.init = {
