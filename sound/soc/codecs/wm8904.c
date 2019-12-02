@@ -1417,6 +1417,13 @@ static int wm8904_set_sysclk(struct snd_soc_dai *dai, int clk_id,
 	struct snd_soc_component *component = dai->component;
 	struct wm8904_priv *priv = snd_soc_component_get_drvdata(component);
 
+	/*
+	 * If using sound-simple-card this is called with clk_id fixed to 0.
+	 * Assume we want WM8904_CLK_MCLK for now in that case.
+	 */
+	if (clk_id == 0)
+		clk_id = WM8904_CLK_MCLK;
+
 	switch (clk_id) {
 	case WM8904_CLK_MCLK:
 		priv->sysclk_src = clk_id;
