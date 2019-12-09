@@ -69,7 +69,12 @@ static int imx_sc_wdt_start(struct watchdog_device *wdog)
 	arm_smccc_smc(IMX_SIP_TIMER, IMX_SIP_TIMER_SET_WDOG_ACT,
 		      SC_TIMER_WDOG_ACTION_PARTITION,
 		      0, 0, 0, 0, 0, &res);
-	return res.a0 ? -EACCES : 0;
+	if (res.a0)
+		return -EACCES;
+
+	dev_dbg(wdog->parent, "Watchdog started\n");
+
+	return 0;
 }
 
 static int imx_sc_wdt_stop(struct watchdog_device *wdog)
@@ -78,6 +83,8 @@ static int imx_sc_wdt_stop(struct watchdog_device *wdog)
 
 	arm_smccc_smc(IMX_SIP_TIMER, IMX_SIP_TIMER_STOP_WDOG,
 		      0, 0, 0, 0, 0, 0, &res);
+
+	dev_dbg(wdog->parent, "Watchdog stopped\n");
 
 	return res.a0 ? -EACCES : 0;
 }
@@ -90,6 +97,8 @@ static int imx_sc_wdt_set_timeout(struct watchdog_device *wdog,
 	wdog->timeout = timeout;
 	arm_smccc_smc(IMX_SIP_TIMER, IMX_SIP_TIMER_SET_TIMEOUT_WDOG,
 		      timeout * 1000, 0, 0, 0, 0, 0, &res);
+
+	dev_dbg(wdog->parent, "Set timeout to %d seconds\n", timeout);
 
 	return res.a0 ? -EACCES : 0;
 }
@@ -111,6 +120,8 @@ static int imx_sc_wdt_set_pretimeout(struct watchdog_device *wdog,
 		return -EACCES;
 
 	wdog->pretimeout = pretimeout;
+
+	dev_dbg(wdog->parent, "Set pretimeout to %d seconds\n", pretimeout);
 
 	return 0;
 }
