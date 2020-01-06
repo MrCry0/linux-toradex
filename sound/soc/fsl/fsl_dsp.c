@@ -70,6 +70,63 @@
 #include "fsl_dsp_pool.h"
 #include "fsl_dsp_xaf_api.h"
 
+#define DSP_DISABLE_FUSE		0x8
+#define DSP_DISABLE_MASK		0x1
+
+struct dsp_sc_msg_misc {
+        struct imx_sc_rpc_msg hdr;
+        u32 word;
+} __packed;
+
+static int dsp_sc_get_fuse(struct imx_sc_ipc *ipc, u32 word, u32 *fuse)
+{
+	struct dsp_sc_msg_misc msg;
+	struct imx_sc_rpc_msg *hdr = &msg.hdr;
+	int ret;
+
+	hdr->ver = IMX_SC_RPC_VERSION;
+	hdr->svc = IMX_SC_RPC_SVC_MISC;
+	hdr->func = IMX_SC_MISC_FUNC_OTP_FUSE_READ;
+	hdr->size = 2;
+
+	msg.word = word;
+
+	ret = imx_scu_call_rpc(ipc, &msg, true);
+	if (ret)
+		return ret;
+
+	*fuse = msg.word;
+
+	return ret;
+}
+
+static int check_dsp_is_available(void)
+{
+	uint32_t fuse = 0xffff;
+	int ret = 0;
+	struct imx_sc_ipc *ipcHandle;;
+
+	ret = imx_scu_get_handle(&ipcHandle);
+	if (ret) {
+		/* We're not running on a iMX8 or iMX8X, so there is no DSP */
+		return -EINVAL;
+	}
+
+	ret = dsp_sc_get_fuse(ipcHandle, DSP_DISABLE_FUSE, &fuse);
+	if (ret) {
+		pr_err("sc_misc_otp_fuse_read fail! %d\n", ret);
+		return -EINVAL;
+	}
+
+	pr_debug("DSP disable fuse[%i] = 0x%x\n", DSP_DISABLE_FUSE, fuse);
+	if (fuse & DSP_DISABLE_MASK) {
+		pr_info("%s: HiFi4 DSP not available on this silicon\n", __func__);
+		return -EINVAL;
+	}
+
+	return 0;
+}
+
 /* ...allocate new client */
 struct xf_client *xf_client_alloc(struct fsl_dsp *dsp_priv)
 {
@@ -1491,7 +1548,22 @@ static struct platform_driver fsl_dsp_driver = {
 		.pm = &fsl_dsp_pm,
 	},
 };
-module_platform_driver(fsl_dsp_driver);
+
+static int __init fsl_dsp_driver_init(void)
+{
+	/* do not install the driver if no DSP is found */
+	if (check_dsp_is_available())
+		return -EINVAL;
+
+	return platform_driver_register(&fsl_dsp_driver);
+}
+module_init(fsl_dsp_driver_init);
+
+static void __exit fsl_dsp_driver_exit(void)
+{
+	platform_driver_unregister(&fsl_dsp_driver);
+}
+module_exit(fsl_dsp_driver_exit);
 
 MODULE_DESCRIPTION("Freescale DSP driver");
 MODULE_ALIAS("platform:fsl-dsp");
