@@ -464,11 +464,6 @@ static int __init disable_pex_perst(char *s)
 __setup("pex_perst=", disable_pex_perst);
 #endif /* CONFIG_MACH_APALIS_T30 || CONFIG_MACH_APALIS_TK1 */
 
-static inline struct tegra_pcie *sys_to_pcie(struct pci_sys_data *sys)
-{
-	return sys->private_data;
-}
-
 static inline void afi_writel(struct tegra_pcie *pcie, u32 value,
 			      unsigned long offset)
 {
