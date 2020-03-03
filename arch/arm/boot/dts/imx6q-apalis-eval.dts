@@ -113,7 +113,7 @@
 		width-mm = <115>;
 		height-mm = <86>;
 
-		data-mapping = "rgb24";
+		data-mapping = "rgb565";
 		status = "disabled";
 
 		panel-timing {
