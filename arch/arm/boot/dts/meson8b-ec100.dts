@@ -150,7 +150,7 @@
 
 		vin-supply = <&vcc_5v>;
 
-		pwms = <&pwm_cd 0 1148 0>;
+		pwms = <&pwm_cd 0 1148 PWM_POLARITY_NORMAL>;
 		pwm-dutycycle-range = <100 0>;
 
 		regulator-boot-on;
@@ -234,7 +234,7 @@
 
 		vin-supply = <&vcc_5v>;
 
-		pwms = <&pwm_cd 1 1148 0>;
+		pwms = <&pwm_cd 1 1148 PWM_POLARITY_NORMAL>;
 		pwm-dutycycle-range = <100 0>;
 
 		regulator-boot-on;

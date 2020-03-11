@@ -161,7 +161,7 @@
 		cooling-levels = <0 150 200 255>;
 		#cooling-cells = <2>;
 		fan-supply = <&vsys_5v0>;
-		pwms = <&pwm0 0 40000 0>;
+		pwms = <&pwm0 0 40000 PWM_POLARITY_NORMAL>;
 	};
 };
 

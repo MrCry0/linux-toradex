@@ -62,7 +62,7 @@
 		cooling-levels = <0 12 18 255>;
 		#cooling-cells = <2>;
 		fan-supply = <&vcc12v0_sys>;
-		pwms = <&pwm1 0 50000 0>;
+		pwms = <&pwm1 0 50000 PWM_POLARITY_NORMAL>;
 	};
 };
 

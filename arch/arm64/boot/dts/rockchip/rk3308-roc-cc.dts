@@ -22,7 +22,7 @@
 
 	ir_tx {
 		compatible = "pwm-ir-tx";
-		pwms = <&pwm5 0 25000 0>;
+		pwms = <&pwm5 0 25000 PWM_POLARITY_NORMAL>;
 	};
 
 	leds {

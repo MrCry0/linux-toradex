@@ -63,21 +63,21 @@
 
 		blue {
 			label = "pwm:blue:user";
-			pwms = <&pwm0 2 10000000 0>;
+			pwms = <&pwm0 2 10000000 PWM_POLARITY_NORMAL>;
 			max-brightness = <255>;
 			linux,default-trigger = "none";
 		};
 
 		green {
 			label = "pwm:green:user";
-			pwms = <&pwm0 1 10000000 0>;
+			pwms = <&pwm0 1 10000000 PWM_POLARITY_NORMAL>;
 			max-brightness = <255>;
 			linux,default-trigger = "default-on";
 		};
 
 		red {
 			label = "pwm:red:user";
-			pwms = <&pwm0 0 10000000 0>;
+			pwms = <&pwm0 0 10000000 PWM_POLARITY_NORMAL>;
 			max-brightness = <255>;
 			linux,default-trigger = "default-on";
 		};

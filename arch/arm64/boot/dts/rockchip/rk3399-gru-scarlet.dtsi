@@ -164,7 +164,7 @@
 		enable-gpios = <&gpio4 21 GPIO_ACTIVE_HIGH>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&bl_en>;
-		pwms = <&pwm1 0 1000000 0>;
+		pwms = <&pwm1 0 1000000 PWM_POLARITY_NORMAL>;
 		pwm-delay-us = <10000>;
 	};
 
@@ -217,7 +217,7 @@ pp1800_pcie: &pp1800_s0 {
 
 &ppvar_bigcpu_pwm {
 	/* On scarlet ppvar big cpu use pwm3 */
-	pwms = <&pwm3 0 3337 0>;
+	pwms = <&pwm3 0 3337 PWM_POLARITY_NORMAL>;
 	regulator-min-microvolt = <800074>;
 	regulator-max-microvolt = <1299226>;
 };

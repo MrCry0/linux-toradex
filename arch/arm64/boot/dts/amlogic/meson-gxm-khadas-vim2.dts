@@ -87,7 +87,7 @@
 
 		power {
 			label = "vim:red:power";
-			pwms = <&pwm_AO_ab 1 7812500 0>;
+			pwms = <&pwm_AO_ab 1 7812500 PWM_POLARITY_NORMAL>;
 			max-brightness = <255>;
 			linux,default-trigger = "default-on";
 		};
@@ -187,7 +187,7 @@
 		compatible = "pwm-clock";
 		#clock-cells = <0>;
 		clock-frequency = <32768>;
-		pwms = <&pwm_ef 0 30518 0>; /* PWM_E at 32.768KHz */
+		pwms = <&pwm_ef 0 30518 PWM_POLARITY_NORMAL>; /* PWM_E at 32.768KHz */
 	};
 };
 

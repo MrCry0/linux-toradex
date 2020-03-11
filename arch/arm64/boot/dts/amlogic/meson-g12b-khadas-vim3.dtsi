@@ -20,7 +20,7 @@
 
 		vin-supply = <&dc_in>;
 
-		pwms = <&pwm_ab 0 1250 0>;
+		pwms = <&pwm_ab 0 1250 PWM_POLARITY_NORMAL>;
 		pwm-dutycycle-range = <100 0>;
 
 		regulator-boot-on;
@@ -39,7 +39,7 @@
 
 		vin-supply = <&vsys_3v3>;
 
-		pwms = <&pwm_AO_cd 1 1250 0>;
+		pwms = <&pwm_AO_cd 1 1250 PWM_POLARITY_NORMAL>;
 		pwm-dutycycle-range = <100 0>;
 
 		regulator-boot-on;

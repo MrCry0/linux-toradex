@@ -41,14 +41,14 @@
 
 		white {
 			label = "white";
-			pwms = <&pwm 0 600000 0>;
+			pwms = <&pwm 0 600000 PWM_POLARITY_NORMAL>;
 			max-brightness = <255>;
 			linux,default-trigger = "default-on";
 		};
 
 		red {
 			label = "red";
-			pwms = <&pwm 1 600000 0>;
+			pwms = <&pwm 1 600000 PWM_POLARITY_NORMAL>;
 			max-brightness = <255>;
 		};
 	};

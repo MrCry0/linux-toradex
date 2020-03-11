@@ -48,7 +48,7 @@
 
 	backlight0: backlight0 {
 		compatible = "pwm-backlight";
-		pwms = <&pwm2 0 500000 0>;
+		pwms = <&pwm2 0 500000 PWM_POLARITY_NORMAL>;
 		power-supply = <&reg_lcd0_pwr>;
 		brightness-levels = < 0  1  2  3  4  5  6  7  8  9
 				     10 11 12 13 14 15 16 17 18 19
@@ -66,7 +66,7 @@
 
 	backlight1: backlight1 {
 		compatible = "pwm-backlight";
-		pwms = <&pwm1 0 500000 0>;
+		pwms = <&pwm1 0 500000 PWM_POLARITY_NORMAL>;
 		power-supply = <&reg_lcd1_pwr>;
 		brightness-levels = < 0  1  2  3  4  5  6  7  8  9
 				     10 11 12 13 14 15 16 17 18 19

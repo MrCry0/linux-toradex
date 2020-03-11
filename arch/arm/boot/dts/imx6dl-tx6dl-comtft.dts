@@ -50,7 +50,7 @@
 };
 
 &backlight {
-	pwms = <&pwm2 0 500000 0>;
+	pwms = <&pwm2 0 500000 PWM_POLARITY_NORMAL>;
 	/delete-property/ turn-on-delay-ms;
 };
 

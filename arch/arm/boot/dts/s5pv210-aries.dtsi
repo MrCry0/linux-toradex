@@ -324,7 +324,7 @@
 
 	vibrator: pwm-vibrator {
 		compatible = "pwm-vibrator";
-		pwms = <&pwm 1 44642 0>;
+		pwms = <&pwm 1 44642 PWM_POLARITY_NORMAL>;
 		pwm-names = "enable";
 		vcc-supply = <&vibrator_pwr>;
 		pinctrl-names = "default";

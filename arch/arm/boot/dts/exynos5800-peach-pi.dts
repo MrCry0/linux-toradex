@@ -32,7 +32,7 @@
 
 	backlight: backlight {
 		compatible = "pwm-backlight";
-		pwms = <&pwm 0 1000000 0>;
+		pwms = <&pwm 0 1000000 PWM_POLARITY_NORMAL>;
 		brightness-levels = <0 100 500 1000 1500 2000 2500 2800>;
 		default-brightness-level = <7>;
 		enable-gpios = <&gpx2 2 GPIO_ACTIVE_HIGH>;

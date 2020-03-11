@@ -118,7 +118,7 @@
 		compatible = "pwm-beeper";
 		pinctrl-names = "default";
 		pinctrl-0 = <&ehrpwm0b_pins>;
-		pwms = <&ehrpwm0 1 1000000 0>;
+		pwms = <&ehrpwm0 1 1000000 PWM_POLARITY_NORMAL>;
 		amp-supply = <&amp>;
 	};
 
@@ -185,7 +185,7 @@
 		compatible = "pwm-clock";
 		#clock-cells = <0>;
 		clock-frequency = <32768>;
-		pwms = <&ecap2 0 30518 0>;
+		pwms = <&ecap2 0 30518 PWM_POLARITY_NORMAL>;
 	};
 
 	/* ARM local RAM */

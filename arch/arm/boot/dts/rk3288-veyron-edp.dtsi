@@ -47,7 +47,7 @@
 		enable-gpios = <&gpio7 RK_PA2 GPIO_ACTIVE_HIGH>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&bl_en>;
-		pwms = <&pwm0 0 1000000 0>;
+		pwms = <&pwm0 0 1000000 PWM_POLARITY_NORMAL>;
 		post-pwm-on-delay-ms = <10>;
 		pwm-off-delay-ms = <10>;
 		power-supply = <&backlight_regulator>;

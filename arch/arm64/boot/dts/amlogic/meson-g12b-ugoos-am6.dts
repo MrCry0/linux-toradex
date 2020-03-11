@@ -109,7 +109,7 @@
 
 		vin-supply = <&main_12v>;
 
-		pwms = <&pwm_ab 0 1250 0>;
+		pwms = <&pwm_ab 0 1250 PWM_POLARITY_NORMAL>;
 		pwm-dutycycle-range = <100 0>;
 
 		regulator-boot-on;
@@ -128,7 +128,7 @@
 
 		vin-supply = <&main_12v>;
 
-		pwms = <&pwm_AO_cd 1 1250 0>;
+		pwms = <&pwm_AO_cd 1 1250 PWM_POLARITY_NORMAL>;
 		pwm-dutycycle-range = <100 0>;
 
 		regulator-boot-on;
@@ -282,7 +282,7 @@
 		compatible = "pwm-clock";
 		#clock-cells = <0>;
 		clock-frequency = <32768>;
-		pwms = <&pwm_ef 0 30518 0>; /* PWM_E at 32.768KHz */
+		pwms = <&pwm_ef 0 30518 PWM_POLARITY_NORMAL>; /* PWM_E at 32.768KHz */
 	};
 };
 

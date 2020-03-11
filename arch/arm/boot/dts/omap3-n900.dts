@@ -152,7 +152,7 @@
 
 	ir: n900-ir {
 		compatible = "nokia,n900-ir";
-		pwms = <&pwm9 0 26316 0>; /* 38000 Hz */
+		pwms = <&pwm9 0 26316 PWM_POLARITY_NORMAL>; /* 38000 Hz */
 	};
 
 	rom_rng: rng {

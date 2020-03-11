@@ -144,7 +144,7 @@
 		pinctrl-names = "default";
 		power-supply = <&vdd_io_reg>;
 		pinctrl-0 = <&backlight_pins>;
-		pwms = <&pwm11 0 5000000 0>;
+		pwms = <&pwm11 0 5000000 PWM_POLARITY_NORMAL>;
 		brightness-levels = <0 10 20 30 40 50 60 70 80 90 100>;
 		default-brightness-level = <7>;
 		enable-gpios = <&gpio6 22 GPIO_ACTIVE_HIGH>; /* gpio_182 */

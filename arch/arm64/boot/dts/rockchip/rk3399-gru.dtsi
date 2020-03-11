@@ -101,7 +101,7 @@
 		compatible = "pwm-regulator";
 		regulator-name = "ppvar_bigcpu_pwm";
 
-		pwms = <&pwm1 0 3337 0>;
+		pwms = <&pwm1 0 3337 PWM_POLARITY_NORMAL>;
 		pwm-supply = <&ppvar_sys>;
 		pwm-dutycycle-range = <100 0>;
 		pwm-dutycycle-unit = <100>;
@@ -130,7 +130,7 @@
 		compatible = "pwm-regulator";
 		regulator-name = "ppvar_litcpu_pwm";
 
-		pwms = <&pwm2 0 3337 0>;
+		pwms = <&pwm2 0 3337 PWM_POLARITY_NORMAL>;
 		pwm-supply = <&ppvar_sys>;
 		pwm-dutycycle-range = <100 0>;
 		pwm-dutycycle-unit = <100>;
@@ -159,7 +159,7 @@
 		compatible = "pwm-regulator";
 		regulator-name = "ppvar_gpu_pwm";
 
-		pwms = <&pwm0 0 3337 0>;
+		pwms = <&pwm0 0 3337 PWM_POLARITY_NORMAL>;
 		pwm-supply = <&ppvar_sys>;
 		pwm-dutycycle-range = <100 0>;
 		pwm-dutycycle-unit = <100>;

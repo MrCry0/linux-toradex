@@ -159,7 +159,7 @@
 
 	buzzer {
 		compatible = "pwm-beeper";
-		pwms = <&pwm 0 1000000 0>;
+		pwms = <&pwm 0 1000000 PWM_POLARITY_NORMAL>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&pwm0_out>;
 	};

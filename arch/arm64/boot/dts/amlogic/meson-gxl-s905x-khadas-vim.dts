@@ -47,7 +47,7 @@
 
 		power {
 			label = "vim:red:power";
-			pwms = <&pwm_AO_ab 1 7812500 0>;
+			pwms = <&pwm_AO_ab 1 7812500 PWM_POLARITY_NORMAL>;
 			max-brightness = <255>;
 			linux,default-trigger = "default-on";
 		};

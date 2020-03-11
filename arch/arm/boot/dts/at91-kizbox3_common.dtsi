@@ -73,7 +73,7 @@
 
 		red {
 			label = "pwm:red:user";
-			pwms = <&pwm0 0 10000000 0>;
+			pwms = <&pwm0 0 10000000 PWM_POLARITY_NORMAL>;
 			max-brightness = <255>;
 			linux,default-trigger = "default-on";
 			status = "disabled";
@@ -81,7 +81,7 @@
 
 		green {
 			label = "pwm:green:user";
-			pwms = <&pwm0 1 10000000 0>;
+			pwms = <&pwm0 1 10000000 PWM_POLARITY_NORMAL>;
 			max-brightness = <255>;
 			linux,default-trigger = "default-on";
 			status = "disabled";
@@ -89,14 +89,14 @@
 
 		blue {
 			label = "pwm:blue:user";
-			pwms = <&pwm0 2 10000000 0>;
+			pwms = <&pwm0 2 10000000 PWM_POLARITY_NORMAL>;
 			max-brightness = <255>;
 			status = "disabled";
 		};
 
 		white {
 			label = "pwm:white:user";
-			pwms = <&pwm0 3 10000000 0>;
+			pwms = <&pwm0 3 10000000 PWM_POLARITY_NORMAL>;
 			max-brightness = <255>;
 			status = "disabled";
 		};

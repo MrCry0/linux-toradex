@@ -57,7 +57,7 @@
 
 	backlight: backlight {
 		compatible = "pwm-backlight";
-		pwms = <&pwm1 0 25000 0>;
+		pwms = <&pwm1 0 25000 PWM_POLARITY_NORMAL>;
 		power-supply = <&vcc3v3_lcd>;
 	};
 

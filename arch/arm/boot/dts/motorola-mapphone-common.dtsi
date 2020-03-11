@@ -178,7 +178,7 @@
 
 	vibrator {
 		compatible = "pwm-vibrator";
-		pwms = <&pwm9 0 10000000 0>, <&pwm8 0 10000000 0>;
+		pwms = <&pwm9 0 10000000 PWM_POLARITY_NORMAL>, <&pwm8 0 10000000 0>;
 		pwm-names = "enable", "direction";
 		direction-duty-cycle-ns = <10000000>;
 	};

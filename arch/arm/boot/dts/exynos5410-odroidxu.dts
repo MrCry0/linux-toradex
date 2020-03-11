@@ -37,7 +37,7 @@
 
 	fan0: pwm-fan {
 		compatible = "pwm-fan";
-		pwms = <&pwm 0 20972 0>;
+		pwms = <&pwm 0 20972 PWM_POLARITY_NORMAL>;
 		#cooling-cells = <2>;
 		cooling-levels = <0 130 170 230>;
 	};

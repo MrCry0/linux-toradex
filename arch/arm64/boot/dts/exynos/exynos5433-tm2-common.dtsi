@@ -913,7 +913,7 @@
 		haptic: max77843-haptic {
 			compatible = "maxim,max77843-haptic";
 			haptic-supply = <&ldo38_reg>;
-			pwms = <&pwm 0 33670 0>;
+			pwms = <&pwm 0 33670 PWM_POLARITY_NORMAL>;
 			pwm-names = "haptic";
 		};
 	};

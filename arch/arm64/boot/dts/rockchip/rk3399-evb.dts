@@ -49,7 +49,7 @@
 			248 249 250 251 252 253 254 255>;
 		default-brightness-level = <200>;
 		enable-gpios = <&gpio1 RK_PB5 GPIO_ACTIVE_HIGH>;
-		pwms = <&pwm0 0 25000 0>;
+		pwms = <&pwm0 0 25000 PWM_POLARITY_NORMAL>;
 	};
 
 	clkin_gmac: external-gmac-clock {
@@ -61,7 +61,7 @@
 
 	vdd_center: vdd-center {
 		compatible = "pwm-regulator";
-		pwms = <&pwm3 0 25000 0>;
+		pwms = <&pwm3 0 25000 PWM_POLARITY_NORMAL>;
 		regulator-name = "vdd_center";
 		regulator-min-microvolt = <800000>;
 		regulator-max-microvolt = <1400000>;
