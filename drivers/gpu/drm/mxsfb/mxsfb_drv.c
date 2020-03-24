@@ -131,6 +131,15 @@ static void mxsfb_pipe_disable(struct drm_simple_display_pipe *pipe)
 	spin_unlock_irq(&drm->event_lock);
 }
 
+static int mxsfb_pipe_check(struct drm_simple_display_pipe *pipe,
+			    struct drm_plane_state *plane_state,
+			    struct drm_crtc_state *crtc_state)
+{
+	struct mxsfb_drm_private *mxsfb = drm_pipe_to_mxsfb_drm_private(pipe);
+
+	return mxsfb_plane_atomic_check(mxsfb, plane_state, crtc_state);
+}
+
 static void mxsfb_pipe_update(struct drm_simple_display_pipe *pipe,
 			      struct drm_plane_state *plane_state)
 {
@@ -166,6 +175,7 @@ static void mxsfb_pipe_disable_vblank(struct drm_simple_display_pipe *pipe)
 static struct drm_simple_display_pipe_funcs mxsfb_funcs = {
 	.enable		= mxsfb_pipe_enable,
 	.disable	= mxsfb_pipe_disable,
+	.check		= mxsfb_pipe_check,
 	.update		= mxsfb_pipe_update,
 	.prepare_fb	= drm_gem_fb_simple_display_pipe_prepare_fb,
 	.enable_vblank	= mxsfb_pipe_enable_vblank,

@@ -39,6 +39,9 @@ void mxsfb_disable_axi_clk(struct mxsfb_drm_private *mxsfb);
 
 void mxsfb_crtc_enable(struct mxsfb_drm_private *mxsfb);
 void mxsfb_crtc_disable(struct mxsfb_drm_private *mxsfb);
+int mxsfb_plane_atomic_check(struct mxsfb_drm_private *mxsfb,
+			     struct drm_plane_state *state,
+			     struct drm_crtc_state *crtc_state);
 void mxsfb_plane_atomic_update(struct mxsfb_drm_private *mxsfb,
 			       struct drm_plane_state *state);
 

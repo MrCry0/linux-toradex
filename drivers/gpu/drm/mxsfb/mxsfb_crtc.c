@@ -299,6 +299,37 @@ void mxsfb_crtc_disable(struct mxsfb_drm_private *mxsfb)
 	mxsfb_disable_axi_clk(mxsfb);
 }
 
+int mxsfb_plane_atomic_check(struct mxsfb_drm_private *mxsfb,
+			     struct drm_plane_state *plane_state,
+			     struct drm_crtc_state *crtc_state)
+{
+	struct drm_crtc *crtc = &mxsfb->pipe.crtc;
+	struct drm_device *drm = crtc->dev;
+	unsigned int pitch;
+
+	if (!plane_state->crtc)
+		return 0;
+
+	if (WARN_ON(!plane_state->fb))
+		return -EINVAL;
+
+	if (plane_state->crtc_x || plane_state->crtc_y) {
+		dev_err(drm->dev, "%s: crtc position must be zero.",
+			__func__);
+		return -EINVAL;
+	}
+
+	pitch = crtc_state->mode.hdisplay *
+		plane_state->fb->format->cpp[0];
+	if (plane_state->fb->pitches[0] != pitch) {
+		dev_err(drm->dev,
+			"Invalid pitch: fb and crtc widths must be the same");
+		return -EINVAL;
+	}
+
+	return 0;
+}
+
 void mxsfb_plane_atomic_update(struct mxsfb_drm_private *mxsfb,
 			       struct drm_plane_state *state)
 {
