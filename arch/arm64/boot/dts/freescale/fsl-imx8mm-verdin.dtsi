@@ -12,6 +12,7 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_dsi_bkl_en>;
 		enable-gpios = <&gpio3 3 GPIO_ACTIVE_HIGH>;
+		power-supply = <&reg_3p3v>;
 		status = "disabled";
 	};
 
@@ -39,6 +40,28 @@
 			debounce-interval = <10>;
 			wakeup-source;
 		};
+	};
+
+	/* Carrier Board Supply */
+	reg_3p3v: regulator-3p3v {
+		compatible = "regulator-fixed";
+		regulator-name = "REG_3P3V";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+	};
+
+	reg_aux_usb: regulator-aux-usb {
+		compatible = "regulator-fixed";
+		regulator-name = "REG_AUX_USB";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+	};
+
+	reg_mipi_phy: regulator-mipi-phy {
+		compatible = "regulator-fixed";
+		regulator-name = "REG_MIPI_PHY";
+		regulator-min-microvolt = <1000000>;
+		regulator-max-microvolt = <1000000>;
 	};
 
 	reg_ethphy: regulator-ethphy {
@@ -420,6 +443,10 @@
 		assigned-clocks = <&clk IMX8MM_CLK_CLKO1>;
 		clock-names = "csi_mclk";
 		clocks = <&clk IMX8MM_CLK_CLKO1>;
+		DOVDD-supply = <&reg_3p3v>;
+		AVDD-supply = <&reg_3p3v>;
+		DVDD-supply = <&reg_3p3v>;
+		PVDD-supply = <&reg_3p3v>;
 		csi_id = <0>;
 		mclk = <24000000>;
 		mclk_source = <0>;
@@ -452,6 +479,11 @@
 		clock-names = "mclk";
 		reg = <0x1a>;
 		status = "disabled";
+		DCVDD-supply = <&reg_3p3v>;
+		DBVDD-supply = <&reg_3p3v>;
+		AVDD-supply = <&reg_3p3v>;
+		CPVDD-supply = <&reg_3p3v>;
+		MICVDD-supply = <&reg_3p3v>;
 	};
 
 	gpio_expander_21: gpio-expander@21 {
@@ -460,6 +492,7 @@
 		gpio-controller;
 		reg = <0x21>;
 		status = "disabled";
+		vcc-supply = <&reg_3p3v>;
 	};
 
 	lvds_bridge: bridge@2c {
@@ -565,6 +598,7 @@
 &mipi_csi_1 {
 	#address-cells = <1>;
 	#size-cells = <0>;
+	mipi-phy-supply = <&reg_mipi_phy>;
 
 	port {
 		mipi1_sensor_ep: endpoint1 {
@@ -597,6 +631,7 @@
 &pcie0 {
 	/* on-module ext oscillator */
 	clkreq-gpio = <&gpio2 19 GPIO_ACTIVE_HIGH>;
+	epdev_on-supply = <&reg_3p3v>;
 	ext_osc = <1>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pcie0>;
@@ -664,6 +699,14 @@
 	pinctrl-0 = <&pinctrl_uart4>;
 };
 
+&usbmisc1 {
+	vbus-wakeup-supply = <&reg_aux_usb>;
+};
+
+&usbmisc2 {
+	vbus-wakeup-supply = <&reg_aux_usb>;
+};
+
 /* Verdin USB_1 */
 &usbotg1 {
 	dr_mode = "otg";
@@ -678,6 +721,14 @@
 	picophy,dc-vol-level-adjust = <7>;
 	picophy,pre-emp-curr-control = <3>;
 	vbus-supply = <&reg_usb_otg2_vbus>;
+};
+
+&usbphynop1 {
+	vcc-supply = <&reg_aux_usb>;
+};
+
+&usbphynop2 {
+	vcc-supply = <&reg_aux_usb>;
 };
 
 /* On-module eMMC */
