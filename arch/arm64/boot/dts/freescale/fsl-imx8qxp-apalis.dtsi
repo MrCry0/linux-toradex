@@ -1015,7 +1015,6 @@
 /* Manage on-module USB WiFi */
 &usbphynop1 {
 	status = "okay";
-	reset-gpios = <&pcal6416_1 12 GPIO_ACTIVE_LOW>;
 	reset-on-resume;
 };
 
