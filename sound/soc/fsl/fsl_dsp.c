@@ -83,8 +83,7 @@ static int check_dsp_is_available(void)
 
 	ret = sc_ipc_getMuID(&mu_id);
 	if (ret) {
-		pr_err("sc_ipc_getMuID() can't obtain mu id SCI! %d\n",
-				ret);
+		/* We're not running on a iMX8 or iMX8X, so there is no DSP */
 		return -EINVAL;
 	}
 
