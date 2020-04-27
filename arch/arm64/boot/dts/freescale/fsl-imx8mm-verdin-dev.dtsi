@@ -67,7 +67,7 @@
 };
 
 &lvds_bridge {
-	status = "okay";
+	status = "disabled";
 };
 
 &mipi_csi_1 {
