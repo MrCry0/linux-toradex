@@ -115,7 +115,7 @@
 		off-on-delay = <100000>;
 	};
 
-	sound {
+	sound_card: sound-card {
 		compatible = "simple-audio-card";
 		simple-audio-card,bitclock-master = <&dailink_master>;
 		simple-audio-card,format = "i2s";
@@ -576,16 +576,16 @@
 		status = "disabled";
 	};
 
-	/* EEPROM on display adapter boards */
-	eeprom_display: eeprom@50 {
+	/* EEPROM on display adapter (MIPI DSI Display Adapter) */
+	eeprom_display_adapter: eeprom@50 {
 		compatible = "st,24c02";
 		pagesize = <16>;
 		reg = <0x50>;
 		status = "disabled";
 	};
 
-	/* EEPROM on Verdin Development board */
-	eeprom_dev_board: eeprom@57 {
+	/* EEPROM on carrier board */
+	eeprom_carrier_board: eeprom@57 {
 		compatible = "st,24c02";
 		pagesize = <16>;
 		reg = <0x57>;

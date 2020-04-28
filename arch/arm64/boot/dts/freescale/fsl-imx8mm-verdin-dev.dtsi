@@ -27,12 +27,12 @@
 };
 
 /* EEPROM on display adapter boards */
-&eeprom_display {
+&eeprom_display_adapter {
 	status = "okay";
 };
 
 /* EEPROM on Verdin Development board */
-&eeprom_dev_board {
+&eeprom_carrier_board {
 	status = "okay";
 };
 
