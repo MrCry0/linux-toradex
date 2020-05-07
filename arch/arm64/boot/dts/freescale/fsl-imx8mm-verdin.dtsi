@@ -256,6 +256,47 @@
 #endif
 };
 
+&gpio1 {
+	gpio-line-names = "SODIMM_216",
+			  "SODIMM_19",
+			  "",
+			  "",
+			  "",
+			  "",
+			  "",
+			  "",
+			  "SODIMM_220",
+			  "SODIMM_222",
+			  "",
+			  "SODIMM_218",
+			  "SODIMM_155",
+			  "SODIMM_157",
+			  "SODIMM_185",
+			  "SODIMM_187";
+};
+
+&gpio2 {
+	gpio-line-names = "",
+			  "",
+			  "",
+			  "",
+			  "",
+			  "",
+			  "",
+			  "",
+			  "",
+			  "",
+			  "",
+			  "",
+			  "SODIMM_84",
+			  "SODIMM_78",
+			  "SODIMM_74",
+			  "SODIMM_80",
+			  "SODIMM_82",
+			  "SODIMM_70",
+			  "SODIMM_72";
+};
+
 &gpio4 {
 	/*
 	 * The SE050 security element may be driven via I2C from user space.
@@ -272,6 +313,37 @@
 };
 
 &gpio5 {
+	gpio-line-names = "SODIMM_131",
+			  "",
+			  "SODIMM_91",
+			  "SODIMM_16",
+			  "SODIMM_15",
+			  "SODIMM_208",
+			  "SODIMM_137",
+			  "SODIMM_139",
+			  "SODIMM_141",
+			  "SODIMM_143",
+			  "SODIMM_196",
+			  "SODIMM_200",
+			  "SODIMM_198",
+			  "SODIMM_202",
+			  "",
+			  "",
+			  "SODIMM_55",
+			  "SODIMM_53",
+			  "SODIMM_95",
+			  "SODIMM_93",
+			  "SODIMM_14",
+			  "SODIMM_12",
+			  "",
+			  "",
+			  "",
+			  "",
+			  "SODIMM_210",
+			  "SODIMM_212",
+			  "SODIMM_151",
+			  "SODIMM_153";
+
 	ctrl_sleep_moci {
 		gpio-hog;
 		gpios = <1 GPIO_ACTIVE_HIGH>;
