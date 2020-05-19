@@ -1150,6 +1150,33 @@ static void imx6_pcie_assert_core_reset(struct imx6_pcie *imx6_pcie)
 	}
 }
 
+static void imx6_pcie_set_l1_latency(struct imx6_pcie *imx6_pcie)
+{
+	u32 val;
+	struct dw_pcie *pci = imx6_pcie->pci;
+
+	switch (imx6_pcie->drvdata->variant) {
+	case IMX8MQ:
+	case IMX8MM:
+	case IMX8MP:
+		/*
+		 * Configure the L1 latency of rc to less than 64us
+		 * Otherwise, the L1/L1SUB wouldn't be enable by ASPM.
+		 */
+		dw_pcie_dbi_ro_wr_en(pci);
+		val = readl(pci->dbi_base + SZ_1M +
+				IMX8MQ_PCIE_LINK_CAP_REG_OFFSET);
+		val &= ~PCI_EXP_LNKCAP_L1EL;
+		val |= IMX8MQ_PCIE_LINK_CAP_L1EL_64US;
+		writel(val, pci->dbi_base + SZ_1M +
+				IMX8MQ_PCIE_LINK_CAP_REG_OFFSET);
+		dw_pcie_dbi_ro_wr_dis(pci);
+		break;
+	default:
+		break;
+	}
+}
+
 static int imx6_pcie_deassert_core_reset(struct imx6_pcie *imx6_pcie)
 {
 	struct dw_pcie *pci = imx6_pcie->pci;
@@ -1252,25 +1279,13 @@ static int imx6_pcie_deassert_core_reset(struct imx6_pcie *imx6_pcie)
 				   IMX8MQ_GPR_PCIE_CLK_REQ_OVERRIDE_EN,
 				   IMX8MQ_GPR_PCIE_CLK_REQ_OVERRIDE_EN);
 
-		if (imx6_pcie->drvdata->flags & IMX6_PCIE_FLAG_SUPPORTS_L1SS) {
+		if (imx6_pcie->drvdata->flags & IMX6_PCIE_FLAG_SUPPORTS_L1SS)
 			/*
 			 * Configure the CLK_REQ# high, let the L1SS
 			 * automatically controlled by HW later.
 			 */
 			reset_control_deassert(imx6_pcie->clkreq_reset);
-			/*
-			 * Configure the L1 latency of rc to less than 64us
-			 * Otherwise, the L1/L1SUB wouldn't be enable by ASPM.
-			 */
-			dw_pcie_dbi_ro_wr_en(pci);
-			val = readl(pci->dbi_base + SZ_1M +
-					IMX8MQ_PCIE_LINK_CAP_REG_OFFSET);
-			val &= ~PCI_EXP_LNKCAP_L1EL;
-			val |= IMX8MQ_PCIE_LINK_CAP_L1EL_64US;
-			writel(val, pci->dbi_base + SZ_1M +
-					IMX8MQ_PCIE_LINK_CAP_REG_OFFSET);
-			dw_pcie_dbi_ro_wr_dis(pci);
-		}
+		imx6_pcie_set_l1_latency(imx6_pcie);
 		break;
 	case IMX8MP:
 		if (phy_power_on(imx6_pcie->phy) < 0)
@@ -1318,6 +1333,14 @@ static int imx6_pcie_deassert_core_reset(struct imx6_pcie *imx6_pcie)
 
 		if(imx8_pcie_wait_for_phy_pll_lock(imx6_pcie) != 0)
 			goto err_pll;
+
+		if (imx6_pcie->drvdata->flags & IMX6_PCIE_FLAG_SUPPORTS_L1SS)
+			/*
+			 * Configure the CLK_REQ# high, let the L1SS
+			 * automatically controlled by HW later.
+			 */
+			reset_control_deassert(imx6_pcie->clkreq_reset);
+		imx6_pcie_set_l1_latency(imx6_pcie);
 		break;
 	case IMX7D:
 		reset_control_deassert(imx6_pcie->pciephy_reset);
@@ -3110,7 +3133,8 @@ static const struct imx6_pcie_drvdata drvdata[] = {
 	},
 	[IMX8MP] = {
 		.variant = IMX8MP,
-		.flags = IMX6_PCIE_FLAG_SUPPORTS_SUSPEND,
+		.flags = IMX6_PCIE_FLAG_SUPPORTS_SUSPEND |
+			 IMX6_PCIE_FLAG_SUPPORTS_L1SS,
 	},
 };
 
