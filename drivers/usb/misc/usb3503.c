@@ -124,7 +124,7 @@ static int usb3503_connect(struct usb3503 *hub)
 					 (USB3503_SPILOCK_CONNECT
 					  | USB3503_SPILOCK_CONFIG), 0);
 		if (err < 0) {
-			dev_err(dev, "SP_ILOCK failed (%d)\n", err);
+			dev_err(dev, "SP_ILOCK 2 failed (%d)\n", err);
 			return err;
 		}
 	}
