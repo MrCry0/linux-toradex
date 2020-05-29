@@ -95,7 +95,17 @@
 		regulator-max-microvolt = <1800000>;
 	};
 
-	/* TBD SPDIF, HDMI audio */
+	reg_pcie_switch: regulator-pcie-switch {
+		compatible = "regulator-fixed";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_gpio7>;
+		enable-active-high;
+		gpio = <&gpio3 19 GPIO_ACTIVE_HIGH>;
+		regulator-name = "pcie_switch";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+		startup-delay-us = <100000>;
+	};
 
 	sound {
 		compatible = "simple-audio-card";
@@ -319,9 +329,8 @@
 
 &iomuxc {
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_gpio34>, <&pinctrl_gpio7>, <&pinctrl_usbo1oc>,
-		    <&pinctrl_gpio8>, <&pinctrl_qspi0a_gpios>,
-		    <&pinctrl_sata1_act>, <&pinctrl_reset_moci>,
+	pinctrl-0 = <&pinctrl_gpio34>, <&pinctrl_usbo1oc>, <&pinctrl_gpio8>,
+		    <&pinctrl_qspi0a_gpios>, <&pinctrl_sata1_act>,
 		    <&pinctrl_mmc1_gpios>, <&pinctrl_dap1_gpios>,
 		    <&pinctrl_wifi_sclk>;
 
@@ -927,13 +936,15 @@
 };
 
 /* Apalis PCIE1 */
-#if 0 /* Todo */
 &pcieb {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_reset_moci>;
+	bus-range = <0x00 0xff>;
 	ext_osc = <0>;
-	hard-wired = <0>;
-	status = "okay";
+	fsl,max-link-speed = <2>;
+	reset-gpio = <&gpio4 1 GPIO_ACTIVE_LOW>;
+	vpcie-supply = <&reg_pcie_switch>;
 };
-#endif
 
 /* Apalis console */
 &pd_dma_lpuart1 {
