@@ -827,7 +827,7 @@
 		/* On-module RESET_MOCI#_DRV */
 		pinctrl_reset_moci: gpioresetmocigrp {
 			fsl,pins = <
-				SC_P_PCIE_CTRL0_CLKREQ_B_LSIO_GPIO4_IO01	0x21
+				SC_P_PCIE_CTRL0_CLKREQ_B_LSIO_GPIO4_IO01	0x11
 			>;
 		};
 
