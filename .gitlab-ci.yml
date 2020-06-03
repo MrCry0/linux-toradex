@@ -43,7 +43,7 @@ stages:
     rm -f index.html 
     wget http://artifactory-horw.int.toradex.com/artifactory/list/torizoncore-oe-prerelease-horw/master/nightly/
     version=$( cat index.html| grep ^"<a" | sed -e 's/[<>="//]/ /g' | awk '{ print $3}' | sort -nrk1,1 | head -1)
-    wget http://artifactory-horw.int.toradex.com/artifactory/list/torizoncore-oe-prerelease-horw/master/nightly/$version/$KERNEL_FILE_PATH/images/kernel-config
+    wget http://artifactory-horw.int.toradex.com/artifactory/list/torizoncore-oe-prerelease-horw/master/nightly/$version/$KERNEL_FILE_PATH/oedeploy/kernel-config
     mkdir -p $TEMP_BUILD_FOLDER
     cp kernel-config $TEMP_BUILD_FOLDER/$KERNEL_CONFIGURATION_FILE
     ##### 
