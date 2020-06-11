@@ -194,7 +194,8 @@ static int apalis_tk1_k20_gpio_probe(struct platform_device *pdev)
 
 	priv->chip.base			= -1;
 	priv->chip.can_sleep		= 1;
-	priv->chip.parent			= &pdev->dev;
+	priv->chip.label		= "k20-gpio";
+	priv->chip.parent		= &pdev->dev;
 	priv->chip.owner		= THIS_MODULE;
 	priv->chip.get			= apalis_tk1_k20_gpio_get;
 	priv->chip.set			= apalis_tk1_k20_gpio_set;
