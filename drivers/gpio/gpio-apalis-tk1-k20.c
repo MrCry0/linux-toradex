@@ -95,8 +95,9 @@ static int apalis_tk1_k20_gpio_request(struct gpio_chip *chip,
 
 	apalis_tk1_k20_reg_write(gpio->apalis_tk1_k20, APALIS_TK1_K20_GPIO_NO,
 			offset);
-	if (apalis_tk1_k20_reg_read(gpio->apalis_tk1_k20,
-			APALIS_TK1_K20_GPIO_NO, &status) < 0) {
+	if ((apalis_tk1_k20_reg_read(gpio->apalis_tk1_k20,
+			APALIS_TK1_K20_GPIO_NO, &status) < 0) ||
+	    (status == 0xff)) {
 		apalis_tk1_k20_unlock(gpio->apalis_tk1_k20);
 		return -ENODEV;
 	}
