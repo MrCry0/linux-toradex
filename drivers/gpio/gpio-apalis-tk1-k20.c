@@ -206,6 +206,9 @@ static int apalis_tk1_k20_gpio_probe(struct platform_device *pdev)
 	priv->chip.free			= apalis_tk1_k20_gpio_free;
 	/* TODO: include as a define somewhere */
 	priv->chip.ngpio		= 160;
+#if defined(CONFIG_OF_GPIO)
+	priv->chip.of_node		= pdev->dev.parent->of_node;
+#endif
 
 	status = gpiochip_add(&priv->chip);
 
