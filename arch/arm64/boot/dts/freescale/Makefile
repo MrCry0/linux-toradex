@@ -153,8 +153,8 @@ dtb-$(CONFIG_ARCH_FSL_IMX8MM) += fsl-imx8mm-evk.dtb \
 				 fsl-imx8mm-ddr4-evk-rm67191.dtb \
 				 fsl-imx8mm-ddr4-qca9377-evk.dtb \
 				 fsl-imx8mm-verdin-nonwifi-dahlia.dtb \
-				 fsl-imx8mm-verdin-wifi-dahlia.dtb \
 				 fsl-imx8mm-verdin-nonwifi-dev.dtb \
+				 fsl-imx8mm-verdin-wifi-dahlia.dtb \
 				 fsl-imx8mm-verdin-wifi-dev.dtb
 dtb-$(CONFIG_ARCH_FSL_IMX8MN) += fsl-imx8mn-ddr4-evk.dtb \
 				 fsl-imx8mn-evk.dtb \
