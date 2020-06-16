@@ -59,7 +59,8 @@ static int apalis_tk1_k20_gpio_output(struct gpio_chip *chip,
 	return 0;
 }
 
-static int apalis_tk1_k20_gpio_get(struct gpio_chip *chip, unsigned int offset)
+static int apalis_tk1_k20_get_status(struct gpio_chip *chip,
+				     unsigned int offset, int mask)
 {
 	struct apalis_tk1_k20_gpio *gpio = container_of(chip,
 			struct apalis_tk1_k20_gpio, chip);
@@ -74,11 +75,24 @@ static int apalis_tk1_k20_gpio_get(struct gpio_chip *chip, unsigned int offset)
 		apalis_tk1_k20_unlock(gpio->apalis_tk1_k20);
 		return -ENODEV;
 	}
-	value &= APALIS_TK1_K20_GPIO_STA_VAL;
 
 	apalis_tk1_k20_unlock(gpio->apalis_tk1_k20);
 
-	return value ? 1 : 0;
+	return (value & mask) > 0;
+}
+
+static int apalis_tk1_k20_gpio_get_dir(struct gpio_chip *chip,
+				       unsigned int offset)
+{
+	/* K20 returns a 1 for output, gpiolib uses 0 for output */
+	return !apalis_tk1_k20_get_status(chip, offset,
+					 APALIS_TK1_K20_GPIO_STA_OE);
+}
+
+static int apalis_tk1_k20_gpio_get(struct gpio_chip *chip, unsigned int offset)
+{
+	return apalis_tk1_k20_get_status(chip, offset,
+					 APALIS_TK1_K20_GPIO_STA_VAL);
 }
 
 static int apalis_tk1_k20_gpio_request(struct gpio_chip *chip,
@@ -186,6 +200,7 @@ static int apalis_tk1_k20_gpio_probe(struct platform_device *pdev)
 	priv->chip.set			= apalis_tk1_k20_gpio_set;
 	priv->chip.direction_input	= apalis_tk1_k20_gpio_input;
 	priv->chip.direction_output	= apalis_tk1_k20_gpio_output;
+	priv->chip.get_direction	= apalis_tk1_k20_gpio_get_dir;
 	priv->chip.request		= apalis_tk1_k20_gpio_request;
 	priv->chip.free			= apalis_tk1_k20_gpio_free;
 	/* TODO: include as a define somewhere */
