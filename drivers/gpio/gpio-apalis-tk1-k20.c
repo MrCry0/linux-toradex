@@ -110,6 +110,11 @@ static int apalis_tk1_k20_gpio_request(struct gpio_chip *chip,
 static void apalis_tk1_k20_gpio_free(struct gpio_chip *chip,
 				     unsigned int offset)
 {
+/*
+ * Keep the current GPIO state after free, libgpiod cli tools free pins after
+ * each access.
+ */
+#if 0
 	struct apalis_tk1_k20_gpio *gpio =
 			container_of(chip, struct apalis_tk1_k20_gpio, chip);
 
@@ -121,6 +126,7 @@ static void apalis_tk1_k20_gpio_free(struct gpio_chip *chip,
 			APALIS_TK1_K20_GPIO_STA, 0);
 
 	apalis_tk1_k20_unlock(gpio->apalis_tk1_k20);
+#endif
 }
 
 
