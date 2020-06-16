@@ -104,7 +104,7 @@ static int apalis_tk1_k20_gpio_request(struct gpio_chip *chip,
 
 	apalis_tk1_k20_unlock(gpio->apalis_tk1_k20);
 
-	return status;
+	return 0;
 }
 
 static void apalis_tk1_k20_gpio_free(struct gpio_chip *chip,
