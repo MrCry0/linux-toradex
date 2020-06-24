@@ -847,7 +847,7 @@
 				SC_P_SPI0_SCK_DMA_SPI0_SCK		0x0600004c
 				SC_P_SPI0_SDO_DMA_SPI0_SDO		0x0600004c
 				SC_P_SPI0_SDI_DMA_SPI0_SDI		0x0600004c
-				SC_P_SPI0_CS0_DMA_SPI0_CS0		0x0600004c
+				SC_P_SPI0_CS0_LSIO_GPIO3_IO05		0x0600004c
 			>;
 		};
 
@@ -857,7 +857,7 @@
 				SC_P_SPI2_SCK_DMA_SPI2_SCK		0x0600004c
 				SC_P_SPI2_SDO_DMA_SPI2_SDO		0x0600004c
 				SC_P_SPI2_SDI_DMA_SPI2_SDI		0x0600004c
-				SC_P_SPI2_CS0_DMA_SPI2_CS0		0x0600004c
+				SC_P_SPI2_CS0_LSIO_GPIO3_IO10		0x0600004c
 			>;
 		};
 
@@ -1210,7 +1210,7 @@
 	pinctrl-0 = <&pinctrl_lpspi0>;
 	#address-cells = <1>;
 	#size-cells = <0>;
-	dma-names = "no","no";
+	cs-gpios = <&gpio3 5 GPIO_ACTIVE_LOW>;
 
 	spidev0: spi@0 {
 		compatible = "toradex,evalspi";
@@ -1225,7 +1225,7 @@
 	pinctrl-0 = <&pinctrl_lpspi2>;
 	#address-cells = <1>;
 	#size-cells = <0>;
-	dma-names = "no","no";
+	cs-gpios = <&gpio3 10 GPIO_ACTIVE_LOW>;
 
 	spidev1: spi@0 {
 		compatible = "toradex,evalspi";
