@@ -37,7 +37,7 @@
 #include "sleep.h"
 
 #ifdef CONFIG_PM_SLEEP
-static DEFINE_SPINLOCK(tegra_lp2_lock);
+static DEFINE_RAW_SPINLOCK(tegra_lp2_lock);
 static u32 iram_save_size;
 static void *iram_save_addr;
 struct tegra_lp1_iram tegra_lp1_iram;
@@ -115,12 +115,12 @@ void tegra_clear_cpu_in_lp2(void)
 	int phy_cpu_id = cpu_logical_map(smp_processor_id());
 	u32 *cpu_in_lp2 = tegra_cpu_lp2_mask;
 
-	spin_lock(&tegra_lp2_lock);
+	raw_spin_lock(&tegra_lp2_lock);
 
 	BUG_ON(!(*cpu_in_lp2 & BIT(phy_cpu_id)));
 	*cpu_in_lp2 &= ~BIT(phy_cpu_id);
 
-	spin_unlock(&tegra_lp2_lock);
+	raw_spin_unlock(&tegra_lp2_lock);
 }
 
 bool tegra_set_cpu_in_lp2(void)
@@ -130,7 +130,7 @@ bool tegra_set_cpu_in_lp2(void)
 	cpumask_t *cpu_lp2_mask = tegra_cpu_lp2_mask;
 	u32 *cpu_in_lp2 = tegra_cpu_lp2_mask;
 
-	spin_lock(&tegra_lp2_lock);
+	raw_spin_lock(&tegra_lp2_lock);
 
 	BUG_ON((*cpu_in_lp2 & BIT(phy_cpu_id)));
 	*cpu_in_lp2 |= BIT(phy_cpu_id);
@@ -140,7 +140,7 @@ bool tegra_set_cpu_in_lp2(void)
 	else if (tegra_get_chip_id() == TEGRA20 && phy_cpu_id == 1)
 		tegra20_cpu_set_resettable_soon();
 
-	spin_unlock(&tegra_lp2_lock);
+	raw_spin_unlock(&tegra_lp2_lock);
 	return last_cpu;
 }
 
