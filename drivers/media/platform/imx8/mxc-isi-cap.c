@@ -573,6 +573,8 @@ static struct vb2_ops mxc_cap_vb2_qops = {
 	.stop_streaming		= cap_vb2_stop_streaming,
 };
 
+/* To enable ctrls in sensor driver, we need to comment the ISI ctrls */
+#ifndef CONFIG_VIDEO_ECAM
 /*
  * V4L2 controls handling
  */
@@ -659,6 +661,7 @@ void mxc_isi_ctrls_delete(struct mxc_isi_dev *mxc_isi)
 		ctrls->alpha = NULL;
 	}
 }
+#endif
 
 static struct media_pad *mxc_isi_get_remote_source_pad(struct mxc_isi_dev *mxc_isi)
 {
@@ -965,7 +968,12 @@ static int mxc_isi_source_fmt_init(struct mxc_isi_dev *mxc_isi)
 	int ret;
 
 	/* Get remote source pad */
+#ifndef CONFIG_VIDEO_ECAM
 	source_pad = subdev_get_remote_source_pad(&mxc_isi->isi_cap.sd);
+#else
+	/* To enable ctrls in sensor driver */
+	source_pad = mxc_isi_get_remote_source_pad(mxc_isi);
+#endif
 	if (source_pad == NULL) {
 		v4l2_err(mxc_isi->v4l2_dev, "%s, No remote pad found!\n", __func__);
 		return -EINVAL;
@@ -1262,7 +1270,12 @@ static int mxc_isi_cap_g_chip_ident(struct file *file, void *fb,
 	}
 
 	/* Get remote source pad subdev */
+#ifndef CONFIG_VIDEO_ECAM
 	sd = mxc_isi_get_sensor_subdev(&mxc_isi->isi_cap.sd);
+#else
+	/* To enable ctrls in sensor driver */
+	sd = media_entity_to_v4l2_subdev(source_pad->entity);
+#endif
 	if (sd == NULL) {
 		v4l2_err(mxc_isi->v4l2_dev, "%s, No remote subdev found!\n", __func__);
 		return -EINVAL;
@@ -1288,6 +1301,7 @@ static int mxc_isi_cap_g_chip_ident(struct file *file, void *fb,
 		return -ENODEV;
 	}
 
+#ifndef CONFIG_VIDEO_ECAM
 	sprintf(chip->match.name, "%s-%d\n", sd->name, vdev->num);
 
 	/* Just check if the callback of the sensor device returns success,
@@ -1296,6 +1310,10 @@ static int mxc_isi_cap_g_chip_ident(struct file *file, void *fb,
 	 */
 
 	return v4l2_subdev_call(sd, core, g_chip_ident, &ci);
+#else
+	sprintf(chip->match.name, "imx8_%s_%d", remote->name, vdev->num);
+	return 0;
+#endif
 }
 
 static int mxc_isi_cap_g_parm(struct file *file, void *fh,
@@ -1312,7 +1330,12 @@ static int mxc_isi_cap_g_parm(struct file *file, void *fh,
 	}
 
 	/* Get remote source pad subdev */
+#ifndef CONFIG_VIDEO_ECAM
 	sd = mxc_isi_get_sensor_subdev(&mxc_isi->isi_cap.sd);
+#else
+	/* To enable ctrls in sensor driver */
+	sd = media_entity_to_v4l2_subdev(source_pad->entity);
+#endif
 	if (sd == NULL) {
 		v4l2_err(mxc_isi->v4l2_dev, "%s, No remote subdev found!\n", __func__);
 		return -EINVAL;
@@ -1334,7 +1357,12 @@ static int mxc_isi_cap_s_parm(struct file *file, void *fh,
 	}
 
 	/* Get remote source pad subdev */
+#ifndef CONFIG_VIDEO_ECAM
 	sd = mxc_isi_get_sensor_subdev(&mxc_isi->isi_cap.sd);
+#else
+	/* To enable ctrls in sensor driver */
+	sd = media_entity_to_v4l2_subdev(source_pad->entity);
+#endif
 	if (sd == NULL) {
 		v4l2_err(mxc_isi->v4l2_dev, "%s, No remote subdev found!\n", __func__);
 		return -EINVAL;
@@ -1368,7 +1396,17 @@ static int mxc_isi_cap_enum_framesizes(struct file *file, void *priv,
 	}
 
 	/* Get remote source pad subdev */
+#ifndef CONFIG_VIDEO_ECAM
 	sd = mxc_isi_get_sensor_subdev(&mxc_isi->isi_cap.sd);
+#else
+	/* To enable ctrls in sensor driver */
+	sd = media_entity_to_v4l2_subdev(source_pad->entity);
+#endif
+	if (sd == NULL) {
+		v4l2_err(mxc_isi->v4l2_dev, "%s, No remote subdev found!\n", __func__);
+		return -EINVAL;
+	}
+
 	if (sd == NULL) {
 		v4l2_err(&mxc_isi->isi_cap.sd, "Can't find subdev\n");
 		return -ENODEV;
@@ -1430,11 +1468,20 @@ static int mxc_isi_cap_enum_frameintervals(struct file *file, void *fh,
 	}
 
 	/* Get remote source pad subdev */
+#ifndef CONFIG_VIDEO_ECAM
 	sd = mxc_isi_get_sensor_subdev(&mxc_isi->isi_cap.sd);
 	if (sd == NULL) {
 		v4l2_err(&mxc_isi->isi_cap.sd, "Can't find sensor subdev\n");
 		return -ENODEV;
 	}
+#else
+	/* To enable ctrls in sensor driver */
+	sd = media_entity_to_v4l2_subdev(source_pad->entity);
+	if (sd == NULL) {
+		v4l2_err(mxc_isi->v4l2_dev, "%s, No remote subdev found!\n", __func__);
+		return -EINVAL;
+	}
+#endif
 
 	ret = v4l2_subdev_call(sd, pad, enum_frame_interval, NULL, &fie);
 	if (ret)
@@ -1448,6 +1495,193 @@ static int mxc_isi_cap_enum_frameintervals(struct file *file, void *fh,
 
 	return 0;
 }
+
+#ifdef CONFIG_VIDEO_ECAM
+static int mxc_vidioc_queryctrl(struct file *file, void *fh,
+					struct v4l2_queryctrl *a)
+{
+	struct mxc_isi_dev *mxc_isi = video_drvdata(file);
+	struct v4l2_subdev *sd;
+	struct media_pad *source_pad;
+
+	source_pad = mxc_isi_get_remote_source_pad(mxc_isi);
+	if (source_pad == NULL) {
+		v4l2_err(mxc_isi->v4l2_dev, "%s, No remote pad found!\n", __func__);
+		return -EINVAL;
+	}
+
+	/* Get remote source pad subdev */
+	sd = media_entity_to_v4l2_subdev(source_pad->entity);
+	if (sd == NULL) {
+		v4l2_err(mxc_isi->v4l2_dev, "%s, No remote subdev found!\n", __func__);
+		return -EINVAL;
+	}
+
+	return v4l2_subdev_call(sd, core, queryctrl, a);
+}
+
+static int mxc_vidioc_query_ext_ctrl(struct file *file, void *fh,
+					struct v4l2_query_ext_ctrl *qec)
+{
+	struct v4l2_queryctrl qc = {
+		.id = qec->id
+	};
+	int ret;
+
+	ret = mxc_vidioc_queryctrl(file, fh, &qc);
+
+	if (ret)
+		return ret;
+
+	qec->id = qc.id;
+	qec->type = qc.type;
+	strlcpy(qec->name, qc.name, sizeof(qec->name));
+	qec->maximum = qc.maximum;
+	qec->minimum = qc.minimum;
+	qec->step = qc.step;
+	qec->default_value = qc.default_value;
+	qec->flags = qc.flags;
+	qec->elem_size = 4;
+	qec->elems = 1;
+	qec->nr_of_dims = 0;
+	memset(qec->dims, 0, sizeof(qec->dims));
+	memset(qec->reserved, 0, sizeof(qec->reserved));
+
+	return 0;
+}
+
+
+static int mxc_isi_vidioc_querymenu(struct file *file, void *fh,
+					struct v4l2_querymenu *qm)
+{
+	struct mxc_isi_dev *mxc_isi = video_drvdata(file);
+	struct v4l2_subdev *sd;
+	struct media_pad *source_pad;
+	source_pad = mxc_isi_get_remote_source_pad(mxc_isi);
+	if (source_pad == NULL) {
+		v4l2_err(mxc_isi->v4l2_dev, "%s, No remote pad found!\n", __func__);
+		return -EINVAL;
+	}
+
+	/* Get remote source pad subdev */
+	sd = media_entity_to_v4l2_subdev(source_pad->entity);
+	if (sd == NULL) {
+		v4l2_err(mxc_isi->v4l2_dev, "%s, No remote subdev found!\n", __func__);
+		return -EINVAL;
+	}
+	return v4l2_subdev_call(sd, core, querymenu, qm);
+}
+
+static int mxc_isi_vidioc_g_ctrl(struct file *file, void *fh,
+					struct v4l2_control *a)
+{
+	struct mxc_isi_dev *mxc_isi = video_drvdata(file);
+	struct v4l2_subdev *sd;
+	struct media_pad *source_pad;
+	source_pad = mxc_isi_get_remote_source_pad(mxc_isi);
+	if (source_pad == NULL) {
+		v4l2_err(mxc_isi->v4l2_dev, "%s, No remote pad found!\n", __func__);
+		return -EINVAL;
+	}
+
+	/* Get remote source pad subdev */
+	sd = media_entity_to_v4l2_subdev(source_pad->entity);
+	if (sd == NULL) {
+		v4l2_err(mxc_isi->v4l2_dev, "%s, No remote subdev found!\n", __func__);
+		return -EINVAL;
+	}
+	return v4l2_subdev_call(sd, core, g_ctrl, a);
+}
+
+static int mxc_isi_vidioc_s_ctrl(struct file *file, void *fh,
+					struct v4l2_control *a)
+{
+	struct mxc_isi_dev *mxc_isi = video_drvdata(file);
+	struct v4l2_subdev *sd;
+	struct media_pad *source_pad;
+	source_pad = mxc_isi_get_remote_source_pad(mxc_isi);
+	if (source_pad == NULL) {
+		v4l2_err(mxc_isi->v4l2_dev, "%s, No remote pad found!\n", __func__);
+		return -EINVAL;
+	}
+
+	/* Get remote source pad subdev */
+	sd = media_entity_to_v4l2_subdev(source_pad->entity);
+	if (sd == NULL) {
+		v4l2_err(mxc_isi->v4l2_dev, "%s, No remote subdev found!\n", __func__);
+		return -EINVAL;
+	}
+	return v4l2_subdev_call(sd, core, s_ctrl, a);
+}
+
+static int mxc_isi_vidioc_g_ext_ctrls(struct file *file, void *fh,
+				  struct v4l2_ext_controls *a)
+{
+	struct mxc_isi_dev *mxc_isi = video_drvdata(file);
+	struct v4l2_subdev *sd;
+	struct media_pad *source_pad;
+	source_pad = mxc_isi_get_remote_source_pad(mxc_isi);
+	if (source_pad == NULL) {
+		v4l2_err(mxc_isi->v4l2_dev, "%s, No remote pad found!\n", __func__);
+		return -EINVAL;
+	}
+
+	/* Get remote source pad subdev */
+	sd = media_entity_to_v4l2_subdev(source_pad->entity);
+	if (sd == NULL) {
+		v4l2_err(mxc_isi->v4l2_dev, "%s, No remote subdev found!\n", __func__);
+		return -EINVAL;
+	}
+
+	return v4l2_subdev_call(sd, core, g_ext_ctrls, a);
+}
+
+static int mxc_isi_vidioc_try_ext_ctrls(struct file *file, void *fh,
+				  struct v4l2_ext_controls *a)
+{
+	struct mxc_isi_dev *mxc_isi = video_drvdata(file);
+	struct v4l2_subdev *sd;
+	struct media_pad *source_pad;
+	source_pad = mxc_isi_get_remote_source_pad(mxc_isi);
+	if (source_pad == NULL) {
+		v4l2_err(mxc_isi->v4l2_dev, "%s, No remote pad found!\n", __func__);
+		return -EINVAL;
+	}
+
+	/* Get remote source pad subdev */
+	sd = media_entity_to_v4l2_subdev(source_pad->entity);
+	if (sd == NULL) {
+		v4l2_err(mxc_isi->v4l2_dev, "%s, No remote subdev found!\n", __func__);
+		return -EINVAL;
+	}
+
+	return v4l2_subdev_call(sd, core, try_ext_ctrls, a);
+
+}
+
+static int mxc_isi_vidioc_s_ext_ctrls(struct file *file, void *fh,
+				  struct v4l2_ext_controls *a)
+{
+	struct mxc_isi_dev *mxc_isi = video_drvdata(file);
+	struct v4l2_subdev *sd;
+	struct media_pad *source_pad;
+	source_pad = mxc_isi_get_remote_source_pad(mxc_isi);
+	if (source_pad == NULL) {
+		v4l2_err(mxc_isi->v4l2_dev, "%s, No remote pad found!\n", __func__);
+		return -EINVAL;
+	}
+
+	/* Get remote source pad subdev */
+	sd = media_entity_to_v4l2_subdev(source_pad->entity);
+	if (sd == NULL) {
+		v4l2_err(mxc_isi->v4l2_dev, "%s, No remote subdev found!\n", __func__);
+		return -EINVAL;
+	}
+
+	return v4l2_subdev_call(sd, core, s_ext_ctrls, a);
+
+}
+#endif
 
 static const struct v4l2_ioctl_ops mxc_isi_capture_ioctl_ops = {
 	.vidioc_querycap		= mxc_isi_cap_querycap,
@@ -1477,6 +1711,16 @@ static const struct v4l2_ioctl_ops mxc_isi_capture_ioctl_ops = {
 
 	.vidioc_enum_framesizes = mxc_isi_cap_enum_framesizes,
 	.vidioc_enum_frameintervals = mxc_isi_cap_enum_frameintervals,
+#ifdef CONFIG_VIDEO_ECAM
+	.vidioc_queryctrl	= mxc_vidioc_queryctrl,
+	.vidioc_query_ext_ctrl	= mxc_vidioc_query_ext_ctrl,
+	.vidioc_querymenu	= mxc_isi_vidioc_querymenu,
+	.vidioc_g_ctrl		= mxc_isi_vidioc_g_ctrl,
+	.vidioc_s_ctrl		= mxc_isi_vidioc_s_ctrl,
+	.vidioc_g_ext_ctrls	= mxc_isi_vidioc_g_ext_ctrls,
+	.vidioc_s_ext_ctrls	= mxc_isi_vidioc_s_ext_ctrls,
+	.vidioc_try_ext_ctrls	= mxc_isi_vidioc_try_ext_ctrls
+#endif
 };
 
 /* Capture subdev media entity operations */
@@ -1787,22 +2031,28 @@ static int mxc_isi_register_cap_device(struct mxc_isi_dev *mxc_isi,
 	if (ret)
 		goto err_free_ctx;
 
+/* To enable ctrls in sensor driver, we need to comment the ISI ctrls */
+#ifndef CONFIG_VIDEO_ECAM
 	ret = mxc_isi_ctrls_create(mxc_isi);
 	if (ret)
 		goto err_me_cleanup;
+#endif
 
 	ret = video_register_device(vdev, VFL_TYPE_GRABBER, -1);
 	if (ret)
 		goto err_ctrl_free;
-
+#ifndef CONFIG_VIDEO_ECAM
 	vdev->ctrl_handler = &mxc_isi->ctrls.handler;
+#endif
 	v4l2_info(v4l2_dev, "Registered %s as /dev/%s\n",
 		  vdev->name, video_device_node_name(vdev));
 
 	return 0;
 
 err_ctrl_free:
+#ifndef CONFIG_VIDEO_ECAM
 	mxc_isi_ctrls_delete(mxc_isi);
+#endif
 err_me_cleanup:
 	media_entity_cleanup(&vdev->entity);
 err_free_ctx:
@@ -1864,7 +2114,10 @@ static void mxc_isi_subdev_unregistered(struct v4l2_subdev *sd)
 	vdev = &mxc_isi->isi_cap.vdev;
 	if (video_is_registered(vdev)) {
 		video_unregister_device(vdev);
+/* To enable ctrls in sensor driver, we need to comment the ISI ctrls*/
+#ifndef CONFIG_VIDEO_ECAM
 		mxc_isi_ctrls_delete(mxc_isi);
+#endif
 		media_entity_cleanup(&vdev->entity);
 	}
 

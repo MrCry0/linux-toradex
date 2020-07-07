@@ -8,6 +8,7 @@ obj-$(CONFIG_IMX8_MIPI_CSI2_SAM) += mxc-mipi-csi2-sam.o
 ov5640_camera_v3-objs := ov5640_v3.o
 obj-$(CONFIG_MXC_CAMERA_OV5640_V3) += ov5640_camera_v3.o
 obj-$(CONFIG_MXC_CAMERA_OV5640_MIPI_V3) += ov5640_mipi_v3.o
+obj-$(CONFIG_MXC_CAMERA_AR0521) += ar0521.o
 max9286_gmsl-objs := max9286.o
 obj-$(CONFIG_GMSL_MAX9286) += max9286_gmsl.o
 obj-$(CONFIG_IMX8_MEDIA_DEVICE) += mxc-media-dev.o
