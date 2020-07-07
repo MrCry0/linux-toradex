@@ -9,7 +9,7 @@
 #include "fsl-imx8qm-apalis-ixora-v1.1.dtsi"
 
 / {
-	model = "Toradex Apalis iMX8QM/QP on Apalis Ixora Board";
-	compatible = "toradex,apalis-imx8qm-ixora", "toradex,apalis-imx8qm",
-		     "toradex,apalis-ixora", "fsl,imx8qm";
+	model = "Toradex Apalis iMX8QM/QP on Apalis Ixora V1.1 Carrier Board";
+	compatible = "toradex,apalis-imx8qm-ixora-v1.1", "toradex,apalis-imx8qm-ixora",
+		     "toradex,apalis-imx8qm", "fsl,imx8qm";
 };
