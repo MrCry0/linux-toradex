@@ -179,7 +179,7 @@
 	atmel_mxt_ts: atmel_mxt_ts@4a {
 		compatible = "atmel,maxtouch";
 		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_touch>;
+		pinctrl-0 = <&pinctrl_gpio5>, <&pinctrl_gpio6>;
 		reg = <0x4a>;
 		interrupt-parent = <&gpio4>;
 		interrupts = <1 IRQ_TYPE_EDGE_FALLING>;    /* Apalis GPIO5 */
@@ -201,10 +201,10 @@
 		mclk_source = <0>;
 		mipi_csi;
 		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_gpio12>;
-		pwn-gpios = <&gpio0 9 GPIO_ACTIVE_HIGH>;
+		pinctrl-0 = <&pinctrl_gpio1>, <&pinctrl_gpio2>;
+		pwn-gpios = <&gpio0 9 GPIO_ACTIVE_HIGH>; /* Apalis GPIO2 */
 		reg = <0x3c>;
-		rst-gpios = <&gpio0 8 GPIO_ACTIVE_LOW>;
+		rst-gpios = <&gpio0 8 GPIO_ACTIVE_LOW>;  /* Apalis GPIO1 */
 		status = "okay";
 
 		port {
@@ -230,7 +230,7 @@
 &iomuxc {
 	pinctrl-0 = <&pinctrl_cam1_gpios>, <&pinctrl_dap1_gpios>,
 		    <&pinctrl_esai0_gpios>, <&pinctrl_fec2_gpios>,
-		    <&pinctrl_gpio34>, <&pinctrl_gpio_usbh_oc_n>,
+		    <&pinctrl_gpio3>, <&pinctrl_gpio4>,<&pinctrl_gpio_usbh_oc_n>,
 		    <&pinctrl_lpuart1ctrl>, <&pinctrl_lvds0_i2c0_gpio>,
 		    <&pinctrl_lvds1_i2c0_gpios>, <&pinctrl_mipi_dsi_0_1_en>,
 		    <&pinctrl_mipi_dsi1_gpios>, <&pinctrl_mlb_gpios>,
