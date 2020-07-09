@@ -455,7 +455,7 @@
 	atmel_mxt_ts: atmel_mxt_ts@4a {
 		compatible = "atmel,maxtouch";
 		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_touch>;
+		pinctrl-0 = <&pinctrl_gpio5>, <&pinctrl_gpio6>;
 		reg = <0x4a>;
 		interrupt-parent = <&gpio3>;
 		interrupts = <17 IRQ_TYPE_EDGE_FALLING>;    /* Apalis GPIO5 */
@@ -484,10 +484,10 @@
 
 &iomuxc {
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_gpio34>, <&pinctrl_usbo1oc>, <&pinctrl_gpio8>,
+	pinctrl-0 = <&pinctrl_dap1_gpios>, <&pinctrl_gpio3>, <&pinctrl_gpio4>,
+		    <&pinctrl_gpio8>, <&pinctrl_mmc1_gpios>,
 		    <&pinctrl_qspi0a_gpios>, <&pinctrl_sata1_act>,
-		    <&pinctrl_mmc1_gpios>, <&pinctrl_dap1_gpios>,
-		    <&pinctrl_wifi_sclk>;
+		    <&pinctrl_usbo1oc>, <&pinctrl_wifi_sclk>;
 
 	apalis-imx8qxp {
 		/* Apalis AN1_ADC */
@@ -550,48 +550,58 @@
 			>;
 		};
 
-		/* Apalis GPIO1+2 */
-		pinctrl_gpio12: gpio12grp {
+		/* Apalis GPIO1 */
+		pinctrl_gpio1: gpio1grp {
 			fsl,pins = <
-				/* Apalis GPIO 1 */
 				SC_P_QSPI0B_DATA3_LSIO_GPIO3_IO21		0x21		/* MXM3 1 */
-				/* Apalis GPIO 2 */
+			>;
+		};
+
+		/* Apalis GPIO2 */
+		pinctrl_gpio2: gpio2grp {
+			fsl,pins = <
 				SC_P_QSPI0B_DQS_LSIO_GPIO3_IO22			0x21		/* MXM3 3 */
 			>;
 		};
 
-		/* Apalis GPIO3+4 */
-		pinctrl_gpio34: gpio34grp {
+		/* Apalis GPIO3 */
+		pinctrl_gpio3: gpio3grp {
 			fsl,pins = <
-				/* Apalis GPIO 3 */
 				SC_P_QSPI0B_SS0_B_LSIO_GPIO3_IO23		0x21		/* MXM3 5 */
-				/* Apalis GPIO 4 */
+			>;
+		};
+
+		/* Apalis GPIO4 */
+		pinctrl_gpio4: gpio4grp {
+			fsl,pins = <
 				SC_P_QSPI0B_SS1_B_LSIO_GPIO3_IO24		0x21		/* MXM3 7 */
 			>;
 		};
 
-		/* Apalis GPIO5+6 */
-		pinctrl_touch: touchgrp {
+		/* Apalis GPIO5 */
+		pinctrl_gpio5: gpio5grp {
 			fsl,pins = <
-				/* Apalis GPIO 5 */
 				SC_P_QSPI0B_SCLK_LSIO_GPIO3_IO17		0x21		/* MXM3 11 */
-				/* Apalis GPIO 6 */
+			>;
+		};
+
+		/* Apalis GPIO6 */
+		pinctrl_gpio6: gpio6grp {
+			fsl,pins = <
 				SC_P_QSPI0B_DATA0_LSIO_GPIO3_IO18		0x21		/* MXM3 13 */
 			>;
 		};
 
 		/* Apalis GPIO7 */
-		pinctrl_gpio7: gpio7 {
+		pinctrl_gpio7: gpio7grp {
 			fsl,pins = <
-				/* Apalis GPIO 7 */
 				SC_P_QSPI0B_DATA1_LSIO_GPIO3_IO19		0x21		/* MXM3 15 */
 			>;
 		};
 
 		/* Apalis GPIO8 */
-		pinctrl_gpio8: gpio8 {
+		pinctrl_gpio8: gpio8grp {
 			fsl,pins = <
-				/* Apalis GPIO 8 */
 				SC_P_QSPI0B_DATA2_LSIO_GPIO3_IO20		0x21		/* MXM3 17 */
 			>;
 		};

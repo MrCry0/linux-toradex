@@ -178,10 +178,10 @@
 		mclk_source = <0>;
 		mipi_csi;
 		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_gpio12>;
-		pwn-gpios = <&gpio3 22 GPIO_ACTIVE_HIGH>;
+		pinctrl-0 = <&pinctrl_gpio1>, <&pinctrl_gpio2>;
+		pwn-gpios = <&gpio3 22 GPIO_ACTIVE_HIGH>; /* Apalis GPIO2 */
 		reg = <0x3c>;
-		rst-gpios = <&gpio3 21 GPIO_ACTIVE_LOW>;
+		rst-gpios = <&gpio3 21 GPIO_ACTIVE_LOW>;  /* Apalis GPIO1 */
 		status = "okay";
 
 		port {
