@@ -27,7 +27,7 @@
 #include "ar0521.h"
 #include "mcu_firmware.h"
 
-#define AR0521_DEBUG 1
+//#define AR0521_DEBUG 1
 
 /*!
  * Maintains the information on the current state of the sensor.
