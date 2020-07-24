@@ -28,6 +28,8 @@ stages:
   stage: build-product
   variables:
    GIT_STRATEGY: fetch
+#  we are only using 3 latest commits to speed up the fetch process, as we are running pipeline each time we do a commit or a MR  https://docs.gitlab.com/ee/ci/large_repositories/index.html#shallow-cloning
+   GIT_DEPTH: "3"
 #  To run just on merge request 
 #  only:
 #     - merge_requests
@@ -39,6 +41,7 @@ stages:
     which ${CROSS_COMPILE}gcc
     ${CROSS_COMPILE}gcc --version
     echo -e "Arch is \e[36m$ARCH\e[39m"
+    THREADS=$(grep processor /proc/cpuinfo -c)
     # due to specific of the kernel build we need to use the latest configuration from the nightly builds. We are getting $Version dynamically , as a variable , based on parsing URL page with Nightly builds ID  
     rm -f index.html 
     wget http://artifactory-horw.int.toradex.com/artifactory/list/torizoncore-oe-prerelease-horw/master/nightly/
@@ -47,7 +50,7 @@ stages:
     mkdir -p $TEMP_BUILD_FOLDER
     cp kernel-config $TEMP_BUILD_FOLDER/$KERNEL_CONFIGURATION_FILE
     ##### 
-    make O=$TEMP_BUILD_FOLDER -j3 2>&1 | tee $KERNEL_BUILD_LOG_FILE_NAME
+    make O=$TEMP_BUILD_FOLDER -j $THREADS 2>&1 | tee $KERNEL_BUILD_LOG_FILE_NAME
   artifacts:
     when: always
     name: "$CI_COMMIT_REF_NAME" 
