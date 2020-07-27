@@ -646,6 +646,7 @@
 
 /* Colibri PWM<B> */
 &pwm1 {
+	#pwm-cells = <3>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pwm1>;
 	status = "disabled";
@@ -653,6 +654,7 @@
 
 /* Colibri PWM<D> */
 &pwm2 {
+	#pwm-cells = <3>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pwm2>;
 	status = "disabled";
@@ -660,6 +662,7 @@
 
 /* Colibri PWM<A> */
 &pwm3 {
+	#pwm-cells = <3>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pwm3>;
 	status = "disabled";
@@ -667,6 +670,7 @@
 
 /* Colibri PWM<C> */
 &pwm4 {
+	#pwm-cells = <3>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pwm4>;
 	status = "disabled";
