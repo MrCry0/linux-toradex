@@ -1,7 +1,7 @@
 variables:
 # uncomment for the pipeline debug purpose
 # CI_DEBUG_TRACE: "true"
-  CI_IMAGE: gitlab.int.toradex.com:4567/philippe.schenker/linux-toradex/ci-kernel-builder:latest
+  CI_IMAGE: gitlab.int.toradex.com:4567/philippe.schenker/linux-toradex/ci-kernel-builder:gcc7
   DOCKER_HOST: tcp://docker:2375
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: ""
