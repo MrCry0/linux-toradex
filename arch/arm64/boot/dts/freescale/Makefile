@@ -134,7 +134,12 @@ dtb-$(CONFIG_ARCH_MXC) += imx8qxp-mek.dtb imx8qxp-mek-dsp.dtb imx8qxp-mek-ov5640
 			  imx8qxp-lpddr4-val-lpspi.dtb imx8qxp-lpddr4-val-lpspi-slave.dtb \
 			  imx8qxp-lpddr4-val-spdif.dtb imx8qxp-lpddr4-val-gpmi-nand.dtb imx8dxp-lpddr4-val.dtb \
 			  imx8qxp-17x17-val.dtb imx8dx-lpddr4-val.dtb imx8dx-17x17-val.dtb \
-			  imx8qxp-lpddr4-val-mlb.dtb
+			  imx8qxp-lpddr4-val-mlb.dtb \
+			  imx8qxp-colibri-aster.dtb \
+			  imx8qxp-colibri-dsihdmi-eval-v3.dtb \
+			  imx8qxp-colibri-eval-v3.dtb \
+			  imx8qxp-colibri-lvds-dual-eval-v3.dtb \
+			  imx8qxp-colibri-lvds-single-eval-v3.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8qxp-mek-dom0.dtb imx8qxp-mek-root.dtb \
 			  imx8qxp-mek-inmate.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8dxl-evk.dtb imx8dxl-evk-rpmsg.dtb \
