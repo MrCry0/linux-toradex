@@ -1,0 +1,15 @@
+// SPDX-License-Identifier: GPL-2.0+ OR MIT
+/*
+ * Copyright 2020 Toradex
+ */
+
+/dts-v1/;
+
+#include "imx8mm-verdin-nonwifi.dtsi"
+#include "imx8mm-verdin-dahlia.dtsi"
+
+/ {
+	model = "Toradex Verdin iMX8M Mini on Dahlia Board";
+	compatible = "toradex,verdin-imx8mm-nonwifi-dahlia",
+		     "toradex,verdin-imx8mm-nonwifi", "fsl,imx8mm";
+};
