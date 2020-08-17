@@ -216,7 +216,7 @@
 	sound {
 		compatible = "fsl,imx-audio-sgtl5000";
 		model = "imx6q-apalis-sgtl5000";
-		cpu-dai = <&ssi1>;
+		ssi-controller = <&ssi1>;
 		audio-codec = <&codec>;
 		audio-routing =
 			"LINE_IN", "Line In Jack",

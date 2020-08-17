@@ -160,7 +160,7 @@
 	sound {
 		compatible = "fsl,imx-audio-sgtl5000";
 		model = "imx6dl-colibri-sgtl5000";
-		cpu-dai = <&ssi1>;
+		ssi-controller = <&ssi1>;
 		audio-codec = <&codec>;
 		audio-routing =
 			"Headphone Jack", "HP_OUT",
