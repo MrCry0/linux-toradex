@@ -859,22 +859,6 @@ static int fsl_lpspi_probe(struct platform_device *pdev)
 
 	platform_set_drvdata(pdev, controller);
 
-	ret = of_property_read_u32(np, "fsl,spi-num-chipselects", &num_cs);
-	if (ret < 0) {
-		if (lpspi_platform_info) {
-			num_cs = lpspi_platform_info->num_chipselect;
-			controller->num_chipselect = num_cs;
-		}
-	} else {
-		controller->num_chipselect = num_cs;
-	}
-
-	fsl_lpspi = spi_controller_get_devdata(controller);
-	fsl_lpspi->dev = &pdev->dev;
-	fsl_lpspi->is_slave = is_slave;
-	fsl_lpspi->is_only_cs1 = of_property_read_bool((&pdev->dev)->of_node,
-						"fsl,spi-only-use-cs1-sel");
-
 	controller->bits_per_word_mask = SPI_BPW_RANGE_MASK(8, 32);
 	controller->transfer_one = fsl_lpspi_transfer_one;
 	controller->prepare_transfer_hardware = lpspi_prepare_xfer_hardware;
@@ -891,20 +875,21 @@ static int fsl_lpspi_probe(struct platform_device *pdev)
 		goto out_controller_put;
 	}
 
-	controller->transfer_one = fsl_lpspi_transfer_one;
-	controller->prepare_transfer_hardware = lpspi_prepare_xfer_hardware;
-	controller->unprepare_transfer_hardware = lpspi_unprepare_xfer_hardware;
-	controller->mode_bits = SPI_CPOL | SPI_CPHA | SPI_CS_HIGH;
-	controller->flags = SPI_MASTER_MUST_RX | SPI_MASTER_MUST_TX;
-	controller->dev.of_node = pdev->dev.of_node;
-	controller->bus_num = pdev->id;
-	controller->slave_abort = fsl_lpspi_slave_abort;
-
-	ret = devm_spi_register_controller(&pdev->dev, controller);
+	ret = of_property_read_u32(np, "fsl,spi-num-chipselects", &num_cs);
 	if (ret < 0) {
-		dev_err(&pdev->dev, "spi_register_controller error.\n");
-		goto out_controller_put;
+		if (lpspi_platform_info) {
+			num_cs = lpspi_platform_info->num_chipselect;
+			controller->num_chipselect = num_cs;
+		}
+	} else {
+		controller->num_chipselect = num_cs;
 	}
+
+	fsl_lpspi = spi_controller_get_devdata(controller);
+	fsl_lpspi->dev = &pdev->dev;
+	fsl_lpspi->is_slave = is_slave;
+	fsl_lpspi->is_only_cs1 = of_property_read_bool((&pdev->dev)->of_node,
+						"fsl,spi-only-use-cs1-sel");
 
 	if (!fsl_lpspi->is_slave) {
 		controller->cs_gpios = devm_kzalloc(&controller->dev,
