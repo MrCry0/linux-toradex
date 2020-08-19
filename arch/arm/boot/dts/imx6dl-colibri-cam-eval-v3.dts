@@ -80,12 +80,11 @@
 / {
 	clocks {
 		/* fixed crystal dedicated to mcp251x */
-		clk16m: clk@1 {
+		clk16m: clk16m {
 			compatible = "fixed-clock";
-			reg=<1>;
-			#clock-cells = <0>;
 			clock-frequency = <16000000>;
 			clock-output-names = "clk16m";
+			#clock-cells = <0>;
 		};
 	};
 };
