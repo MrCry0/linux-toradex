@@ -75,6 +75,8 @@
 		gpios = <&gpio3 16 GPIO_ACTIVE_HIGH /* sda */
 			 &gpio2 30 GPIO_ACTIVE_HIGH /* scl */
 			>;
+		i2c-gpio,sda-open-drain;
+		i2c-gpio,scl-open-drain;
 		i2c-gpio,delay-us = <2>;	/* ~100 kHz */
 		#address-cells = <1>;
 		#size-cells = <0>;
