@@ -14,6 +14,154 @@
 		stdout-path = &lpuart1;
 	};
 
+	/* Apalis BKL1 */
+	backlight: backlight {
+		compatible = "pwm-backlight";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_gpio_bkl_on>;
+		enable-gpios = <&lsio_gpio1 4 GPIO_ACTIVE_HIGH>; /* Apalis BKL1_ON */
+	};
+
+	gpio-fan {
+		compatible = "gpio-fan";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_gpio8>;
+		gpios = <&lsio_gpio3 28 GPIO_ACTIVE_HIGH>;
+		gpio-fan,speed-map = <	 0 0
+				      3000 1>;
+	};
+
+	/* Apalis WAKE1_MICO */
+	gpio-keys {
+		compatible = "gpio-keys";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_gpio_keys>;
+		status = "disabled";
+
+		wakeup_key: wakeup-key {
+			label = "Wake-Up";
+			gpios = <&lsio_gpio2 20 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_WAKEUP>;
+			debounce-interval = <10>;
+			wakeup-source;
+		};
+	};
+
+	lvds1_panel {
+		compatible = "logictechno,lt170410-2whc";
+		backlight = <&backlight>;
+
+		port {
+			panel_lvds1_in: endpoint {
+				remote-endpoint = <&lvds1_out>;
+			};
+		};
+	};
+
+	pcie_sata_refclk: sata-clock-generator {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <100000000>;
+	};
+
+	pcie_sata_refclk_gate: sata-ref-clock {
+		compatible = "gpio-gate-clock";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_pcie_sata_refclk>;
+		#clock-cells = <0>;
+		clocks = <&pcie_sata_refclk>;
+		enable-gpios = <&lsio_gpio4 11 GPIO_ACTIVE_HIGH>;
+	};
+
+	/*
+	 * Power management bus used to control LDO1OUT of the
+	 * second PMIC PF8100. This is used for controlling voltage levels of
+	 * typespecific RGMII signals and Apalis UART2_RTS UART2_CTS.
+	 *
+	 * IMX_SC_R_BOARD_R1 for 3.3V
+	 * IMX_SC_R_BOARD_R2 for 1.8V
+	 *
+	 * those power domains are mutually exclusive.
+	 */
+	pmbus_external_rgmii: pmbusextrgmii {
+		compatible = "simple-pm-bus";
+		power-domains = <&pd IMX_SC_R_BOARD_R1>;
+	};
+
+	pcie_wifi_refclk: wifi-clock-generator {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <100000000>;
+	};
+
+	pcie_wifi_refclk_gate: wifi-ref-clock {
+		compatible = "gpio-gate-clock";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_pcie_wifi_refclk>;
+		#clock-cells = <0>;
+		clocks = <&pcie_wifi_refclk>;
+		enable-gpios = <&lsio_gpio2 11 GPIO_ACTIVE_HIGH>;
+	};
+
+	reg_module_3v3: regulator-module-3v3 {
+		compatible = "regulator-fixed";
+		regulator-name = "+V3.3";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+	};
+
+	reg_module_3v3_avdd: regulator-module-3v3-avdd {
+		compatible = "regulator-fixed";
+		regulator-name = "+V3.3_AUDIO";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+	};
+
+	reg_module_wifi: regulator-module-wifi {
+		compatible = "regulator-fixed";
+		enable-active-high;
+		gpio = <&lsio_gpio1 28 GPIO_ACTIVE_HIGH>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_wifi_pdn>;
+		regulator-name = "wifi_pwrdn_fake_regulator";
+		regulator-settling-time-us = <100>;
+
+		regulator-state-mem {
+			regulator-off-in-suspend;
+		};
+	};
+
+	reg_pcie_switch: regulator-pcie-switch {
+		compatible = "regulator-fixed";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_gpio7>;
+		enable-active-high;
+		gpio = <&lsio_gpio3 26 GPIO_ACTIVE_HIGH>;
+		regulator-name = "pcie_switch";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+		startup-delay-us = <100000>;
+	};
+
+	reg_usb_host_vbus: regulator-usb-host-vbus {
+		compatible = "regulator-fixed";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_usbh_en>;
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		enable-active-high;
+		/* Apalis USBH_EN */
+		gpio = <&lsio_gpio4 4 GPIO_ACTIVE_HIGH>;
+		regulator-always-on;
+	};
+
+	reg_vref_1v8: regulator-vref-1v8 {
+		compatible = "regulator-fixed";
+		regulator-name = "+V1.8";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+	};
+
 	reserved-memory {
 		#address-cells = <2>;
 		#size-cells = <2>;
@@ -62,6 +210,12 @@
 			reg = <0 0x95000000 0 0x400000>;
 		};
 
+		vdevbuffer: vdevbuffer {
+			compatible = "shared-dma-pool";
+			reg = <0 0x90400000 0 0x100000>;
+			no-map;
+		};
+
 		/* global autoconfigured region for contiguous allocations */
 		linux,cma {
 			compatible = "shared-dma-pool";
@@ -72,51 +226,35 @@
 		};
 	};
 
-	reg_module_3v3: regulator-module-3v3 {
-		compatible = "regulator-fixed";
-		regulator-name = "+V3.3";
-		regulator-min-microvolt = <3300000>;
-		regulator-max-microvolt = <3300000>;
+	touchscreen: vf50-touchscreen {
+		compatible = "toradex,vf50-touchscreen";
+		io-channels = <&adc1 2>,<&adc1 1>,
+			      <&adc1 0>,<&adc1 3>;
+		xp-gpios = <&lsio_gpio2 4 GPIO_ACTIVE_LOW>;
+		xm-gpios = <&lsio_gpio2 5 GPIO_ACTIVE_HIGH>;
+		yp-gpios = <&lsio_gpio2 17 GPIO_ACTIVE_LOW>;
+		ym-gpios = <&lsio_gpio2 21 GPIO_ACTIVE_HIGH>;
+		interrupt-parent = <&lsio_gpio3>;
+		interrupts = <22 IRQ_TYPE_LEVEL_LOW>;
+		pinctrl-names = "idle","default";
+		pinctrl-0 = <&pinctrl_touchctrl_idle>, <&pinctrl_touchctrl_gpios>;
+		pinctrl-1 = <&pinctrl_adc1>, <&pinctrl_touchctrl_gpios>;
+		vf50-ts-min-pressure = <200>;
+		status = "okay";
 	};
 
-	reg_module_3v3_avdd: regulator-module-3v3-avdd {
-		compatible = "regulator-fixed";
-		regulator-name = "+V3.3_AUDIO";
-		regulator-min-microvolt = <3300000>;
-		regulator-max-microvolt = <3300000>;
-	};
+};
 
-	reg_module_wifi: regulator-module-wifi {
-		compatible = "regulator-fixed";
-		enable-active-high;
-		gpio = <&lsio_gpio1 28 GPIO_ACTIVE_HIGH>;
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_wifi_pdn>;
-		regulator-name = "wifi_pwrdn_fake_regulator";
-		regulator-settling-time-us = <100>;
+&adc0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_adc0>;
+	vref-supply = <&reg_vref_1v8>;
+};
 
-		regulator-state-mem {
-			regulator-off-in-suspend;
-		};
-	};
-
-	reg_usb_host_vbus: regulator-usb-host-vbus {
-		compatible = "regulator-fixed";
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_usbh_en>;
-		regulator-min-microvolt = <5000000>;
-		regulator-max-microvolt = <5000000>;
-		enable-active-high;
-		/* Apalis USBH_EN */
-		gpio = <&lsio_gpio4 4 GPIO_ACTIVE_HIGH>;
-	};
-
-	reg_vref_1v8: regulator-vref-1v8 {
-		compatible = "regulator-fixed";
-		regulator-name = "+V1.8";
-		regulator-min-microvolt = <1800000>;
-		regulator-max-microvolt = <1800000>;
-	};
+&adc1 {
+	/* pinctrl handled by touchscreen above */
+	#io-channel-cells = <1>;
+	vref-supply = <&reg_vref_1v8>;
 };
 
 /* Apalis GLAN */
@@ -140,9 +278,38 @@
 			interrupt-parent = <&lsio_gpio1>;
 			interrupts = <29 IRQ_TYPE_LEVEL_LOW>;
 			micrel,led-mode = <0>;
+			power-domains = <&pd IMX_SC_R_BOARD_R0>;
 			reg = <7>;
 		};
 	};
+};
+
+/* Apalis CAN1 */
+&flexcan1 {
+	/* define the following property to disable CAN-FD mode */
+	/* disable-fd-mode; */
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_flexcan1>;
+	/* xceiver-supply = <&reg_can_stby>; */
+};
+
+/* Apalis CAN2 */
+&flexcan2 {
+	/* define the following property to disable CAN-FD mode */
+	/* disable-fd-mode; */
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_flexcan2>;
+	/* xceiver-supply = <&reg_can_stby>; */
+};
+
+/* Apalis HDMI1 */
+&hdmi {
+	compatible = "cdn,imx8qm-hdmi";
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_hdmi_ctrl>;
+	firmware-name = "hdmitxfw.bin";
+	hdmi-ctrl-gpios = <&lsio_gpio1 30 GPIO_ACTIVE_HIGH>;
+	lane-mapping = <0x93>;
 };
 
 /* On-module I2C */
@@ -345,7 +512,7 @@
 		/* Apalis GPIO6 */
 		pinctrl_gpio6: gpio6grp {
 			fsl,pins = <
-				IMX8QM_FLEXCAN2_TX_LSIO_GPIO4_IO02		0x06000021
+				IMX8QM_FLEXCAN2_TX_LSIO_GPIO4_IO02		0x00000021
 			>;
 		};
 
@@ -980,12 +1147,88 @@
 	};
 };
 
-&irqsteer_csi0 {
+&jpegdec {
 	status = "okay";
 };
 
-&irqsteer_csi1 {
+&jpegenc {
 	status = "okay";
+};
+
+&ldb2_phy {
+	status = "disabled";
+};
+
+&ldb2 {
+	status = "disabled";
+
+	lvds-channel@0 {
+		fsl,data-mapping = "spwg";
+		fsl,data-width = <24>;
+		status = "okay";
+
+		port@1 {
+			reg = <1>;
+
+			lvds1_out: endpoint {
+				remote-endpoint = <&panel_lvds1_in>;
+			};
+		};
+	};
+};
+
+/* Apalis SPI1 */
+&lpspi0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_lpspi0>;
+	#address-cells = <1>;
+	#size-cells = <0>;
+	cs-gpios = <&lsio_gpio3 5 GPIO_ACTIVE_LOW>;
+
+	spidev0: spi@0 {
+		compatible = "toradex,evalspi";
+		reg = <0>;
+		spi-max-frequency = <4000000>;
+	};
+};
+
+/* Apalis SPI2 */
+&lpspi2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_lpspi2>;
+	#address-cells = <1>;
+	#size-cells = <0>;
+	cs-gpios = <&lsio_gpio3 10 GPIO_ACTIVE_LOW>;
+
+	spidev1: spi@0 {
+		compatible = "toradex,evalspi";
+		reg = <0>;
+		spi-max-frequency = <4000000>;
+	};
+};
+
+/* Apalis UART3 */
+&lpuart0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_lpuart0>;
+};
+
+/* Apalis UART1 */
+&lpuart1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_lpuart1>;
+};
+
+/* Apalis UART4 */
+&lpuart2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_lpuart2>;
+};
+
+/* Apalis UART2 */
+&lpuart3 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_lpuart3>;
 };
 
 &lsio_gpio0 {
@@ -1017,13 +1260,6 @@
 			  "MXM3_118",
 			  "MXM3_114",
 			  "MXM3_116";
-
-	/* Todo: Remove that again when adding PCIE */
-	reset_moci {
-		gpio-hog;
-		gpios = <30 GPIO_ACTIVE_HIGH>;
-		output-high;
-	};
 };
 
 &lsio_gpio1 {
@@ -1085,6 +1321,15 @@
 			  "MXM3_183",
 			  "MXM3_185",
 			  "MXM3_187";
+
+	/*
+	 * Add GPIO2_20 as a wakeup source:
+	 * Pin:  SC_P_SPI3_CS0 (MXM3_37/WAKE1_MICO)
+	 * Type: SC_PAD_WAKEUP_FALL_EDGE
+	 * Line: 20
+	 */
+	 pad-wakeup = <101 5 20>;
+	 pad-wakeup-num = <1>;
 };
 
 &lsio_gpio3 {
@@ -1210,28 +1455,135 @@
 			  "MXM3_243";
 };
 
-/* Apalis UART3 */
-&lpuart0 {
+/* Apalis PCIE1 */
+&pciea {
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_lpuart0>;
+	pinctrl-0 = <&pinctrl_reset_moci>;
+	clocks = <&pciea_lpcg 0>,
+		 <&pciea_lpcg 1>,
+		 <&pciea_lpcg 2>,
+		 <&phyx2_lpcg 0>,
+		 <&phyx2_crr0_lpcg 0>,
+		 <&pciea_crr2_lpcg 0>,
+		 <&misc_crr5_lpcg 0>,
+		 <&pcie_sata_refclk_gate>;
+	clock-names = "pcie", "pcie_bus", "pcie_inbound_axi",
+		      "pcie_phy", "phy_per", "pcie_per", "misc_per",
+		      "pcie_ext";
+
+	ext_osc = <1>;
+	fsl,max-link-speed = <1>;
+	reset-gpio = <&lsio_gpio0 30 GPIO_ACTIVE_LOW>;
+	vpcie-supply = <&reg_pcie_switch>;
 };
 
-/* Apalis UART1 */
-&lpuart1 {
+/* On-module Wi-Fi */
+&pcieb {
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_lpuart1>;
+	pinctrl-0 = <&pinctrl_pcieb &pinctrl_wifi>;
+	clocks = <&pcieb_lpcg 0>,
+		 <&pcieb_lpcg 1>,
+		 <&pcieb_lpcg 2>,
+		 <&phyx2_lpcg 1>,
+		 <&phyx2_lpcg 0>,
+		 <&phyx2_crr0_lpcg 0>,
+		 <&pcieb_crr3_lpcg 0>,
+		 <&pciea_crr2_lpcg 0>,
+		 <&misc_crr5_lpcg 0>,
+		 <&pcie_wifi_refclk_gate>;
+	clock-names = "pcie", "pcie_bus", "pcie_inbound_axi",
+		      "pcie_phy", "pcie_phy_pclk", "phy_per",
+		      "pcie_per", "pciex2_per", "misc_per",
+		      "pcie_ext";
+	epdev_on-supply = <&reg_module_wifi>;
+	ext_osc = <1>;
+	fsl,max-link-speed = <1>;
+	reset-gpio = <&lsio_gpio5 0 GPIO_ACTIVE_LOW>;
+	status = "okay";
 };
 
-/* Apalis UART4 */
-&lpuart2 {
+&pwm_lvds1 {
+	#pwm-cells = <3>;
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_lpuart2>;
+	pinctrl-0 = <&pinctrl_pwm_bkl>;
+	status = "okay";
 };
 
-/* Apalis UART2 */
-&lpuart3 {
+/* Apalis PWM3, MXM3 pin 6 */
+&pwm0 {
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_lpuart3>;
+	pinctrl-0 = <&pinctrl_pwm0>;
+	#pwm-cells = <3>;
+};
+
+/* Apalis PWM4, MXM3 pin 8 */
+&pwm1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pwm1>;
+	#pwm-cells = <3>;
+};
+
+/* Apalis PWM1, MXM3 pin 2 */
+&pwm2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pwm2>;
+	#pwm-cells = <3>;
+};
+
+/* Apalis PWM2, MXM3 pin 4 */
+&pwm3 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pwm3>;
+	#pwm-cells = <3>;
+};
+
+&rpmsg0{
+	/*
+	 * 64K for one rpmsg instance:
+	 */
+	vdev-nums = <2>;
+	reg = <0x0 0x90000000 0x0 0x20000>;
+	memory-region = <&vdevbuffer>;
+};
+
+&rpmsg1{
+	/*
+	 * 64K for one rpmsg instance:
+	 */
+	vdev-nums = <2>;
+	reg = <0x0 0x90100000 0x0 0x20000>;
+	memory-region = <&vdevbuffer>;
+};
+
+
+/* Apalis SATA1 */
+&sata {
+	clocks = <&sata_lpcg 0>,
+		 <&phyx1_lpcg 0>,
+		 <&phyx1_lpcg 1>,
+		 <&phyx1_lpcg 2>,
+		 <&phyx2_crr0_lpcg 0>,
+		 <&phyx1_crr1_lpcg 0>,
+		 <&pciea_crr2_lpcg 0>,
+		 <&pcieb_crr3_lpcg 0>,
+		 <&sata_crr4_lpcg 0>,
+		 <&misc_crr5_lpcg 0>,
+		 <&phyx2_lpcg 0>,
+		 <&phyx2_lpcg 1>,
+		 <&phyx1_lpcg 3>,
+		 <&pcie_sata_refclk_gate>;
+	clock-names = "sata", "sata_ref", "epcs_tx", "epcs_rx",
+		      "per_clk0", "per_clk1", "per_clk2",
+		      "per_clk3", "per_clk4", "per_clk5",
+		      "phy_pclk0", "phy_pclk1", "phy_apbclk",
+		      "sata_ext";
+	ext_osc = <1>;
+};
+
+/* Apalis SPDIF1 */
+&spdif0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_spdif0>;
 };
 
 &thermal_zones {
@@ -1266,6 +1618,25 @@
 	};
 };
 
+&usb3phynop1 {
+	status = "okay";
+};
+
+/* Apalis USBH2, Apalis USBH3 and on-module Wi-Fi via on-module HSIC Hub */
+&usbh1 {
+	pinctrl-names = "idle", "active";
+	pinctrl-0 = <&pinctrl_usb_hsic_idle>;
+	pinctrl-1 = <&pinctrl_usb_hsic_active>;
+	adp-disable;
+	disable-over-current;
+	hnp-disable;
+	srp-disable;
+};
+
+&usbphy1 {
+	status = "okay";
+};
+
 /* Apalis USBO1 */
 &usbotg1 {
 	pinctrl-names = "default";
@@ -1273,7 +1644,7 @@
 	adp-disable;
 	ci-disable-lpm;
 	hnp-disable;
-	power-polarity-active-high;
+	over-current-active-high;
 	srp-disable;
 };
 
@@ -1288,7 +1659,7 @@
 	non-removable;
 	status = "okay";
 };
-#if 0
+
 /* Apalis MMC1 */
 &usdhc2 {
 	bus-width = <8>;
@@ -1308,4 +1679,62 @@
 	pinctrl-1 = <&pinctrl_usdhc3_100mhz>, <&pinctrl_sd1_cd>;
 	pinctrl-2 = <&pinctrl_usdhc3_200mhz>, <&pinctrl_sd1_cd>;
 };
-#endif
+
+&vpu_decoder {
+	compatible = "nxp,imx8qm-b0-vpudec";
+	boot-region = <&decoder_boot>;
+	rpc-region = <&decoder_rpc>;
+	reg-csr = <0x2d080000>;
+	core_type = <2>;
+	status = "okay";
+};
+
+&vpu_ts {
+	compatible = "nxp,imx8qm-b0-vpu-ts";
+	boot-region = <&ts_boot>;
+	reg-csr = <0x2d0b0000>;
+	status = "okay";
+};
+
+&vpu_encoder {
+	compatible = "nxp,imx8qm-b0-vpuenc";
+	boot-region = <&encoder_boot>;
+	rpc-region = <&encoder_rpc>;
+	reserved-region = <&encoder_reserved>;
+	reg-rpc-system = <0x40000000>;
+	resolution-max = <1920 1920>;
+	power-domains = <&pd IMX_SC_R_VPU_ENC_0>, <&pd IMX_SC_R_VPU_ENC_1>,
+			<&pd IMX_SC_R_VPU>;
+	power-domain-names = "vpuenc1", "vpuenc2", "vpu";
+	mbox-names = "enc1_tx0", "enc1_tx1", "enc1_rx",
+		     "enc2_tx0", "enc2_tx1", "enc2_rx";
+	mboxes = <&mu1_m0 0 0
+		  &mu1_m0 0 1
+		  &mu1_m0 1 0
+		  &mu2_m0 0 0
+		  &mu2_m0 0 1
+		  &mu2_m0 1 0>;
+	status = "okay";
+
+	vpu_enc_core0: core0@1020000 {
+		compatible = "fsl,imx8-mu1-vpu-m0";
+		reg = <0x1020000 0x20000>;
+		reg-csr = <0x1090000 0x10000>;
+		interrupts = <GIC_SPI 473 IRQ_TYPE_LEVEL_HIGH>;
+		fsl,vpu_ap_mu_id = <17>;
+		fw-buf-size = <0x200000>;
+		rpc-buf-size = <0x80000>;
+		print-buf-size = <0x80000>;
+	};
+
+	vpu_enc_core1: core1@1040000 {
+		compatible = "fsl,imx8-mu2-vpu-m0";
+		reg = <0x1040000 0x20000>;
+		reg-csr = <0x10A0000 0x10000>;
+		interrupts = <GIC_SPI 474 IRQ_TYPE_LEVEL_HIGH>;
+		fsl,vpu_ap_mu_id = <18>;
+		fw-buf-size = <0x200000>;
+		rpc-buf-size = <0x80000>;
+		print-buf-size = <0x80000>;
+	};
+};
