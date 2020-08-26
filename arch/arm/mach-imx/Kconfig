@@ -46,6 +46,7 @@ config HAVE_IMX_GPCV2
 
 config HAVE_IMX_MMDC
 	bool
+	select HAVE_IMX_BUSFREQ
 
 config HAVE_IMX_AMP
 	bool
