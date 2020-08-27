@@ -3,13 +3,6 @@
  * Copyright 2020 Toradex
  */
 
-&backlight {
-	brightness-levels = <0 45 63 88 119 158 203 255>;
-	default-brightness-level = <4>;
-	pwms = <&pwm1 0 6666667 PWM_POLARITY_INVERTED>;
-	status = "okay";
-};
-
 /* Verdin SPI_1 */
 &ecspi2 {
 	status = "okay";
@@ -50,10 +43,6 @@
 	status = "okay";
 };
 
-&i2c2 {
-	status = "okay";
-};
-
 &i2c3 {
 	status = "okay";
 };
@@ -62,21 +51,8 @@
 	status = "okay";
 };
 
-&mipi_dsi {
-	status = "okay";
-};
-
-/* MIPI-DSI to HDMI adapter */
-&mipi_dsi_hdmi {
-	status = "okay";
-};
 /* Verdin PCIE_1 */
 &pcie0 {
-	status = "okay";
-};
-
-/* Verdin PWM_3_DSI */
-&pwm1 {
 	status = "okay";
 };
 

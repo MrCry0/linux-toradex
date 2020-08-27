@@ -7,15 +7,6 @@
 #include "imx8mm.dtsi"
 
 / {
-	backlight: backlight {
-		compatible = "pwm-backlight";
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_dsi_bkl_en>;
-		enable-gpios = <&gpio3 3 GPIO_ACTIVE_HIGH>;
-		power-supply = <&reg_3p3v>;
-		status = "disabled";
-	};
-
 	chosen {
 		bootargs = "console=ttymxc0,115200 earlycon";
 		stdout-path = &uart1;
@@ -34,34 +25,42 @@
 		pinctrl-0 = <&pinctrl_gpio_keys>;
 
 		wakeup {
-			label = "Wake-Up";
-			gpios = <&gpio4 28 GPIO_ACTIVE_LOW>;
-			linux,code = <KEY_WAKEUP>;
 			debounce-interval = <10>;
+			gpios = <&gpio4 28 GPIO_ACTIVE_LOW>;
+			label = "Wake-Up";
+			linux,code = <KEY_WAKEUP>;
 			wakeup-source;
 		};
+	};
+
+	pcie0_refclk: pcie0-refclk {
+		compatible = "gpio-gate-clock";
+		#clock-cells = <0>;
+		clock-frequency = <100000000>;
+		/* on-module ext oscillator */
+		enable-gpios = <&gpio2 19 GPIO_ACTIVE_HIGH>;
 	};
 
 	/* Carrier Board Supply */
 	reg_3p3v: regulator-3p3v {
 		compatible = "regulator-fixed";
-		regulator-name = "REG_3P3V";
-		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
+		regulator-min-microvolt = <3300000>;
+		regulator-name = "REG_3P3V";
 	};
 
 	reg_aux_usb: regulator-aux-usb {
 		compatible = "regulator-fixed";
-		regulator-name = "REG_AUX_USB";
-		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
+		regulator-min-microvolt = <3300000>;
+		regulator-name = "REG_AUX_USB";
 	};
 
 	reg_mipi_phy: regulator-mipi-phy {
 		compatible = "regulator-fixed";
-		regulator-name = "REG_MIPI_PHY";
-		regulator-min-microvolt = <1000000>;
 		regulator-max-microvolt = <1000000>;
+		regulator-min-microvolt = <1000000>;
+		regulator-name = "REG_MIPI_PHY";
 	};
 
 	reg_ethphy: regulator-ethphy {
@@ -72,9 +71,9 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_reg_eth>;
 		regulator-boot-on;
-		regulator-name = "V3.3_ETH";
-		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
+		regulator-min-microvolt = <3300000>;
+		regulator-name = "V3.3_ETH";
 		startup-delay-us = <200000>;
 	};
 
@@ -85,9 +84,9 @@
 		gpio = <&gpio1 12 GPIO_ACTIVE_HIGH>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_reg_usb1_en>;
-		regulator-name = "usb_otg1_vbus";
-		regulator-min-microvolt = <5000000>;
 		regulator-max-microvolt = <5000000>;
+		regulator-min-microvolt = <5000000>;
+		regulator-name = "usb_otg1_vbus";
 	};
 
 	reg_usb_otg2_vbus: regulator-usb-otg2 {
@@ -97,9 +96,9 @@
 		gpio = <&gpio1 14 GPIO_ACTIVE_HIGH>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_reg_usb2_en>;
-		regulator-name = "usb_otg2_vbus";
-		regulator-min-microvolt = <5000000>;
 		regulator-max-microvolt = <5000000>;
+		regulator-min-microvolt = <5000000>;
+		regulator-name = "usb_otg2_vbus";
 	};
 
 	reg_usdhc2_vmmc: regulator-usdhc2 {
@@ -108,11 +107,22 @@
 		gpio = <&gpio3 5 GPIO_ACTIVE_HIGH>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_usdhc2_pwr_en>;
-		regulator-name = "V3.3_SD";
-		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
+		regulator-min-microvolt = <3300000>;
+		regulator-name = "V3.3_SD";
 		startup-delay-us = <2000>;
 		off-on-delay = <100000>;
+	};
+
+	reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		rpmsg_reserved: rpmsg@b8000000 {
+			no-map;
+			reg = <0 0xb8000000 0 0x400000>;
+		};
 	};
 
 	sound_card: sound-card {
@@ -133,6 +143,7 @@
 			"Microphone", "Microphone Jack",
 			"Headphone", "Headphone Jack",
 			"Line", "Line In Jack";
+
 		dailink_master: simple-audio-card,codec {
 			sound-dai = <&wm8904_1a>;
 			clocks = <&clk IMX8MM_CLK_SAI2_ROOT>;
@@ -145,16 +156,7 @@
 };
 
 &A53_0 {
-	arm-supply = <&buck2_reg>;
-};
-
-/*
- * The AUDIO PLLs support max 650MHz, so use the suitable settings.
- * Originally introduced by NXP in the NXP commit a4b0c7c3fadc7.
- */
-&clk {
-	assigned-clocks = <&clk IMX8MM_AUDIO_PLL1>, <&clk IMX8MM_AUDIO_PLL2>;
-	assigned-clock-rates = <393216000>, <361267200>;
+	cpu-supply = <&buck2_reg>;
 };
 
 /* Verdin SPI_1 */
@@ -344,10 +346,6 @@
 	};
 };
 
-&gpu {
-	status = "okay";
-};
-
 /* On-module I2C */
 &i2c1 {
 	clock-frequency = <400000>;
@@ -356,13 +354,13 @@
 	status = "okay";
 
 	pmic: bd71837@4b {
-		compatible = "rohm,bd71840", "rohm,bd71837";
-		bd71837,pmic-buck2-uses-i2c-dvs;
-		bd71837,pmic-buck2-dvs-voltage = <1000000>, <900000>, <0>; /* VDD_ARM: Run-Idle */
-		gpio_intr = <&gpio1 3 GPIO_ACTIVE_LOW>;
+		compatible = "rohm,bd71837";
+		interrupt-parent = <&gpio1>;
 		/* PMIC BD71837 PMIC_nINT GPIO1_IO3 */
+		interrupts = <3 GPIO_ACTIVE_LOW>;
 		pinctrl-0 = <&pinctrl_pmic>;
 		reg = <0x4b>;
+		rohm,reset-snvs-powered;
 
 		gpo {
 			rohm,drv = <0x0C>;	/* 0b0000_1100 all gpos with cmos output mode */
@@ -372,97 +370,97 @@
 			buck1_reg: BUCK1 {
 				regulator-always-on;
 				regulator-boot-on;
-				regulator-compatible = "buck1";
 				regulator-max-microvolt = <1300000>;
 				regulator-min-microvolt = <700000>;
+				regulator-name = "BUCK1";
 				regulator-ramp-delay = <1250>;
 			};
 
 			buck2_reg: BUCK2 {
 				regulator-always-on;
 				regulator-boot-on;
-				regulator-compatible = "buck2";
 				regulator-max-microvolt = <1300000>;
 				regulator-min-microvolt = <700000>;
+				regulator-name = "BUCK2";
 				regulator-ramp-delay = <1250>;
 			};
 
 			buck5_reg: BUCK5 {
 				regulator-always-on;
 				regulator-boot-on;
-				regulator-compatible = "buck5";
 				regulator-max-microvolt = <1350000>;
 				regulator-min-microvolt = <700000>;
+				regulator-name = "BUCK5";
 			};
 
 			buck6_reg: BUCK6 {
 				regulator-always-on;
 				regulator-boot-on;
-				regulator-compatible = "buck6";
 				regulator-max-microvolt = <3300000>;
 				regulator-min-microvolt = <3000000>;
+				regulator-name = "BUCK6";
 			};
 
 			buck7_reg: BUCK7 {
 				regulator-always-on;
 				regulator-boot-on;
-				regulator-compatible = "buck7";
 				regulator-max-microvolt = <1995000>;
 				regulator-min-microvolt = <1605000>;
+				regulator-name = "BUCK7";
 			};
 
 			buck8_reg: BUCK8 {
 				regulator-always-on;
 				regulator-boot-on;
-				regulator-compatible = "buck8";
 				regulator-max-microvolt = <1400000>;
 				regulator-min-microvolt = <800000>;
+				regulator-name = "BUCK8";
 			};
 
 			ldo1_reg: LDO1 {
 				regulator-always-on;
 				regulator-boot-on;
-				regulator-compatible = "ldo1";
 				regulator-max-microvolt = <3300000>;
 				regulator-min-microvolt = <3000000>;
+				regulator-name = "LDO1";
 			};
 
 			ldo2_reg: LDO2 {
 				regulator-always-on;
 				regulator-boot-on;
-				regulator-compatible = "ldo2";
 				regulator-max-microvolt = <900000>;
 				regulator-min-microvolt = <900000>;
+				regulator-name = "LDO2";
 			};
 
 			ldo3_reg: LDO3 {
 				regulator-always-on;
 				regulator-boot-on;
-				regulator-compatible = "ldo3";
 				regulator-max-microvolt = <3300000>;
 				regulator-min-microvolt = <1800000>;
+				regulator-name = "LDO3";
 			};
 
 			ldo4_reg: LDO4 {
 				regulator-always-on;
 				regulator-boot-on;
-				regulator-compatible = "ldo4";
 				regulator-max-microvolt = <1800000>;
 				regulator-min-microvolt = <900000>;
+				regulator-name = "LDO4";
 			};
 
 			ldo5_reg: LDO5 {
-				regulator-compatible = "ldo5";
 				regulator-max-microvolt = <3300000>;
 				regulator-min-microvolt = <3300000>;
+				regulator-name = "LDO5";
 			};
 
 			ldo6_reg: LDO6 {
 				regulator-always-on;
 				regulator-boot-on;
-				regulator-compatible = "ldo6";
 				regulator-max-microvolt = <1800000>;
 				regulator-min-microvolt = <900000>;
+				regulator-name = "LDO6";
 			};
 		};
 	};
@@ -483,13 +481,6 @@
 		pagesize = <16>;
 		reg = <0x50>;
 	};
-};
-
-/* Verdin I2C_2_DSI */
-&i2c2 {
-	clock-frequency = <10000>;
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_i2c2>;
 };
 
 /* Verdin I2C_3_HDMI N/A */
@@ -539,36 +530,6 @@
 		status = "disabled";
 	};
 
-	/* MIPI-DSI to HDMI adapter */
-	mipi_dsi_hdmi: hdmi@48 {
-		compatible = "lontium,lt8912";
-		ddc-i2c-bus = <&i2c2>;
-		hpd-gpios = <&gpio3 15 GPIO_ACTIVE_HIGH>;
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_gpio_hpd>, <&pinctrl_gpio1>,
-			    <&pinctrl_gpio2>;
-		reg = <0x48>;
-		reset-gpios = <&gpio5 5 GPIO_ACTIVE_LOW>;
-		status = "disabled";
-
-		port {
-			lt8912_1_in: endpoint {
-				remote-endpoint = <&mipi_dsi_bridge1_out>;
-			};
-		};
-	};
-
-	atmel_mxt_ts: atmel_mxt_ts@4a {
-		compatible = "atmel,maxtouch";
-		interrupt-parent = <&gpio3>;
-		interrupts = <15 IRQ_TYPE_EDGE_FALLING>; /* SODIMM 17 */
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_gpio_hpd>, <&pinctrl_gpio2>;
-		reg = <0x4a>;
-		reset-gpios = <&gpio5 5 GPIO_ACTIVE_HIGH>; /* SODIMM 208 */
-		status = "disabled";
-	};
-
 	/* EEPROM on display adapter (MIPI DSI Display Adapter) */
 	eeprom_display_adapter: eeprom@50 {
 		compatible = "st,24c02";
@@ -590,34 +551,23 @@
 	status = "okay";
 };
 
-&mipi_dsi {
-	port@1 {
-		mipi_dsi_bridge1_out: endpoint {
-			remote-endpoint = <&lt8912_1_in>;
-		};
-	};
-};
-
 &mu {
 	status = "okay";
 };
 
 /* Verdin PCIE_1 */
 &pcie0 {
-	/* on-module ext oscillator */
-	clkreq-gpio = <&gpio2 19 GPIO_ACTIVE_HIGH>;
+	clocks = <&clk IMX8MM_CLK_PCIE1_ROOT>,
+		 <&clk IMX8MM_CLK_PCIE1_AUX>,
+		 <&clk IMX8MM_CLK_PCIE1_PHY>,
+		 <&pcie0_refclk>;
+	clock-names = "pcie", "pcie_aux", "pcie_phy", "pcie_bus";
 	epdev_on-supply = <&reg_3p3v>;
 	ext_osc = <1>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pcie0>;
+	reserved-region = <&rpmsg_reserved>;
 	reset-gpio = <&gpio3 19 GPIO_ACTIVE_LOW>;
-};
-
-/* Verdin PWM_3_DSI */
-&pwm1 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_pwm_1>;
-	#pwm-cells = <3>;
 };
 
 /* Verdin PWM_1 */
@@ -642,6 +592,10 @@
 	assigned-clocks = <&clk IMX8MM_CLK_SAI2>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_sai2>;
+};
+
+&snvs_pwrkey {
+	status = "okay";
 };
 
 /* Verdin UART_3 */
@@ -684,9 +638,13 @@
 
 /* Verdin USB_1 */
 &usbotg1 {
+	adp-disable;
 	dr_mode = "otg";
+	hnp-disable;
 	picophy,dc-vol-level-adjust = <7>;
 	picophy,pre-emp-curr-control = <3>;
+	srp-disable;
+	usb-role-switch;
 	vbus-supply = <&reg_usb_otg1_vbus>;
 };
 
