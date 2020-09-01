@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+ OR X11
 /*
- * Copyright 2018-2019 Toradex
+ * Copyright 2018-2020 Toradex
  */
 
 #include "dt-bindings/pwm/pwm.h"
@@ -10,9 +10,44 @@
 	model = "Toradex Colibri iMX8QXP/DX Module";
 	compatible = "toradex,colibri-imx8x", "fsl,imx8qxp";
 
+	backlight: backlight {
+		compatible = "pwm-backlight";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_gpio_bl_on>;
+		enable-gpios = <&lsio_gpio3 12 GPIO_ACTIVE_HIGH>; /* Colibri BL_ON */
+		status = "disabled";
+	};
+
 	chosen {
+		bootargs = "console=ttyLP3,115200";
 		stdout-path = &lpuart3;
 	};
+
+	/* Colibri Parallel RGB */
+	display_lcdif: display@disp1 {
+                compatible = "fsl,imx-lcdif-mux-display";
+                #address-cells = <1>;
+                #size-cells = <0>;
+                pinctrl-names = "default";
+                pinctrl-0 = <&pinctrl_lcdif>;
+                clocks = <&clk IMX_SC_R_LCD_0 IMX_SC_PM_CLK_BYPASS>,
+                         <&clk IMX_SC_R_LCD_0 IMX_SC_PM_CLK_MISC0>;
+                clock-names = "bypass_div", "pixel";
+                assigned-clocks = <&clk IMX_SC_R_LCD_0 IMX_SC_PM_CLK_MISC0>;
+                assigned-clock-parents = <&clk IMX_SC_R_LCD_0 IMX_SC_PM_CLK_BYPASS>;
+                fsl,lcdif-mux-regs = <&lcdif_mux_regs>;
+                fsl,interface-pix-fmt = "rgb666";
+                power-domains = <&pd IMX_SC_R_LCD_0>;
+		status = "disabled";
+
+                port@0 {
+                        reg = <0>;
+
+                        lcd_display_in: endpoint {
+                                remote-endpoint = <&dpu_disp1_lcdif>;
+                        };
+                };
+        };
 
 	reg_module_3v3: regulator-module-3v3 {
 		compatible = "regulator-fixed";
@@ -20,6 +55,119 @@
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
 	};
+
+	reg_module_3v3_avdd: regulator-module-3v3-avdd {
+		compatible = "regulator-fixed";
+		regulator-name = "+V3.3_AVDD_AUDIO";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+	};
+
+	reg_vref_1v8: regulator-vref-1v8 {
+		compatible = "regulator-fixed";
+		regulator-name = "vref-1v8";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+	};
+
+	vdd_3v3_vga: regulator-vga-avcc {
+		compatible = "regulator-fixed";
+		regulator-name = "+3.3V_AVCC_VGA";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-always-on;
+        };
+};
+
+/* Colibri Analogue Inputs */
+&adc0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_adc0>;
+	vref-supply = <&reg_vref_1v8>;
+};
+
+/* Colibri PWM_A */
+&adma_pwm {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pwm_a>;
+	#pwm-cells = <3>;
+};
+
+&cameradev {
+	status = "disabled";
+};
+
+/* Display Prefetch Resolve, (Tiling) */
+&dc0_dpr1_channel1 {
+	status = "okay";
+};
+
+&dc0_dpr1_channel2 {
+	status = "okay";
+};
+
+&dc0_dpr1_channel3 {
+	status = "okay";
+};
+
+&dc0_dpr2_channel1 {
+	status = "okay";
+};
+
+&dc0_dpr2_channel2 {
+	status = "okay";
+};
+
+&dc0_dpr2_channel3 {
+	status = "okay";
+};
+
+&dc0_pc {
+	status = "okay";
+};
+
+&dc0_prg1 {
+	status = "okay";
+};
+
+&dc0_prg2 {
+	status = "okay";
+};
+
+&dc0_prg3 {
+	status = "okay";
+};
+
+&dc0_prg4 {
+	status = "okay";
+};
+
+&dc0_prg5 {
+	status = "okay";
+};
+
+&dc0_prg6 {
+	status = "okay";
+};
+
+&dc0_prg7 {
+	status = "okay";
+};
+
+&dc0_prg8 {
+	status = "okay";
+};
+
+&dc0_prg9 {
+	status = "okay";
+};
+
+&dpu1 {
+	status = "okay";
+};
+
+&dpu_disp1_lcdif {
+	remote-endpoint = <&lcd_display_in>;
 };
 
 /* Colibri Ethernet */
@@ -43,172 +191,114 @@
 	};
 };
 
-&lsio_gpio0 {
+/* Colibri optional CAN on UART_B RTS/CTS */
+&flexcan1 {
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_flexcan1>;
+        xceiver-supply = <&reg_module_3v3>;
+};
+
+/* Colibri optional CAN on PS2 */
+&flexcan2 {
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_flexcan2>;
+        xceiver-supply = <&reg_module_3v3>;
+};
+
+/* Colibri optional CAN on UART_A TXD/RXD */
+&flexcan3 {
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_flexcan3>;
+        xceiver-supply = <&reg_module_3v3>;
+};
+
+&gpu_3d0 {
 	status = "okay";
 };
 
-&lsio_gpio1 {
+/* On-module I2C */
+&i2c0 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	clock-frequency = <100000>;
+	pinctrl-names = "default";
+	/*
+	 * There is a shared clock between SGTL5000 and on-module USB hab,
+	 * so it is a good way to handle pinmuxing for this clock on a parent
+	 * device i2c0
+	 */
+	pinctrl-0 = <&pinctrl_i2c0>, <&pinctrl_sgtl5000_usb_clk>;
 	status = "okay";
+
+	/* GPIO expander */
+	gpio_expander_43: gpio-expander@43 {
+		compatible = "fcs,fxl6408";
+		gpio-controller;
+		#gpio-cells = <2>;
+		reg = <0x43>;
+		inital_io_dir = <0xff>;
+		inital_output = <0x05>;
+	};
+
+	/* Touch controller */
+        ad7879@2c {
+		compatible = "adi,ad7879-1";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_ad7879_int>;
+		reg = <0x2c>;
+		interrupt-parent = <&lsio_gpio3>;
+		interrupts = <5 IRQ_TYPE_EDGE_FALLING>;
+		touchscreen-max-pressure = <4096>;
+		adi,resistance-plate-x = <120>;
+		adi,first-conversion-delay = /bits/ 8 <3>;
+		adi,acquisition-time = /bits/ 8 <1>;
+		adi,median-filter-size = /bits/ 8 <2>;
+		adi,averaging = /bits/ 8 <1>;
+		adi,conversion-interval = /bits/ 8 <255>;
+        };
 };
 
-&lsio_gpio3 {
-	status = "okay";
+/* MIPI DSI accessible on FFC (X2) */
+&i2c0_mipi_lvds0 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_i2c0_mipi_lvds0>;
+	clock-frequency = <100000>;
 };
 
-&lsio_gpio4 {
-	status = "okay";
+/* On-module MIPI CSI I2C accessible on FFC (X3) */
+&i2c0_mipi_lvds1 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	clock-frequency = <100000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_i2c0_mipi_lvds1>;
 };
 
-&lsio_gpio0 {
-	gpio-line-names = "",
-			  "SODIMM_70",
-			  "SODIMM_60",
-			  "SODIMM_58",
-			  "SODIMM_78",
-			  "SODIMM_72",
-			  "SODIMM_80",
-			  "SODIMM_46",
-			  "SODIMM_62",
-			  "SODIMM_48",
-			  "SODIMM_74",
-			  "SODIMM_50",
-			  "SODIMM_52",
-			  "SODIMM_54",
-			  "SODIMM_66",
-			  "SODIMM_64",
-			  "SODIMM_68",
-			  "",
-			  "",
-			  "SODIMM_82",
-			  "SODIMM_56",
-			  "SODIMM_28",
-			  "SODIMM_30",
-			  "",
-			  "SODIMM_61",
-			  "SODIMM_103",
-			  "",
-			  "",
-			  "",
-			  "SODIMM_25",
-			  "SODIMM_27",
-			  "SODIMM_100";
+/* Colibri I2C */
+&i2c1 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	clock-frequency = <100000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_i2c1>;
+
+	/* Atmel maxtouch controller */
+	atmel_mxt_ts: atmel_mxt_ts@4a {
+		compatible = "atmel,maxtouch";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_mxt_ts>;
+		reg = <0x4a>;
+		interrupt-parent = <&lsio_gpio3>;
+		interrupts = <20 IRQ_TYPE_EDGE_FALLING>;        /* SODIMM 107 */
+		reset-gpios = <&lsio_gpio3 24 GPIO_ACTIVE_HIGH>;     /* SODIMM 106 */
+		status = "disabled";
+	};
 };
 
-&lsio_gpio1 {
-	gpio-line-names = "SODIMM_86",
-			  "SODIMM_92",
-			  "SODIMM_90",
-			  "SODIMM_88",
-			  "",
-			  "",
-			  "",
-			  "SODIMM_59",
-			  "",
-			  "SODIMM_6",
-			  "SODIMM_8",
-			  "",
-			  "",
-			  "SODIMM_2",
-			  "SODIMM_4",
-			  "SODIMM_34",
-			  "SODIMM_32",
-			  "SODIMM_63",
-			  "SODIMM_55",
-			  "SODIMM_33",
-			  "SODIMM_35",
-			  "SODIMM_36",
-			  "SODIMM_38",
-			  "SODIMM_21",
-			  "SODIMM_19",
-			  "SODIMM_140",
-			  "SODIMM_142",
-			  "SODIMM_196",
-			  "SODIMM_194",
-			  "SODIMM_186",
-			  "SODIMM_188",
-			  "SODIMM_138";
-};
-
-&lsio_gpio2 {
-	gpio-line-names = "SODIMM_23",
-			  "",
-			  "",
-			  "SODIMM_144";
-};
-
-&lsio_gpio3 {
-	gpio-line-names = "SODIMM_96",
-			  "SODIMM_75",
-			  "SODIMM_37",
-			  "SODIMM_29",
-			  "",
-			  "",
-			  "",
-			  "",
-			  "",
-			  "SODIMM_43",
-			  "SODIMM_45",
-			  "SODIMM_69",
-			  "SODIMM_71",
-			  "SODIMM_73",
-			  "SODIMM_77",
-			  "SODIMM_89",
-			  "SODIMM_93",
-			  "SODIMM_95",
-			  "SODIMM_99",
-			  "SODIMM_105",
-			  "SODIMM_107",
-			  "SODIMM_98",
-			  "SODIMM_102",
-			  "SODIMM_104",
-			  "SODIMM_106";
-};
-
-&lsio_gpio4 {
-	gpio-line-names = "",
-			  "",
-			  "",
-			  "SODIMM_129",
-			  "SODIMM_133",
-			  "SODIMM_127",
-			  "SODIMM_131",
-			  "",
-			  "",
-			  "",
-			  "",
-			  "",
-			  "",
-			  "",
-			  "",
-			  "",
-			  "",
-			  "",
-			  "",
-			  "SODIMM_44",
-			  "",
-			  "SODIMM_76",
-			  "SODIMM_31",
-			  "SODIMM_47",
-			  "SODIMM_190",
-			  "SODIMM_192",
-			  "SODIMM_49",
-			  "SODIMM_51",
-			  "SODIMM_53";
-};
-
-&lsio_gpio5 {
-	gpio-line-names = "",
-			  "SODIMM_57",
-			  "SODIMM_65",
-			  "SODIMM_85",
-			  "",
-			  "",
-			  "",
-			  "",
-			  "SODIMM_135",
-			  "SODIMM_137",
-			  "UNUSABLE_SODIMM_180",
-			  "UNUSABLE_SODIMM_184";
+&imx8_gpu_ss {
+        status = "okay";
 };
 
 &iomuxc {
@@ -512,11 +602,11 @@
 		/* Colibri Parallel RGB LCD Interface */
 		pinctrl_lcdif: lcdif-pins {
 			fsl,pins = <
+				IMX8QXP_USDHC1_RESET_B_LSIO_GPIO4_IO19		0x40		/* SODIMM  44 */
+				IMX8QXP_MCLK_IN1_ADMA_LCDIF_EN			0x40		/* SODIMM  44 */
 				IMX8QXP_MCLK_OUT0_ADMA_LCDIF_CLK		0x60		/* SODIMM  56 */
 				IMX8QXP_SPI3_CS0_ADMA_LCDIF_HSYNC		0x60		/* SODIMM  68 */
 				IMX8QXP_MCLK_IN0_ADMA_LCDIF_VSYNC		0x60		/* SODIMM  82 */
-				IMX8QXP_MCLK_IN1_ADMA_LCDIF_EN			0x60		/* SODIMM  44 */
-				IMX8QXP_USDHC1_RESET_B_LSIO_GPIO4_IO19		0x60		/* SODIMM  44 */
 				IMX8QXP_ESAI0_FSR_ADMA_LCDIF_D00		0x60		/* SODIMM  76 */
 				IMX8QXP_USDHC1_WP_LSIO_GPIO4_IO21		0x60		/* SODIMM  76 */
 				IMX8QXP_ESAI0_FST_ADMA_LCDIF_D01		0x60		/* SODIMM  70 */
@@ -702,6 +792,31 @@
 	};
 };
 
+&isi_0 {
+        interface = <2 0 2>;
+        /**
+         * interface = <Input MIPI_VCx Output>
+         * Input:       0-DC0, 1-DC1, 2-MIPI CSI0, 3-MIPI CSI1, 4-HDMI, 5-MEM, INPUT: 6-PARALLEL CSI
+         * MIPI_VCx:    0-VC0, 1-VC1, 2-VC2, 3-VC3, MIPI CSI only
+         * Output:      0-DC0, 1-DC1, 2-MEM
+         */
+};
+
+&isi_1 {
+        interface = <6 0 2>;
+        parallel_csi;
+};
+
+/* Colibri SPI */
+&lpspi2 {
+        #address-cells = <1>;
+        #size-cells = <0>;
+        fsl,spi-num-chipselects = <1>;
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_lpspi2>;
+        cs-gpios = <&lsio_gpio1 0 GPIO_ACTIVE_LOW>;
+};
+
 /* Colibri UART_B */
 &lpuart0 {
 	pinctrl-names = "default";
@@ -718,6 +833,237 @@
 &lpuart3 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lpuart3>, <&pinctrl_lpuart3_ctrl>;
+};
+
+&lsio_gpio0 {
+	gpio-line-names = "",
+			  "SODIMM_70",
+			  "SODIMM_60",
+			  "SODIMM_58",
+			  "SODIMM_78",
+			  "SODIMM_72",
+			  "SODIMM_80",
+			  "SODIMM_46",
+			  "SODIMM_62",
+			  "SODIMM_48",
+			  "SODIMM_74",
+			  "SODIMM_50",
+			  "SODIMM_52",
+			  "SODIMM_54",
+			  "SODIMM_66",
+			  "SODIMM_64",
+			  "SODIMM_68",
+			  "",
+			  "",
+			  "SODIMM_82",
+			  "SODIMM_56",
+			  "SODIMM_28",
+			  "SODIMM_30",
+			  "",
+			  "SODIMM_61",
+			  "SODIMM_103",
+			  "",
+			  "",
+			  "",
+			  "SODIMM_25",
+			  "SODIMM_27",
+			  "SODIMM_100";
+	status = "okay";
+};
+
+&lsio_gpio1 {
+	gpio-line-names = "SODIMM_86",
+			  "SODIMM_92",
+			  "SODIMM_90",
+			  "SODIMM_88",
+			  "",
+			  "",
+			  "",
+			  "SODIMM_59",
+			  "",
+			  "SODIMM_6",
+			  "SODIMM_8",
+			  "",
+			  "",
+			  "SODIMM_2",
+			  "SODIMM_4",
+			  "SODIMM_34",
+			  "SODIMM_32",
+			  "SODIMM_63",
+			  "SODIMM_55",
+			  "SODIMM_33",
+			  "SODIMM_35",
+			  "SODIMM_36",
+			  "SODIMM_38",
+			  "SODIMM_21",
+			  "SODIMM_19",
+			  "SODIMM_140",
+			  "SODIMM_142",
+			  "SODIMM_196",
+			  "SODIMM_194",
+			  "SODIMM_186",
+			  "SODIMM_188",
+			  "SODIMM_138";
+	status = "okay";
+};
+
+&lsio_gpio2 {
+	gpio-line-names = "SODIMM_23",
+			  "",
+			  "",
+			  "SODIMM_144";
+	status = "okay";
+};
+
+&lsio_gpio3 {
+	gpio-line-names = "SODIMM_96",
+			  "SODIMM_75",
+			  "SODIMM_37",
+			  "SODIMM_29",
+			  "",
+			  "",
+			  "",
+			  "",
+			  "",
+			  "SODIMM_43",
+			  "SODIMM_45",
+			  "SODIMM_69",
+			  "SODIMM_71",
+			  "SODIMM_73",
+			  "SODIMM_77",
+			  "SODIMM_89",
+			  "SODIMM_93",
+			  "SODIMM_95",
+			  "SODIMM_99",
+			  "SODIMM_105",
+			  "SODIMM_107",
+			  "SODIMM_98",
+			  "SODIMM_102",
+			  "SODIMM_104",
+			  "SODIMM_106";
+	status = "okay";
+};
+
+&lsio_gpio4 {
+	gpio-line-names = "",
+			  "",
+			  "",
+			  "SODIMM_129",
+			  "SODIMM_133",
+			  "SODIMM_127",
+			  "SODIMM_131",
+			  "",
+			  "",
+			  "",
+			  "",
+			  "",
+			  "",
+			  "",
+			  "",
+			  "",
+			  "",
+			  "",
+			  "",
+			  "SODIMM_44",
+			  "",
+			  "SODIMM_76",
+			  "SODIMM_31",
+			  "SODIMM_47",
+			  "SODIMM_190",
+			  "SODIMM_192",
+			  "SODIMM_49",
+			  "SODIMM_51",
+			  "SODIMM_53";
+	status = "okay";
+};
+
+&lsio_gpio5 {
+	gpio-line-names = "",
+			  "SODIMM_57",
+			  "SODIMM_65",
+			  "SODIMM_85",
+			  "",
+			  "",
+			  "",
+			  "",
+			  "SODIMM_135",
+			  "SODIMM_137",
+			  "UNUSABLE_SODIMM_180",
+			  "UNUSABLE_SODIMM_184";
+	status = "okay";
+};
+
+/* MIPI CSI accessible via FFC (X3) */
+&mipi_csi_0 {
+        #address-cells = <1>;
+        #size-cells = <0>;
+        /delete-property/virtual-channel;
+};
+
+&mipi0_dsi_host {
+        pwr-delay = <10>;
+};
+
+&mipi1_dsi_host {
+        pwr-delay = <10>;
+};
+
+/* On-module PCIe for wifi */
+&pcieb{
+	/*
+	 * WARNING! Enabling "epdev_on-supply" leads a crash of pcie driver on
+	 * system suspend.
+	 */
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pcieb &pinctrl_wifi>;
+	ext_osc = <1>;
+	clkreq-gpio = <&gpio_expander_43 3 GPIO_ACTIVE_HIGH>;
+	disable-gpio = <&gpio_expander_43 6 GPIO_ACTIVE_LOW>;
+	power-on-gpio = <&gpio_expander_43 2 GPIO_ACTIVE_LOW>;
+	reset-gpio = <&lsio_gpio4 0 GPIO_ACTIVE_LOW>;
+	fsl,max-link-speed = <1>;
+	status = "okay";
+};
+
+/* Colibri PWM_B */
+&pwm0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pwm_b>;
+	#pwm-cells = <3>;
+};
+
+/* Colibri PWM_C */
+&pwm1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pwm_c>;
+	#pwm-cells = <3>;
+};
+
+/* Colibri PWM_D */
+&pwm2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pwm_d>;
+	#pwm-cells = <3>;
+};
+
+&rpmsg{
+	/*
+	 * 64K for one rpmsg instance:
+	 */
+	vdev-nums = <2>;
+	reg = <0x0 0x90000000 0x0 0x20000>;
+};
+
+/* On-module I2S */
+&sai0 {
+	#sound-dai-cells = <0>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_sai0>;
+	status = "okay";
+};
+
+&tsens {
+	tsens-num = <3>;
 };
 
 &thermal_zones {
@@ -753,6 +1099,8 @@
 /* On-module eMMC */
 &usdhc1 {
 	bus-width = <8>;
+	no-sd;
+	no-sdio;
 	non-removable;
 	pinctrl-names = "default", "state_100mhz", "state_200mhz";
 	pinctrl-0 = <&pinctrl_usdhc1>;
@@ -773,3 +1121,12 @@
 	disable-wp;
 	vmmc-supply = <&reg_module_3v3>;
 };
+
+&vpu_decoder {
+        core_type = <1>;
+};
+
+&vpu_encoder {
+        core_type = <1>;
+};
+
