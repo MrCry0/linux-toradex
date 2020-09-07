@@ -13,8 +13,10 @@
 
 / {
 	model = "Toradex Colibri iMX7D 1GB on Colibri Iris V2 Board";
-	compatible = "toradex,colibri_imx7d_emmc-iris-v2", \
-			"toradex,colibri_imx7d_emmc", "fsl,imx7d";
+	compatible = "toradex,colibri-imx7d-emmc-iris-v2",
+		     "toradex,colibri-imx7d-emmc",
+		     "toradex,colibri-imx7d",
+		     "fsl,imx7d";
 };
 
 &usbotg2 {
