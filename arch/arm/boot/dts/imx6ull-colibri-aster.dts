@@ -14,5 +14,7 @@
 
 / {
 	model = "Toradex Colibri iMX6ULL 256MB on Colibri Aster";
-	compatible = "toradex,colibri_imx6ull-aster", "fsl,imx6ull";
+	compatible = "toradex,colibri-imx6ull-aster",
+		     "toradex,colibri-imx6ull",
+		     "fsl,imx6ull";
 };

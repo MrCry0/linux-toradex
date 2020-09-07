@@ -14,5 +14,7 @@
 
 / {
 	model = "Toradex Colibri iMX6ULL 512MB on Colibri Aster";
-	compatible = "toradex,colibri_imx6ull-wifi-aster", "fsl,imx6ull";
+	compatible = "toradex,colibri-imx6ull-wifi-aster",
+		     "toradex,colibri-imx6ull",
+		     "fsl,imx6ull";
 };

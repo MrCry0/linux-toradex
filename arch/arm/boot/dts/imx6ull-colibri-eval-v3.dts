@@ -10,5 +10,7 @@
 
 / {
 	model = "Toradex Colibri iMX6ULL 256MB on Colibri Evaluation Board V3";
-	compatible = "toradex,colibri-imx6ull-eval", "fsl,imx6ull";
+	compatible = "toradex,colibri-imx6ull-eval",
+		     "toradex,colibri-imx6ull",
+		     "fsl,imx6ull";
 };

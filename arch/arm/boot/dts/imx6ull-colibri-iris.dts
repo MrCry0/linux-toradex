@@ -10,5 +10,7 @@
 
 / {
 	model = "Toradex Colibri iMX6ULL 256MB on Colibri Iris";
-	compatible = "toradex,colibri_imx6ull-iris", "fsl,imx6ull";
+	compatible = "toradex,colibri-imx6ull-iris",
+		     "toradex,colibri-imx6ull",
+		     "fsl,imx6ull";
 };
