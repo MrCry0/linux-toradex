@@ -11,7 +11,9 @@
 
 / {
 	model = "Toradex Colibri iMX8QXP/DX with single channel lvds";
-	compatible = "toradex,colibri-imx8qxp-lvds-single-eval-v3", "toradex,colibri-imx8qxp", "fsl,imx8qxp";
+	compatible = "toradex,colibri-imx8x-lvds-single-eval-v3",
+		     "toradex,colibri-imx8x",
+		     "fsl,imx8qxp";
 };
 
 &iomuxc {

@@ -10,5 +10,7 @@
 
 / {
 	model = "Toradex Colibri iMX8QXP/DX on Colibri Evaluation Board V3";
-	compatible = "toradex,colibri-imx8qxp-eval-v3", "toradex,colibri-imx8qxp", "fsl,imx8qxp";
+	compatible = "toradex,colibri-imx8x-eval-v3",
+		     "toradex,colibri-imx8x",
+		     "fsl,imx8qxp";
 };

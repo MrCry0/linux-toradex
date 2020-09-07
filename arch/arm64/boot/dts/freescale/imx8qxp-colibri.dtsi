@@ -8,7 +8,8 @@
 
 / {
 	model = "Toradex Colibri iMX8QXP/DX Module";
-	compatible = "toradex,colibri-imx8x", "fsl,imx8qxp";
+	compatible = "toradex,colibri-imx8x",
+		     "fsl,imx8qxp";
 
 	backlight: backlight {
 		compatible = "pwm-backlight";
