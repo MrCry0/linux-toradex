@@ -93,7 +93,7 @@
 &ecspi4 {
 	status = "okay";
 
-	mcp251x0: mcp251x@1 {
+	mcp251x0: mcp251x@0 {
 		compatible = "microchip,mcp2515";
 		reg = <0>;
 		clocks = <&clk16m>;
@@ -102,7 +102,7 @@
 		spi-max-frequency = <10000000>;
 		status = "okay";
 	};
-	spidev0: spidev@1 {
+	spidev0: spidev@0 {
 		compatible = "toradex,evalspi";
 		reg = <0>;
 		spi-max-frequency = <23000000>;
