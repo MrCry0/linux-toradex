@@ -10,5 +10,7 @@
 
 / {
 	model = "Toradex Apalis iMX8QXP/DX on Apalis Evaluation Board";
-	compatible = "toradex,apalis-imx8qxp-eval", "toradex,apalis-imx8qxp", "fsl,imx8qxp";
+	compatible = "toradex,apalis-imx8x-eval",
+		     "toradex,apalis-imx8x",
+		     "fsl,imx8qxp";
 };
