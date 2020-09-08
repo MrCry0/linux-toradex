@@ -8,7 +8,10 @@
 
 / {
 	model = "Toradex Apalis iMX8QM V1.1";
-	compatible = "toradex,apalis-imx8qm-v1.1", "toradex,apalis-imx8qm", "fsl,imx8qm";
+	compatible = "toradex,apalis-imx8-v1.1",
+		     "toradex,apalis-imx8",
+		     "toradex,apalis-imx8",
+		     "fsl,imx8qm";
 
 	chosen {
 		stdout-path = &lpuart1;

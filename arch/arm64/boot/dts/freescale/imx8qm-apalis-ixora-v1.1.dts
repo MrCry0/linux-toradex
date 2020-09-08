@@ -10,6 +10,9 @@
 
 / {
 	model = "Toradex Apalis iMX8QM/QP on Apalis Ixora V1.1 Carrier Board";
-	compatible = "toradex,apalis-imx8qm-ixora-v1.1", "toradex,apalis-imx8qm-ixora",
-		     "toradex,apalis-imx8qm", "fsl,imx8qm";
+	compatible = "toradex,apalis-imx8-ixora-v1.1",
+		     "toradex,apalis-imx8-ixora",
+		     "toradex,apalis-imx8",
+		     "toradex,apalis-imx8",
+		     "fsl,imx8qm";
 };

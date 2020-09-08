@@ -7,7 +7,9 @@
 
 / {
 	model = "Toradex Apalis iMX8QM";
-	compatible = "toradex,apalis-imx8qm", "fsl,imx8qm";
+	compatible = "toradex,apalis-imx8",
+		     "toradex,apalis-imx8",
+		     "fsl,imx8qm";
 };
 
 &ethphy0 {
