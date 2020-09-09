@@ -342,7 +342,7 @@
 		line-name = "CTRL_SLEEP_MOCI#";
 		output-high;
 		pinctrl-names = "default";
-		pinctrl-0 = <&pintctrl_ctrl_sleep_moci>;
+		pinctrl-0 = <&pinctrl_ctrl_sleep_moci>;
 	};
 };
 
@@ -734,15 +734,9 @@
 		>;
 	};
 
-	pintctrl_ctrl_sleep_moci: ctrlsleepmocigrp {
+	pinctrl_ctrl_sleep_moci: ctrlsleepmocigrp {
 		fsl,pins = <
 			MX8MM_IOMUXC_SAI3_TXD_GPIO5_IO1			0x1c4	/* CTRL_SLEEP_MOCI */
-		>;
-	};
-
-	pinctrl_dsi_bkl_en: dsi_bkl_en {
-		fsl,pins = <
-			MX8MM_IOMUXC_NAND_CE2_B_GPIO3_IO3		0x1c4	/* SODIMM 21 */
 		>;
 	};
 
@@ -818,19 +812,6 @@
 		>;
 	};
 
-	/* (MEZ_)GPIO_1 shared with (MEZ_)DSI_1_INT# on Verdin Development Board */
-	pinctrl_gpio1: gpio1grp {
-		fsl,pins = <
-			MX8MM_IOMUXC_NAND_CE3_B_GPIO3_IO4		0x184	/* SODIMM 206 */
-		>;
-	};
-
-	pinctrl_gpio2: gpio2grp {
-		fsl,pins = <
-			MX8MM_IOMUXC_SPDIF_EXT_CLK_GPIO5_IO5		0x184	/* SODIMM 208 */
-		>;
-	};
-
 	pinctrl_gpio3: gpio3grp {
 		fsl,pins = <
 			MX8MM_IOMUXC_UART3_RXD_GPIO5_IO26		0x184	/* SODIMM 210 */
@@ -900,13 +881,6 @@
 		>;
 	};
 
-	/* (MEZ_)DSI_1_INT# shared with (MEZ_)GPIO_1 on Verdin Development Board */
-	pinctrl_gpio_hpd: gpiohpdgrp {
-		fsl,pins = <
-			MX8MM_IOMUXC_NAND_RE_B_GPIO3_IO15		0x184	/* SODIMM 17 */
-		>;
-	};
-
 	pinctrl_gpio_keys: gpiokeysgrp {
 		fsl,pins = <
 			MX8MM_IOMUXC_SAI3_RXFS_GPIO4_IO28		0x1c4	/* SODIMM 252 */
@@ -942,6 +916,40 @@
 		fsl,pins = <
 			MX8MM_IOMUXC_I2C4_SCL_I2C4_SCL			0x400001c6	/* SODIMM 14 */
 			MX8MM_IOMUXC_I2C4_SDA_I2C4_SDA			0x400001c6	/* SODIMM 12 */
+		>;
+	};
+
+	/* Verdin MEZ_DSI_1_BKL_EN */
+	pinctrl_mez_dsi_1_bkl_en: mezdsi1bklengrp {
+		fsl,pins = <
+			MX8MM_IOMUXC_NAND_CE2_B_GPIO3_IO3		0x1c4	/* SODIMM 21 */
+		>;
+	};
+
+	/* Verdin MEZ_DSI_1_INT HPD (pulled-down as active-high) */
+	pinctrl_mez_dsi_1_int_hpd: mezdsi1inthpdgrp {
+		fsl,pins = <
+			MX8MM_IOMUXC_NAND_RE_B_GPIO3_IO15		0x184	/* SODIMM 17 */
+		>;
+	};
+
+	/* Verdin MEZ_DSI_1_INT# (pulled-up as active-low) */
+	pinctrl_mez_dsi_1_int_n: mezdsi1intngrp {
+		fsl,pins = <
+			MX8MM_IOMUXC_NAND_RE_B_GPIO3_IO15		0x1c4	/* SODIMM 17 */
+		>;
+	};
+
+	/* MEZ_GPIO_1 shared with MEZ_DSI_1_INT on Verdin DSI to HDMI Display Adapter */
+	pinctrl_mez_gpio1: mezgpio1grp {
+		fsl,pins = <
+			MX8MM_IOMUXC_NAND_CE3_B_GPIO3_IO4		0x184	/* SODIMM 206 */
+		>;
+	};
+
+	pinctrl_mez_gpio2: mezgpio2grp {
+		fsl,pins = <
+			MX8MM_IOMUXC_SPDIF_EXT_CLK_GPIO5_IO5		0x1c4	/* SODIMM 208 */
 		>;
 	};
 
