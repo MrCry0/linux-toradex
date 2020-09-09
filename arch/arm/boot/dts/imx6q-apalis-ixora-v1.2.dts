@@ -260,7 +260,7 @@
 		reg = <0x21>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_ipu1_csi0 &pinctrl_cam_mclk>;
-		clocks = <&clks 200>;
+		clocks = <&clks IMX6QDL_CLK_CKO2>;
 		clock-names = "csi_mclk";
 		DOVDD-supply = <&reg_3p3v>;
 		AVDD-supply = <&reg_3p3v>;
@@ -278,7 +278,7 @@
 		reg = <0x21>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_ipu1_csi0 &pinctrl_cam_mclk>;
-		clocks = <&clks 200>;
+		clocks = <&clks IMX6QDL_CLK_CKO2>;
 		clock-names = "csi_mclk";
 		DOVDD-supply = <&reg_3p3v>; /* 3.3v */
 		AVDD-supply = <&reg_3p3v>;  /* 1.8v */
@@ -296,7 +296,7 @@
 		reg = <0x20>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_ipu1_csi0 &pinctrl_cam_mclk>;
-		clocks = <&clks 200>;
+		clocks = <&clks IMX6QDL_CLK_CKO2>;
 		clock-names = "csi_mclk";
 		DVDDIO-supply = <&reg_3p3v>; /* 3.3v */
 		AVDD-supply = <&reg_3p3v>;  /* 1.8v */
@@ -313,7 +313,7 @@
 		reg = <0x3c>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_cam_mclk>;
-		clocks = <&clks 200>;
+		clocks = <&clks IMX6QDL_CLK_CKO2>;
 		clock-names = "csi_mclk";
 		DOVDD-supply = <&reg_1p8v>;
 		AVDD-supply = <&reg_2p5v>;
