@@ -64,12 +64,29 @@
 		regulator-max-microvolt = <3300000>;
 	};
 
-	reg_vref_1v8: regulator-vref-1v8 {
+	reg_module_vref_1v8: regulator-module-vref-1v8 {
 		compatible = "regulator-fixed";
 		regulator-name = "vref-1v8";
 		regulator-min-microvolt = <1800000>;
 		regulator-max-microvolt = <1800000>;
 	};
+
+        sound_card: sound-card {
+		compatible = "simple-audio-card";
+		simple-audio-card,bitclock-master = <&dailink_master>;
+		simple-audio-card,format = "i2s";
+		simple-audio-card,frame-master = <&dailink_master>;
+		simple-audio-card,name = "imx8qxp-sgtl5000";
+
+		dailink_master: simple-audio-card,codec {
+			sound-dai = <&sgtl5000_a>;
+			clocks = <&mclkout0_lpcg 0>;
+		};
+
+		simple-audio-card,cpu {
+			sound-dai = <&sai0>;
+		};
+        };
 
 	vdd_3v3_vga: regulator-vga-avcc {
 		compatible = "regulator-fixed";
@@ -85,7 +102,7 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_adc0>;
 	status = "okay";
-	vref-supply = <&reg_vref_1v8>;
+	vref-supply = <&reg_module_vref_1v8>;
 };
 
 /* Colibri PWM_A */
@@ -275,6 +292,22 @@
 		adi,averaging = /bits/ 8 <1>;
 		adi,conversion-interval = /bits/ 8 <255>;
         };
+
+	sgtl5000_a: sgtl5000@a {
+		compatible = "fsl,sgtl5000";
+		#sound-dai-cells = <0>;
+		assigned-clocks = <&clk IMX_SC_R_AUDIO_PLL_0 IMX_SC_PM_CLK_PLL>,
+				  <&clk IMX_SC_R_AUDIO_PLL_0 IMX_SC_PM_CLK_SLV_BUS>,
+				  <&clk IMX_SC_R_AUDIO_PLL_0 IMX_SC_PM_CLK_MST_BUS>,
+				  <&mclkout0_lpcg 0>;
+		assigned-clock-rates = <786432000>, <49152000>, <12288000>, <12288000>;
+		clocks = <&mclkout0_lpcg 0>;
+		clock-names = "mclk";
+		reg = <0xa>;
+		VDDA-supply = <&reg_module_3v3_avdd>;
+		VDDIO-supply = <&reg_module_3v3>;
+		VDDD-supply = <&reg_module_vref_1v8>;
+	};
 };
 
 /* MIPI DSI accessible on FFC (X2) */
