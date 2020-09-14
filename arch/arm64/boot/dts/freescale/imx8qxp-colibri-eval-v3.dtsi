@@ -4,6 +4,13 @@
  */
 
 / {
+	/* fixed crystal dedicated to mcp25xx */
+	clk16m: clock-16mhz-fixed {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <16000000>;
+	};
+
 	panel_dpi: panel-dpi {
 		/*
 		 * edt,et057090dhu: EDT 5.7" LCD TFT
@@ -50,6 +57,30 @@
 /* Colibri Ethernet */
 &fec1 {
 	status = "okay";
+};
+
+/* Colibri SPI */
+&lpspi2 {
+        status = "okay";
+
+        mcp2515: can@0 {
+                compatible = "microchip,mcp2515";
+                pinctrl-names = "default";
+                pinctrl-0 = <&pinctrl_can_int>;
+                reg = <0>;
+                clocks = <&clk16m>;
+                interrupt-parent = <&lsio_gpio3>;
+                interrupts = <13 IRQ_TYPE_EDGE_FALLING>;
+                spi-max-frequency = <10000000>;
+                status = "okay";
+        };
+
+        spidev0: spidev@0 {
+                compatible = "toradex,evalspi";
+                reg = <0>;
+                spi-max-frequency = <10000000>;
+                status = "disabled";
+        };
 };
 
 /* Colibri UART_B */
