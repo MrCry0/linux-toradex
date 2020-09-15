@@ -42,6 +42,10 @@
 	};
 };
 
+&adc0 {
+	status = "okay";
+};
+
 &fec1 {
 	status = "okay";
 };
@@ -63,6 +67,21 @@
 
 /* Apalis UART4 */
 &lpuart3 {
+	status = "okay";
+};
+
+/* Apalis PWM2 */
+&pwm_mipi_lvds0 {
+	status = "okay";
+};
+
+/* Apalis BKL1_PWM */
+&pwm_mipi_lvds1 {
+	status = "okay";
+};
+
+/* Apalis PWM1 */
+&pwm2 {
 	status = "okay";
 };
 

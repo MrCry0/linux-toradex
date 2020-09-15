@@ -50,159 +50,11 @@
 	};
 };
 
-&lsio_gpio0 {
-	gpio-line-names = "",
-			  "MXM3_293",
-			  "MXM3_295",
-			  "MXM3_297",
-			  "MXM3_299",
-			  "MXM3_301",
-			  "MXM3_273",
-			  "MXM3_275",
-			  "MXM3_277",
-			  "MXM3_279",
-			  "MXM3_281",
-			  "MXM3_283",
-			  "MXM3_255",
-			  "MXM3_257",
-			  "MXM3_259",
-			  "MXM3_261",
-			  "MXM3_247",
-			  "",
-			  "",
-			  "MXM3_245",
-			  "MXM3_243",
-			  "MXM3_112",
-			  "MXM3_118",
-			  "",
-			  "MXM3_265",
-			  "MXM3_196",
-			  "MXM3_200",
-			  "MXM3_202",
-			  "MXM3_204",
-			  "MXM3_310",
-			  "MXM3_312",
-			  "MXM3_318";
-};
-
-&lsio_gpio1 {
-	gpio-line-names = "MXM3_235",
-			  "MXM3_233",
-			  "MXM3_231",
-			  "MXM3_229",
-			  "MXM3_221",
-			  "MXM3_223",
-			  "MXM3_225",
-			  "MXM3_316",
-			  "MXM3_227",
-			  "MXM3_307",
-			  "MXM3_305",
-			  "MXM3_194",
-			  "",
-			  "MXM3_311",
-			  "MXM3_309",
-			  "MXM3_128",
-			  "MXM3_130",
-			  "MXM3_12",
-			  "MXM3_14",
-			  "MXM3_16",
-			  "MXM3_18",
-			  "MXM3_132",
-			  "MXM3_126",
-			  "MXM3_134",
-			  "MXM3_136",
-			  "MXM3_35",
-			  "MXM3_37",
-			  "MXM3_4",
-			  "MXM3_6",
-			  "MXM3_207",
-			  "MXM3_205",
-			  "MXM3_239";
-};
-
-&lsio_gpio2 {
-	gpio-line-names = "MXM3_8",
-			  "",
-			  "",
-			  "MXM3_140";
-};
-
-&lsio_gpio3 {
-	gpio-line-names = "MXM3_191",
-			  "MXM3_193",
-			  "MXM3_203",
-			  "MXM3_201",
-			  "",
-			  "",
-			  "",
-			  "",
-			  "",
-			  "MXM3_96",
-			  "MXM3_110",
-			  "MXM3_114",
-			  "MXM3_116",
-			  "MXM3_286",
-			  "MXM3_158",
-			  "MXM3_198",
-			  "MXM3_274",
-			  "MXM3_11",
-			  "MXM3_13",
-			  "MXM3_15",
-			  "MXM3_17",
-			  "MXM3_1",
-			  "MXM3_3",
-			  "MXM3_5",
-			  "MXM3_7";
-};
-
-&lsio_gpio4 {
-	gpio-line-names = "",
-			  "",
-			  "",
-			  "MXM3_211",
-			  "MXM3_84",
-			  "MXM3_262",
-			  "MXM3_209",
-			  "",
-			  "",
-			  "",
-			  "",
-			  "",
-			  "",
-			  "",
-			  "",
-			  "",
-			  "",
-			  "",
-			  "",
-			  "MXM3_152",
-			  "MXM3_148",
-			  "MXM3_156",
-			  "MXM3_164",
-			  "MXM3_154",
-			  "MXM3_150",
-			  "MXM3_160",
-			  "MXM3_162",
-			  "MXM3_144",
-			  "MXM3_146",
-			  "MXM3_77",
-			  "MXM3_79",
-			  "MXM3_65";
-};
-
-&lsio_gpio5 {
-	gpio-line-names = "MXM3_67",
-			  "MXM3_71",
-			  "MXM3_73",
-			  "MXM3_113",
-			  "MXM3_115",
-			  "MXM3_119",
-			  "MXM3_121",
-			  "MXM3_125",
-			  "MXM3_127",
-			  "MXM3_131",
-			  "MXM3_59",
-			  "MXM3_61";
+/* Apalis AN1_ADC */
+&adc0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_adc0>;
+	vref-supply = <&reg_vref_1v8>;
 };
 
 /* Apalis Gigabit Ethernet */
@@ -791,6 +643,182 @@
 &lpuart3 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lpuart3>;
+};
+
+&lsio_gpio0 {
+	gpio-line-names = "",
+			  "MXM3_293",
+			  "MXM3_295",
+			  "MXM3_297",
+			  "MXM3_299",
+			  "MXM3_301",
+			  "MXM3_273",
+			  "MXM3_275",
+			  "MXM3_277",
+			  "MXM3_279",
+			  "MXM3_281",
+			  "MXM3_283",
+			  "MXM3_255",
+			  "MXM3_257",
+			  "MXM3_259",
+			  "MXM3_261",
+			  "MXM3_247",
+			  "",
+			  "",
+			  "MXM3_245",
+			  "MXM3_243",
+			  "MXM3_112",
+			  "MXM3_118",
+			  "",
+			  "MXM3_265",
+			  "MXM3_196",
+			  "MXM3_200",
+			  "MXM3_202",
+			  "MXM3_204",
+			  "MXM3_310",
+			  "MXM3_312",
+			  "MXM3_318";
+};
+
+&lsio_gpio1 {
+	gpio-line-names = "MXM3_235",
+			  "MXM3_233",
+			  "MXM3_231",
+			  "MXM3_229",
+			  "MXM3_221",
+			  "MXM3_223",
+			  "MXM3_225",
+			  "MXM3_316",
+			  "MXM3_227",
+			  "MXM3_307",
+			  "MXM3_305",
+			  "MXM3_194",
+			  "",
+			  "MXM3_311",
+			  "MXM3_309",
+			  "MXM3_128",
+			  "MXM3_130",
+			  "MXM3_12",
+			  "MXM3_14",
+			  "MXM3_16",
+			  "MXM3_18",
+			  "MXM3_132",
+			  "MXM3_126",
+			  "MXM3_134",
+			  "MXM3_136",
+			  "MXM3_35",
+			  "MXM3_37",
+			  "MXM3_4",
+			  "MXM3_6",
+			  "MXM3_207",
+			  "MXM3_205",
+			  "MXM3_239";
+};
+
+&lsio_gpio2 {
+	gpio-line-names = "MXM3_8",
+			  "",
+			  "",
+			  "MXM3_140";
+};
+
+&lsio_gpio3 {
+	gpio-line-names = "MXM3_191",
+			  "MXM3_193",
+			  "MXM3_203",
+			  "MXM3_201",
+			  "",
+			  "",
+			  "",
+			  "",
+			  "",
+			  "MXM3_96",
+			  "MXM3_110",
+			  "MXM3_114",
+			  "MXM3_116",
+			  "MXM3_286",
+			  "MXM3_158",
+			  "MXM3_198",
+			  "MXM3_274",
+			  "MXM3_11",
+			  "MXM3_13",
+			  "MXM3_15",
+			  "MXM3_17",
+			  "MXM3_1",
+			  "MXM3_3",
+			  "MXM3_5",
+			  "MXM3_7";
+};
+
+&lsio_gpio4 {
+	gpio-line-names = "",
+			  "",
+			  "",
+			  "MXM3_211",
+			  "MXM3_84",
+			  "MXM3_262",
+			  "MXM3_209",
+			  "",
+			  "",
+			  "",
+			  "",
+			  "",
+			  "",
+			  "",
+			  "",
+			  "",
+			  "",
+			  "",
+			  "",
+			  "MXM3_152",
+			  "MXM3_148",
+			  "MXM3_156",
+			  "MXM3_164",
+			  "MXM3_154",
+			  "MXM3_150",
+			  "MXM3_160",
+			  "MXM3_162",
+			  "MXM3_144",
+			  "MXM3_146",
+			  "MXM3_77",
+			  "MXM3_79",
+			  "MXM3_65";
+};
+
+&lsio_gpio5 {
+	gpio-line-names = "MXM3_67",
+			  "MXM3_71",
+			  "MXM3_73",
+			  "MXM3_113",
+			  "MXM3_115",
+			  "MXM3_119",
+			  "MXM3_121",
+			  "MXM3_125",
+			  "MXM3_127",
+			  "MXM3_131",
+			  "MXM3_59",
+			  "MXM3_61";
+};
+
+/* Apalis PWM2 */
+&pwm_mipi_lvds0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pwm_mipi_lvds0>;
+	#pwm-cells = <3>;
+};
+
+/* Apalis BKL1_PWM */
+&pwm_mipi_lvds1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pwm_mipi_lvds1>;
+	#pwm-cells = <3>;
+};
+
+/* Apalis PWM1 */
+&pwm2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pwm2>;
+	#pwm-cells = <3>;
 };
 
 &thermal_zones {
