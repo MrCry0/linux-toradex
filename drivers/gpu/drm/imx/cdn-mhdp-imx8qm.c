@@ -10,6 +10,7 @@
 #include <linux/firmware.h>
 #include <linux/pm_domain.h>
 #include <linux/clk.h>
+#include <linux/delay.h>
 #include <drm/drmP.h>
 
 #include "cdns-mhdp-imx.h"
@@ -549,6 +550,7 @@ static int cdns_mhdp_firmware_load(struct imx_mhdp_device *imx_mhdp)
 {
 	const u8 *iram;
 	const u8 *dram;
+	int i;
 	u32 rate;
 	int ret;
 
@@ -573,13 +575,27 @@ static int cdns_mhdp_firmware_load(struct imx_mhdp_device *imx_mhdp)
 			DRM_ERROR("failed to load firmware\n");
 			return -ENOENT;
 		}
-	} else {
-		iram = imx_mhdp->fw->data + FW_IRAM_OFFSET;
-		dram = iram + FW_IRAM_SIZE;
-
-		cdns_mhdp_firmware_write_section(imx_mhdp, iram, FW_IRAM_SIZE, ADDR_IMEM);
-		cdns_mhdp_firmware_write_section(imx_mhdp, dram, FW_DRAM_SIZE, ADDR_DMEM);
 	}
+
+	for (i = 0; i < 10; i++) {
+		if (imx_mhdp->fw)
+			break;
+		usleep_range(1000, 10000);
+	}
+
+	if (!imx_mhdp->fw) {
+		DRM_ERROR("FW loading timed out\n");
+		return -ENXIO;
+	}
+
+	/* Copy the firmware to the hdmi controller */
+	iram = imx_mhdp->fw->data + FW_IRAM_OFFSET;
+	dram = iram + FW_IRAM_SIZE;
+
+	cdns_mhdp_firmware_write_section(imx_mhdp, iram,
+			FW_IRAM_SIZE, ADDR_IMEM);
+	cdns_mhdp_firmware_write_section(imx_mhdp, dram,
+			FW_DRAM_SIZE, ADDR_DMEM);
 
 out:
 	/* un-reset ucpu */
