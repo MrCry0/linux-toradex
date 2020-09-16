@@ -83,6 +83,9 @@
 	 *
 	 * IMX_SC_R_BOARD_R1 for 3.3V
 	 * IMX_SC_R_BOARD_R2 for 1.8V
+	 * IMX_SC_R_BOARD_R3 for 2.5V
+	 * Note that for 2.5V operation the pad muxing needs to be changed,
+	 * compare with PSW_OVR field of IMX8QM_COMP_CTL_GPIO_1V8_3V3_ENET_ENETA_PAD.
 	 *
 	 * those power domains are mutually exclusive.
 	 */
