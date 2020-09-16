@@ -78,21 +78,20 @@
         };
 };
 
+/* Colibri Analogue Inputs */
+&adc0 {
+	status = "okay";
+};
+
+/* Colibri PWM_A */
+&adma_pwm {
+	status = "okay";
+};
+
 /* Colibri Ethernet */
 &fec1 {
 	status = "okay";
 };
-
-&lsio_gpio3 {
-	/*
-	 * Add GPIO3_10 as a wakeup source:
-	 * Pin:  SC_P_QSPI0A_DATA1 (SODIMM_45)
-	 * Type: SC_PAD_WAKEUP_RISE_EDGE
-	 * Line: GPIO3_IO10
-	 */
-	pad-wakeup = <157 6 10>;
-	pad-wakeup-num = <1>;
- };
 
 &i2c1 {
 	status = "okay";
@@ -141,6 +140,32 @@
 /* Colibri UART_A */
 &lpuart3 {
 	status= "okay";
+};
+
+&lsio_gpio3 {
+	/*
+	 * Add GPIO3_10 as a wakeup source:
+	 * Pin:  157	SC_P_QSPI0A_DATA1 (SODIMM_45)
+	 * Type: 6	SC_PAD_WAKEUP_RISE_EDGE
+	 * Line: 10	GPIO3_IO10
+	 */
+	pad-wakeup = <IMX8QXP_QSPI0A_DATA1 6 10>;
+	pad-wakeup-num = <1>;
+ };
+
+/* Colibri PWM_B */
+&pwm0 {
+	status = "okay";
+};
+
+/* Colibri PWM_C */
+&pwm1 {
+	status = "okay";
+};
+
+/* Colibri PWM_D */
+&pwm2 {
+	status = "okay";
 };
 
 /* Colibri SDCard */

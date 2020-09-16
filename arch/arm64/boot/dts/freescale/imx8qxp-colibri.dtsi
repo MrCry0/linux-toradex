@@ -110,7 +110,6 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pwm_a>;
 	#pwm-cells = <3>;
-	status = "okay";
 };
 
 &cameradev {
@@ -1082,7 +1081,6 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pwm_b>;
 	#pwm-cells = <3>;
-	status = "okay";
 };
 
 /* Colibri PWM_C */
@@ -1090,7 +1088,6 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pwm_c>;
 	#pwm-cells = <3>;
-	status = "okay";
 };
 
 /* Colibri PWM_D */
@@ -1098,7 +1095,6 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pwm_d>;
 	#pwm-cells = <3>;
-	status = "okay";
 };
 
 &rpmsg{
