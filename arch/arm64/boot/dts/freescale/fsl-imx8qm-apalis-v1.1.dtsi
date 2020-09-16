@@ -82,7 +82,7 @@
 	 */
 	pmbus_external_rgmii: pmbusextrgmii {
 		compatible = "simple-pm-bus";
-		power-domains = <&pd_1v8_ext_rgmii>;
+		power-domains = <&pd_3v3_ext_rgmii>;
 	};
 
 	pcie_sata_refclk: sata-clock-generator {
