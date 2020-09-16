@@ -4,12 +4,25 @@
  */
 
 / {
+	aliases {
+		rtc0 = &rtc_i2c;
+		rtc1 = &rtc;
+        };
+
 	/* fixed crystal dedicated to mcp25xx */
 	clk16m: clock-16mhz-fixed {
 		compatible = "fixed-clock";
 		#clock-cells = <0>;
 		clock-frequency = <16000000>;
 	};
+
+	extcon_usbc_det: usbc_det {
+		compatible = "linux,extcon-usb-gpio";
+		debounce = <25>;
+		id-gpio = <&lsio_gpio5 9 GPIO_ACTIVE_HIGH>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_usbc_det>;
+        };
 
 	panel_dpi: panel-dpi {
 		/*
@@ -52,11 +65,43 @@
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
 	};
+
+	reg_usbh_vbus: regulator-usbh-vbus {
+		compatible = "regulator-fixed";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_usbh1_reg>;
+		regulator-name = "usbh_vbus";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		gpio = <&lsio_gpio4 3 GPIO_ACTIVE_LOW>;
+		regulator-always-on;
+        };
 };
 
 /* Colibri Ethernet */
 &fec1 {
 	status = "okay";
+};
+
+&lsio_gpio3 {
+	/*
+	 * Add GPIO3_10 as a wakeup source:
+	 * Pin:  SC_P_QSPI0A_DATA1 (SODIMM_45)
+	 * Type: SC_PAD_WAKEUP_RISE_EDGE
+	 * Line: GPIO3_IO10
+	 */
+	pad-wakeup = <157 6 10>;
+	pad-wakeup-num = <1>;
+ };
+
+&i2c1 {
+	status = "okay";
+
+	/* M41T0M6 real time clock on carrier board */
+	rtc_i2c: rtc@68 {
+		compatible = "st,m41t0";
+		reg = <0x68>;
+	};
 };
 
 /* Colibri SPI */
@@ -102,3 +147,36 @@
 &usdhc2 {
 	status = "okay";
 };
+
+&usbotg1 {
+        extcon = <&extcon_usbc_det &extcon_usbc_det>;
+        vbus-supply = <&reg_usbh_vbus>;
+        srp-disable;
+        hnp-disable;
+        adp-disable;
+        power-polarity-active-high;
+        disable-over-current;
+        status = "okay";
+};
+
+&usbotg3 {
+        dr_mode = "host";
+        status = "okay";
+};
+
+&vpu_encoder {
+        status = "okay";
+};
+
+&vpu_decoder {
+        status = "okay";
+};
+
+&vpu_lpcg {
+        status = "okay";
+};
+
+&vpu_ts {
+        status = "okay";
+};
+
