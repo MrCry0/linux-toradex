@@ -168,6 +168,10 @@
 	status = "okay";
 };
 
+&usb3phynop1 {
+	status = "okay";
+};
+
 /* Colibri SDCard */
 &usdhc2 {
 	status = "okay";

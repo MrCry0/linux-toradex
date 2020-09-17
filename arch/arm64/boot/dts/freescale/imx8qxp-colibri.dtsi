@@ -258,7 +258,7 @@
 	clock-frequency = <100000>;
 	pinctrl-names = "default";
 	/*
-	 * There is a shared clock between SGTL5000 and on-module USB hab,
+	 * There is a shared clock between SGTL5000 and on-module USB hub,
 	 * so it is a good way to handle pinmuxing for this clock on a parent
 	 * device i2c0
 	 */
@@ -296,8 +296,8 @@
 		compatible = "fsl,sgtl5000";
 		#sound-dai-cells = <0>;
 		assigned-clocks = <&clk IMX_SC_R_AUDIO_PLL_0 IMX_SC_PM_CLK_PLL>,
-				  <&clk IMX_SC_R_AUDIO_PLL_0 IMX_SC_PM_CLK_SLV_BUS>,
-				  <&clk IMX_SC_R_AUDIO_PLL_0 IMX_SC_PM_CLK_MST_BUS>,
+				  <&aud_pll_div0_lpcg 0>,
+				  <&aud_rec0_lpcg 0>,
 				  <&mclkout0_lpcg 0>;
 		assigned-clock-rates = <786432000>, <49152000>, <12288000>, <12288000>;
 		clocks = <&mclkout0_lpcg 0>;
@@ -306,6 +306,22 @@
 		VDDA-supply = <&reg_module_3v3_avdd>;
 		VDDIO-supply = <&reg_module_3v3>;
 		VDDD-supply = <&reg_module_vref_1v8>;
+	};
+
+	/* USB3503A */
+	usb3803@8 {
+		compatible = "smsc,usb3803";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_usb3503a>;
+		bypass-gpios = <&gpio_expander_43 5 GPIO_ACTIVE_LOW>;
+		clocks = <&mclkout0_lpcg 0>;
+		clock-names = "refclk";
+		disabled-ports = <2>;
+		initial-mode = <1>;
+		intn-gpios = <&lsio_gpio3 4 GPIO_ACTIVE_LOW>;
+		non-removable-devices = <1>;
+		reg = <0x8>;
+		reset-gpios = <&gpio_expander_43 4 GPIO_ACTIVE_LOW>;
 	};
 };
 
