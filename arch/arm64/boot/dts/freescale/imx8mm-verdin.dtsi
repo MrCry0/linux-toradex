@@ -644,7 +644,6 @@
 	picophy,dc-vol-level-adjust = <7>;
 	picophy,pre-emp-curr-control = <3>;
 	srp-disable;
-	usb-role-switch;
 	vbus-supply = <&reg_usb_otg1_vbus>;
 };
 
