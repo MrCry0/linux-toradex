@@ -454,8 +454,8 @@
 				regulator-always-on;
 				regulator-boot-on;
 				regulator-compatible = "ldo1";
-				regulator-max-microvolt = <3300000>;
-				regulator-min-microvolt = <3000000>;
+				regulator-max-microvolt = <1900000>;
+				regulator-min-microvolt = <1600000>;
 			};
 
 			ldo2_reg: LDO2 {
@@ -463,7 +463,7 @@
 				regulator-boot-on;
 				regulator-compatible = "ldo2";
 				regulator-max-microvolt = <900000>;
-				regulator-min-microvolt = <900000>;
+				regulator-min-microvolt = <800000>;
 			};
 
 			ldo3_reg: LDO3 {
