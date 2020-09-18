@@ -192,6 +192,9 @@ struct device * __init imx_soc_device_init(void)
 	case MXC_CPU_IMX6ULZ:
 		soc_id = "i.MX6ULZ";
 		break;
+	case MXC_CPU_IMX6ULZL:
+		soc_id = "i.MX6ULZL";
+		break;
 	case MXC_CPU_IMX7D:
 		soc_dev_attr->unique_id = kasprintf(GFP_KERNEL, "%llx", imx_get_soc_uid());
 		soc_id = "i.MX7D";
