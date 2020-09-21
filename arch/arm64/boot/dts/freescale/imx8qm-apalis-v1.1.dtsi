@@ -232,6 +232,24 @@
 		};
 	};
 
+	sound {
+		compatible = "simple-audio-card";
+		simple-audio-card,bitclock-master = <&dailink_master>;
+		simple-audio-card,format = "i2s";
+		simple-audio-card,frame-master = <&dailink_master>;
+		/* simple-audio-card,mclk-fs = <1>; */
+		simple-audio-card,name = "apalis-imx8qm-sgtl5000";
+
+		simple-audio-card,cpu {
+			sound-dai = <&sai1>;
+		};
+
+		dailink_master: simple-audio-card,codec {
+			clocks = <&mclkout0_lpcg 0>;
+			sound-dai = <&sgtl5000>;
+		};
+	};
+
 	touchscreen: vf50-touchscreen {
 		compatible = "toradex,vf50-touchscreen";
 		io-channels = <&adc1 2>,<&adc1 1>,
@@ -261,6 +279,10 @@
 	/* pinctrl handled by touchscreen above */
 	#io-channel-cells = <1>;
 	vref-supply = <&reg_vref_1v8>;
+};
+
+&asrc0 {
+	fsl,asrc-rate  = <48000>;
 };
 
 /* Apalis GLAN */
@@ -326,6 +348,24 @@
 	#size-cells = <0>;
 	clock-frequency = <100000>;
 	status = "okay";
+
+	sgtl5000: codec@a {
+		compatible = "fsl,sgtl5000";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_sgtl5000>;
+		#sound-dai-cells = <0>;
+		assigned-clocks = <&clk IMX_SC_R_AUDIO_PLL_0 IMX_SC_PM_CLK_PLL>,
+				<&clk IMX_SC_R_AUDIO_PLL_0 IMX_SC_PM_CLK_SLV_BUS>,
+				<&clk IMX_SC_R_AUDIO_PLL_0 IMX_SC_PM_CLK_MST_BUS>,
+				<&mclkout0_lpcg 0>;
+		assigned-clock-rates = <786432000>, <49152000>, <12288000>, <12288000>;
+		clocks = <&mclkout0_lpcg 0>;
+		clock-names = "mclk";
+		reg = <0x0a>;
+		VDDA-supply = <&reg_module_3v3_avdd>;
+		VDDD-supply = <&reg_vref_1v8>;
+		VDDIO-supply = <&reg_module_3v3>;
+	};
 
 	/* USB3503A */
 	usb3503@8 {
@@ -1561,6 +1601,16 @@
 	memory-region = <&vdevbuffer>;
 };
 
+&sai1 {
+	#sound-dai-cells = <0>;
+	assigned-clocks = <&clk IMX_SC_R_AUDIO_PLL_0 IMX_SC_PM_CLK_PLL>,
+			<&clk IMX_SC_R_AUDIO_PLL_0 IMX_SC_PM_CLK_SLV_BUS>,
+			<&clk IMX_SC_R_AUDIO_PLL_0 IMX_SC_PM_CLK_MST_BUS>,
+			<&sai1_lpcg 0>; /* FIXME: should be sai1, original code is 0 */
+	assigned-clock-rates = <786432000>, <49152000>, <12288000>, <49152000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_sai1>;
+};
 
 /* Apalis SATA1 */
 &sata {

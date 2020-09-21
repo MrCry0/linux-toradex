@@ -24,6 +24,14 @@
 	status = "okay";
 };
 
+&amix {
+	status = "okay";
+};
+
+&asrc0 {
+	status = "okay";
+};
+
 &backlight {
 	default-brightness-level = <4>;
 	brightness-levels = <0 45 63 88 119 158 203 255>;
@@ -341,6 +349,10 @@
 &pwm_lvds1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pwm_bkl>;
+	status = "okay";
+};
+
+&sai1 {
 	status = "okay";
 };
 
