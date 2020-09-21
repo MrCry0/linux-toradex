@@ -250,6 +250,22 @@
 		};
 	};
 
+	sound-hdmi {
+		compatible = "fsl,imx-audio-cdnhdmi";
+		model = "imx-audio-hdmi-tx";
+		audio-cpu = <&sai5>;
+		protocol = <1>;
+		hdmi-out;
+	};
+
+	sound-hdmi-arc {
+		compatible = "fsl,imx-audio-spdif";
+		model = "imx-hdmi-arc";
+		spdif-controller = <&spdif1>;
+		spdif-in;
+		spdif-out;
+	};
+
 	touchscreen: vf50-touchscreen {
 		compatible = "toradex,vf50-touchscreen";
 		io-channels = <&adc1 2>,<&adc1 1>,

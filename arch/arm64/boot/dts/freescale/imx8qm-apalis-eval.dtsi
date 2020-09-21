@@ -356,6 +356,14 @@
 	status = "okay";
 };
 
+&sai5 {
+	status = "okay";
+};
+
+&sai5_lpcg {
+	status = "okay";
+};
+
 /* Apalis SATA1 */
 &sata {
 	status = "okay";
@@ -363,6 +371,14 @@
 
 /* Apalis SPDIF1 */
 &spdif0 {
+	status = "okay";
+};
+
+&spdif1 {
+	status = "okay";
+};
+
+&spdif1_lpcg {
 	status = "okay";
 };
 
