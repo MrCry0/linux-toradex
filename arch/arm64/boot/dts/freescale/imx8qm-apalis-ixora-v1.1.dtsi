@@ -13,14 +13,15 @@
 
 &lsio_gpio5 {
 	ngpios = <32>;
-	gpio-line-names = "gpio5-01", "gpio5-02", "gpio5-03", "gpio5-04",
-			  "gpio5-05", "gpio5-06", "gpio5-07", "gpio5-08",
-			  "gpio5-09", "gpio5-10", "gpio5-11", "gpio5-12",
-			  "gpio5-13", "gpio5-14", "gpio5-15", "gpio5-16",
-			  "gpio5-17", "gpio5-18", "gpio5-19", "LED-5-GREEN",
-			  "LED-5-RED", "gpio5-22", "gpio5-23", "gpio5-24",
-			  "UART24-FORCEOFF", "gpio5-26", "LED-4-GREEN", "gpio5-28",
-			  "LED-4-RED", "gpio5-30", "gpio5-31", "gpio5-32";
+	gpio-line-names = "gpio5-00", "gpio5-01", "gpio5-02", "gpio5-03",
+			  "gpio5-04", "gpio5-05", "gpio5-06", "gpio5-07",
+			  "gpio5-08", "gpio5-09", "gpio5-10", "gpio5-11",
+			  "gpio5-12", "gpio5-13", "gpio5-14", "gpio5-15",
+			  "gpio5-16", "gpio5-17", "gpio5-18", "gpio5-19",
+			  "LED-5-GREEN", "LED-5-RED", "gpio5-22", "gpio5-23",
+			  "gpio5-24", "UART24-FORCEOFF", "gpio5-26",
+			  "LED-4-GREEN", "gpio5-28", "LED-4-RED", "gpio5-30",
+			  "gpio5-31";
 };
 
 &iomuxc {
