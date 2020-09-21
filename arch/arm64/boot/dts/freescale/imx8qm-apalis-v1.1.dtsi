@@ -266,6 +266,14 @@
 		spdif-out;
 	};
 
+	sound-spdif {
+		compatible = "fsl,imx-audio-spdif";
+		model = "imx-spdif";
+		spdif-controller = <&spdif0>;
+		spdif-in;
+		spdif-out;
+	};
+
 	touchscreen: vf50-touchscreen {
 		compatible = "toradex,vf50-touchscreen";
 		io-channels = <&adc1 2>,<&adc1 1>,
@@ -1656,6 +1664,11 @@
 &spdif0 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_spdif0>;
+	assigned-clocks = <&clk IMX_SC_R_AUDIO_PLL_0 IMX_SC_PM_CLK_PLL>,
+			<&clk IMX_SC_R_AUDIO_PLL_0 IMX_SC_PM_CLK_SLV_BUS>,
+			<&clk IMX_SC_R_AUDIO_PLL_0 IMX_SC_PM_CLK_MST_BUS>;
+	assigned-clock-rates = <786432000>, <49152000>, <24576000>;
+	status = "okay";
 };
 
 &thermal_zones {
