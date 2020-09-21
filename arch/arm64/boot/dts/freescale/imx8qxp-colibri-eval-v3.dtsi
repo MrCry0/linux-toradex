@@ -103,6 +103,14 @@
 	};
 };
 
+&jpegdec {
+	status = "okay";
+};
+
+&jpegenc {
+	status = "okay";
+};
+
 /* Colibri SPI */
 &lpspi2 {
         status = "okay";
@@ -202,10 +210,6 @@
 };
 
 &vpu_lpcg {
-        status = "okay";
-};
-
-&vpu_ts {
         status = "okay";
 };
 
