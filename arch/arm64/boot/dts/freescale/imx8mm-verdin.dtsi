@@ -354,6 +354,9 @@
 	status = "okay";
 
 	pmic: bd71837@4b {
+		#clock-cells = <0>;
+		clocks = <&osc_32k 0>;
+		clock-output-names = "clk-32k-out";
 		compatible = "rohm,bd71837";
 		interrupt-parent = <&gpio1>;
 		/* PMIC BD71837 PMIC_nINT GPIO1_IO3 */
