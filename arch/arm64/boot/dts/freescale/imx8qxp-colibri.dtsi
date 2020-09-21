@@ -71,6 +71,90 @@
 		regulator-max-microvolt = <1800000>;
 	};
 
+	reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		/*
+		 * 0x8800_0000 ~ 0x8FFF_FFFF is reserved for M4
+		 * Shouldn't be used at A core and Linux side.
+		 *
+		 */
+		m4_reserved: m4@0x88000000 {
+			no-map;
+			reg = <0 0x88000000 0 0x8000000>;
+		};
+
+		rpmsg_reserved: rpmsg@0x90000000 {
+			no-map;
+			reg = <0 0x90200000 0 0x200000>;
+		};
+
+		decoder_boot: decoder-boot@84000000 {
+			reg = <0 0x84000000 0 0x2000000>;
+			no-map;
+		};
+
+		encoder_boot: encoder-boot@86000000 {
+			reg = <0 0x86000000 0 0x200000>;
+			no-map;
+		};
+
+		decoder_rpc: decoder-rpc@0x92000000 {
+			reg = <0 0x92000000 0 0x200000>;
+			no-map;
+		};
+
+		encoder_rpc: encoder-rpc@0x92200000 {
+			reg = <0 0x92200000 0 0x200000>;
+			no-map;
+		};
+
+		encoder_reserved: encoder_reserved@94400000 {
+			no-map;
+			reg = <0 0x94400000 0 0x800000>;
+		};
+
+		/* global autoconfigured region for contiguous allocations */
+		linux,cma {
+			compatible = "shared-dma-pool";
+			reusable;
+			size = <0 0x3c000000>;
+			alloc-ranges = <0 0x96000000 0 0x3c000000>;
+		};
+
+		vdev0vring0: vdev0vring0@90000000 {
+			compatible = "shared-dma-pool";
+			reg = <0 0x90000000 0 0x8000>;
+			no-map;
+		};
+
+		vdev0vring1: vdev0vring1@90008000 {
+			compatible = "shared-dma-pool";
+			reg = <0 0x90008000 0 0x8000>;
+			no-map;
+		};
+
+		vdev1vring0: vdev1vring0@90010000 {
+			compatible = "shared-dma-pool";
+			reg = <0 0x90010000 0 0x8000>;
+			no-map;
+		};
+
+		vdev1vring1: vdev1vring1@90018000 {
+			compatible = "shared-dma-pool";
+			reg = <0 0x90018000 0 0x8000>;
+			no-map;
+		};
+
+		vdevbuffer: vdevbuffer {
+			compatible = "shared-dma-pool";
+			reg = <0 0x90400000 0 0x100000>;
+			no-map;
+		};
+	};
+
         sound_card: sound-card {
 		compatible = "simple-audio-card";
 		simple-audio-card,bitclock-master = <&dailink_master>;
@@ -1083,12 +1167,13 @@
 	 */
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pcieb &pinctrl_wifi>;
-	ext_osc = <1>;
 	clkreq-gpio = <&gpio_expander_43 3 GPIO_ACTIVE_HIGH>;
+	ext_osc = <1>;
+	fsl,max-link-speed = <1>;
 	disable-gpio = <&gpio_expander_43 6 GPIO_ACTIVE_LOW>;
 	power-on-gpio = <&gpio_expander_43 2 GPIO_ACTIVE_LOW>;
+	reserved-region = <&rpmsg_reserved>;
 	reset-gpio = <&lsio_gpio4 0 GPIO_ACTIVE_LOW>;
-	fsl,max-link-speed = <1>;
 	status = "okay";
 };
 
@@ -1119,6 +1204,8 @@
 	 */
 	vdev-nums = <2>;
 	reg = <0x0 0x90000000 0x0 0x20000>;
+	memory-region = <&vdevbuffer>;
+	status = "okay";
 };
 
 /* On-module I2S */
