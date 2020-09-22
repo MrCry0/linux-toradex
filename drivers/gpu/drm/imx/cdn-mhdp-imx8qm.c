@@ -539,18 +539,10 @@ int cdns_mhdp_firmware_write_section(struct imx_mhdp_device *imx_mhdp,
 	return 0;
 }
 
-static void cdns_mhdp_firmware_load_cont(const struct firmware *fw, void *context)
-{
-	struct imx_mhdp_device *imx_mhdp = context;
-
-	imx_mhdp->fw = fw;
-}
-
 static int cdns_mhdp_firmware_load(struct imx_mhdp_device *imx_mhdp)
 {
 	const u8 *iram;
 	const u8 *dram;
-	int i;
 	u32 rate;
 	int ret;
 
@@ -566,29 +558,17 @@ static int cdns_mhdp_firmware_load(struct imx_mhdp_device *imx_mhdp)
 		goto out;
 
 	if (!imx_mhdp->fw) {
-		ret = request_firmware_nowait(THIS_MODULE, FW_ACTION_NOHOTPLUG,
+		ret = request_firmware_direct(&imx_mhdp->fw,
 						imx_mhdp->firmware_name,
-						imx_mhdp->mhdp.dev, GFP_KERNEL,
-						imx_mhdp,
-						cdns_mhdp_firmware_load_cont);
+						imx_mhdp->mhdp.dev);
 		if (ret < 0) {
 			DRM_ERROR("failed to load firmware\n");
-			return -ENOENT;
+			/* Maybe U-Boot loaded the firmware. Therefore, still try to
+			 * reset the controller */
+			goto out;
 		}
 	}
 
-	for (i = 0; i < 10; i++) {
-		if (imx_mhdp->fw)
-			break;
-		usleep_range(1000, 10000);
-	}
-
-	if (!imx_mhdp->fw) {
-		DRM_ERROR("FW loading timed out\n");
-		return -ENXIO;
-	}
-
-	/* Copy the firmware to the hdmi controller */
 	iram = imx_mhdp->fw->data + FW_IRAM_OFFSET;
 	dram = iram + FW_IRAM_SIZE;
 
