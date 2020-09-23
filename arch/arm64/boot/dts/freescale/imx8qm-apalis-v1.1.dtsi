@@ -359,7 +359,7 @@
 	compatible = "cdn,imx8qm-hdmi";
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_hdmi_ctrl>;
-	firmware-name = "hdmitxfw.bin";
+	firmware-name = "imx/hdmi/hdmitxfw.bin";
 	hdmi-ctrl-gpios = <&lsio_gpio1 30 GPIO_ACTIVE_HIGH>;
 	lane-mapping = <0x93>;
 };
