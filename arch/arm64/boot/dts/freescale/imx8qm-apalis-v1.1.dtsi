@@ -1720,6 +1720,10 @@
 	srp-disable;
 };
 
+&usbphynop2 {
+	status = "okay";
+}
+
 &usbphy1 {
 	status = "okay";
 };
