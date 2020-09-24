@@ -288,7 +288,9 @@
 		pinctrl-0 = <&pinctrl_touchctrl_idle>, <&pinctrl_touchctrl_gpios>;
 		pinctrl-1 = <&pinctrl_adc1>, <&pinctrl_touchctrl_gpios>;
 		vf50-ts-min-pressure = <200>;
-		status = "okay";
+		/* NOTE: you must remove the pinctrl-adc1 from the adc1
+			node below to use the touchscreen */
+		status = "disabled";
 	};
 
 };
@@ -300,8 +302,9 @@
 };
 
 &adc1 {
-	/* pinctrl handled by touchscreen above */
 	#io-channel-cells = <1>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_adc1>;
 	vref-supply = <&reg_vref_1v8>;
 };
 
