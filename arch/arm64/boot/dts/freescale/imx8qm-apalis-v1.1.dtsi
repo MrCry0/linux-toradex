@@ -1743,7 +1743,7 @@
 	adp-disable;
 	ci-disable-lpm;
 	hnp-disable;
-	over-current-active-high;
+	power-active-high;
 	srp-disable;
 };
 
