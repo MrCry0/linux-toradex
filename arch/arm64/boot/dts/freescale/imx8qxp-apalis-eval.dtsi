@@ -244,6 +244,10 @@
 	status = "okay";
 };
 
+&usbh1 {
+	status = "okay";
+};
+
 /* Apalis USBO1 */
 &usbotg1 {
 	vbus-supply = <&reg_usb_otg1_vbus>;
