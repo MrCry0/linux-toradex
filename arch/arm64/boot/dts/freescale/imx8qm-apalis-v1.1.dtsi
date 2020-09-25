@@ -366,6 +366,14 @@
 	lane-mapping = <0x93>;
 };
 
+&hsio_refa_clk {
+	status = "disabled";
+};
+
+&hsio_refb_clk {
+	status = "disabled";
+};
+
 /* On-module I2C */
 &i2c1 {
 	pinctrl-names = "default";
