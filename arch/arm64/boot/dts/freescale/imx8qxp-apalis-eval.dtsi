@@ -258,6 +258,10 @@
 	vbus-regulator = <&reg_usb_host_vbus>;
 };
 
+&usbphy1 {
+	status = "okay";
+};
+
 /* Apalis MMC1 */
 &usdhc2 {
 	status = "okay";
