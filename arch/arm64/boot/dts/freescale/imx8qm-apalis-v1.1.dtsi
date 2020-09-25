@@ -35,13 +35,13 @@
 	};
 
 	/* Apalis WAKE1_MICO */
-	gpio-keys {
+	wakeup_key: gpio-keys {
 		compatible = "gpio-keys";
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_gpio_keys>;
 		status = "disabled";
 
-		wakeup_key: wakeup-key {
+		wakeup-key {
 			label = "Wake-Up";
 			gpios = <&lsio_gpio2 20 GPIO_ACTIVE_LOW>;
 			linux,code = <KEY_WAKEUP>;
