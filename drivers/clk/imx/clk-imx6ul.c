@@ -384,7 +384,7 @@ static void __init imx6ul_clocks_init(struct device_node *ccm_node)
 	hws[IMX6UL_CLK_I2C1]		= imx_clk_hw_gate2("i2c1",		"perclk",	base + 0x70,	6);
 	hws[IMX6UL_CLK_I2C2]		= imx_clk_hw_gate2("i2c2",		"perclk",	base + 0x70,	8);
 	hws[IMX6UL_CLK_I2C3]		= imx_clk_hw_gate2("i2c3",		"perclk",	base + 0x70,	10);
-	hws[IMX6UL_CLK_OCOTP]		= imx_clk_hw_gate2_flags("ocotp",	"ipg",		base + 0x70,	12, CLK_IS_CRITICAL);
+	hws[IMX6UL_CLK_OCOTP]		= imx_clk_hw_gate2("ocotp",	"ipg",		base + 0x70,	12);
 	hws[IMX6UL_CLK_IOMUXC]		= imx_clk_hw_gate2("iomuxc",	"lcdif_podf",	base + 0x70,	14);
 	hws[IMX6UL_CLK_GPIO3]		= imx_clk_hw_gate2("gpio3",	"ipg",		base + 0x70,	26);
 	hws[IMX6UL_CLK_LCDIF_APB]	= imx_clk_hw_gate2("lcdif_apb",	"axi",		base + 0x70,	28);
