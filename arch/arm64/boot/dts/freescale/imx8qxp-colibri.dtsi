@@ -1166,6 +1166,7 @@
 
 /* On-module PCIe for wifi */
 &pcieb{
+	compatible = "fsl,imx8qxp-pcie","snps,dw-pcie";
 	/*
 	 * WARNING! Enabling "epdev_on-supply" leads a crash of pcie driver on
 	 * system suspend.
