@@ -102,6 +102,7 @@ struct imx6_pcie {
 	struct dw_pcie		*pci;
 	struct gpio_desc	*clkreq_gpiod;
 	struct gpio_desc	*dis_gpiod;
+	struct gpio_desc	*power_on_gpiod;
 	struct gpio_desc	*reset_gpiod;
 	bool			gpio_active_high;
 	struct clk		*pcie_bus;
@@ -1159,6 +1160,9 @@ static void imx6_pcie_deassert_core_reset(struct imx6_pcie *imx6_pcie)
 		}
 	}
 
+	if (imx6_pcie->power_on_gpiod)
+		gpiod_set_value_cansleep(imx6_pcie->power_on_gpiod, 1);
+
 	if (imx6_pcie->clkreq_gpiod)
 		gpiod_set_value_cansleep(imx6_pcie->clkreq_gpiod, 1);
 
@@ -1880,8 +1884,8 @@ static int imx6_pcie_host_init(struct pcie_port *pp)
 	struct dw_pcie *pci = to_dw_pcie_from_pp(pp);
 	struct imx6_pcie *imx6_pcie = to_imx6_pcie(pci);
 
-	if (imx6_pcie->dis_gpiod)
-		gpiod_set_value_cansleep(imx6_pcie->dis_gpiod, 1);
+	if (imx6_pcie->power_on_gpiod)
+		gpiod_set_value_cansleep(imx6_pcie->power_on_gpiod, 1);
 
 	imx6_pcie_assert_core_reset(imx6_pcie);
 	imx6_pcie_init_phy(imx6_pcie);
@@ -2502,6 +2506,15 @@ static int imx6_pcie_probe(struct platform_device *pdev)
 			dev_err(&pdev->dev, "unable to get disable gpio\n");
 		return ret;
 	}
+
+	imx6_pcie->power_on_gpiod = devm_gpiod_get_optional(dev, "power-on",
+							   GPIOD_OUT_LOW);
+		if (IS_ERR(imx6_pcie->power_on_gpiod)) {
+			ret = PTR_ERR(imx6_pcie->power_on_gpiod);
+			if (ret != -EPROBE_DEFER)
+				dev_err(&pdev->dev, "unable to get power-on gpio\n");
+			return ret;
+		}
 
 	imx6_pcie->epdev_on = devm_regulator_get(&pdev->dev,
 						 "epdev_on");
