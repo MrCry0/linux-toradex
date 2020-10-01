@@ -2437,22 +2437,22 @@ static int imx6_pcie_probe(struct platform_device *pdev)
 			dev_info(dev, "couldn't get pcie-phy\n");
 			imx6_pcie->phy = NULL;
 		}
-	}
 
-	/* Find the HSIO MIX if one is defined, only imx8mp uses it */
-	np = of_parse_phandle(node, "fsl,imx8mp-hsio-mix", 0);
-	if (np) {
-		struct resource res;
+		/* Find the HSIO MIX if one is defined, only imx8mp uses it */
+		np = of_parse_phandle(node, "fsl,imx8mp-hsio-mix", 0);
+		if (np) {
+			struct resource res;
 
-		ret = of_address_to_resource(np, 0, &res);
-		if (ret) {
-			dev_err(dev, "Unable to find HSIO MIX res\n");
-			return ret;
-		}
-		imx6_pcie->hsmix_base = devm_ioremap_resource(dev, &res);
-		if (IS_ERR(imx6_pcie->hsmix_base)) {
-			dev_err(dev, "Unable to map HSIO MIX res\n");
-			return PTR_ERR(imx6_pcie->hsmix_base);
+			ret = of_address_to_resource(np, 0, &res);
+			if (ret) {
+				dev_err(dev, "Unable to find HSIO MIX res\n");
+				return ret;
+			}
+			imx6_pcie->hsmix_base = devm_ioremap_resource(dev, &res);
+			if (IS_ERR(imx6_pcie->hsmix_base)) {
+				dev_err(dev, "Unable to map HSIO MIX res\n");
+				return PTR_ERR(imx6_pcie->hsmix_base);
+			}
 		}
 	}
 
