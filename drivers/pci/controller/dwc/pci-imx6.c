@@ -1135,6 +1135,9 @@ static void imx6_pcie_assert_core_reset(struct imx6_pcie *imx6_pcie)
 		break;
 	}
 
+	if (imx6_pcie->dis_gpiod)
+		gpiod_set_value_cansleep(imx6_pcie->dis_gpiod, 1);
+
 	if (imx6_pcie->vpcie && regulator_is_enabled(imx6_pcie->vpcie) > 0) {
 		int ret = regulator_disable(imx6_pcie->vpcie);
 
