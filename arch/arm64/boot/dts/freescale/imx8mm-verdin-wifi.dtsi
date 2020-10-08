@@ -3,8 +3,6 @@
  * Copyright 2020 Toradex
  */
 
-#include "imx8mm-verdin.dtsi"
-
 / {
 	reg_wifi_en: regulator-wifi-en {
 		compatible = "regulator-fixed";
@@ -32,31 +30,6 @@
 	vmmc-supply = <&reg_wifi_en>;
 	wifi-host;
 	status = "okay";
-};
-
-&iomuxc {
-	pinctrl_wifi_ctrl: wifictrlgrp {
-		fsl,pins = <
-		MX8MM_IOMUXC_NAND_READY_B_GPIO3_IO16				0x1c4		/* WIFI_WKUP_BT */
-		MX8MM_IOMUXC_SD1_RESET_B_GPIO2_IO10				0x1c4		/* WIFI_WKUP_WLAN */
-		MX8MM_IOMUXC_SAI1_RXD7_GPIO4_IO9				0x1c4		/* WIFI_W_WKUP_HOST */
-		>;
-	};
-
-	pinctrl_wifi_i2s: bti2sgrp {
-		fsl,pins = <
-			MX8MM_IOMUXC_SAI1_RXD4_SAI6_TX_BCLK			0xd6		/* WIFI_TX_BCLK */
-			MX8MM_IOMUXC_SAI1_RXD5_SAI6_TX_DATA0			0xd6		/* WIFI_TX_DATA0 */
-			MX8MM_IOMUXC_SAI1_RXD6_SAI6_TX_SYNC			0xd6		/* WIFI_TX_SYNC */
-			MX8MM_IOMUXC_SAI1_TXD5_SAI6_RX_DATA0			0xd6		/* WIFI_RX_DATA0 */
-		>;
-	};
-
-	pinctrl_wifi_pwr_en: wifipwrengrp {
-		fsl,pins = <
-			MX8MM_IOMUXC_SAI5_MCLK_GPIO3_IO25			0x184		/* PMIC_EN_WIFI */
-		>;
-	};
 };
 
 &gpio3 {
