@@ -594,6 +594,12 @@ static int pca9450_buck123_dvs_init(struct pca9450_pmic *pmic)
 			}
 		}
 	}
+	/* clear the preset enable bit as we use PCA9450_BUCKxOUT_DVSy regs */
+	ret = pca9450_clear_bits(pca9450, PCA9450_BUCK123_DVS, \
+				 BUCK123_PRESET_EN);
+	if (ret < 0)
+		return ret;
+
 	return 0;
 }
 
