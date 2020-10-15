@@ -2677,7 +2677,7 @@ mwifiex_cfg80211_sched_scan_start(struct wiphy *wiphy,
 	struct ieee_types_header *ie;
 
 	if (!request || (!request->n_ssids && !request->n_match_sets)) {
-		wiphy_err(wiphy, "%s : Invalid Sched_scan parameters",
+		wiphy_notice(wiphy, "%s : Invalid Sched_scan parameters",
 			  __func__);
 		return -EINVAL;
 	}
