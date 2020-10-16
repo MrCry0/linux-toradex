@@ -1883,8 +1883,6 @@ err_reset_phy:
 		imx6_pcie_clk_disable(imx6_pcie);
 		if (imx6_pcie->vpcie != NULL)
 			regulator_disable(imx6_pcie->vpcie);
-		if (imx6_pcie->epdev_on != NULL)
-			regulator_disable(imx6_pcie->epdev_on);
 	}
 
 	return ret;
@@ -3005,7 +3003,7 @@ static int imx6_pcie_probe(struct platform_device *pdev)
 			} else {
 				dev_err(dev, "unable to add pcie port.\n");
 			}
-			goto err_ret;
+			goto err_reg;
 		}
 		pci_imx_set_msi_en(&imx6_pcie->pci->pp);
 
@@ -3051,6 +3049,8 @@ static int imx6_pcie_probe(struct platform_device *pdev)
 
 	return 0;
 
+err_reg:
+	regulator_disable(imx6_pcie->epdev_on);
 err_ret:
 	imx6_pcie_detach_pd(dev);
 	return ret;
