@@ -339,6 +339,7 @@
 		/* PMIC PCA9450 PMIC_nINT GPIO1_IO3 */
 		pinctrl-0 = <&pinctrl_pmic>;
 		gpio_intr = <&gpio1 3 GPIO_ACTIVE_LOW>;
+		i2c-lt-en = <0x101>;
 
 		regulators {
 			#address-cells = <1>;
