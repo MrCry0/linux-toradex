@@ -9,6 +9,15 @@ Required properties:
                             initialization data. Including 6 buck regulators
 			    and 5 ldo regulators.
 
+Optional properties:
+ - i2c-lt-en            : Sets I2C level translator enable in CONFIG2, valid:
+                            0x100 = Forced Disable
+                            0x101 = Enable only when STANDBY and RUN mode
+                            0x102 = Enable only when RUN mode
+                            0x103 = Forced enable
+                          Any other value or if the property is missing CONFIG2
+                          is not changed.
+
 Example:
 	pmic: pca9450@25 {
 		reg = <0x25>;
@@ -16,6 +25,7 @@ Example:
 		/* PMIC PCA9450 PMIC_nINT GPIO1_IO3 */
 		pinctrl-0 = <&pinctrl_pmic>;
 		gpio_intr = <&gpio1 3 GPIO_ACTIVE_LOW>;
+		i2c-lt-en = <0x101>;
 
 		regulators {
 			#address-cells = <1>;
