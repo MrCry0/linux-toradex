@@ -176,6 +176,10 @@ static struct pca9450_board *pca9450_parse_dt(struct i2c_client *client,
 	else
 		board_info->irq_base = -1;
 
+	r = of_property_read_u32(np, "i2c-lt-en", &prop);
+	if (!r)
+		board_info->i2c_lt_en = 0x100 | prop;
+
 	return board_info;
 
 err_intr:
@@ -235,6 +239,17 @@ static int pca9450_i2c_probe(struct i2c_client *i2c,
 		goto err;
 	}
 	dev_info(pca9450->dev, "Device ID=0x%X\n", ret);
+
+	if ((pmic_plat_data->i2c_lt_en > 0xff) &&
+	    (pmic_plat_data->i2c_lt_en < 0x104)) {
+		ret = pca9450_reg_write(pca9450, PCA9450_CONFIG2,
+		                        pmic_plat_data->i2c_lt_en & 0xff);
+		if (ret < 0) {
+			dev_err(pca9450->dev, "%s(): Read PCA9450_REG_DEVICE failed!\n",
+				__func__);
+			goto err;
+		}
+	}
 
 	pca9450_irq_init(pca9450, of_pmic_plat_data);
 

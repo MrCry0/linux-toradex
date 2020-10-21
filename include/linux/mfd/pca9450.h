@@ -233,6 +233,7 @@ enum {
 struct pca9450_board {
 	struct regulator_init_data *init_data[PCA9450_REGULATOR_CNT];
 	int	gpio_intr;
+	int	i2c_lt_en;
 	int	irq_base;
 };
 
