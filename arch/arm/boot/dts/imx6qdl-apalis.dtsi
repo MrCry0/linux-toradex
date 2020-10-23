@@ -713,7 +713,6 @@
 };
 
 &ldb {
-	status = "okay";
 //	split-mode;
 //	dual-mode;
 
@@ -723,7 +722,6 @@
 		fsl,data-width = <18>;
 		crtc = "ipu2-di1";
 		primary;
-		status = "okay";
 
 		display-timings {
 			native-mode = <&timing_xga>;
@@ -809,7 +807,6 @@
 		fsl,data-mapping = "spwg";
 		fsl,data-width = <18>;
 		crtc = "ipu1-di0";
-		status = "okay";
 
 		display-timings {
 /*			native-mode = <&timing_svga_ch2>;*/
