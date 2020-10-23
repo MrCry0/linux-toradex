@@ -272,10 +272,6 @@
 	};
 };
 
-&lcd {
-	status = "okay";
-};
-
 &ldb {
 	status = "okay";
 };
@@ -293,10 +289,6 @@
 };
 
 &mxcfb2 {
-	status = "okay";
-};
-
-&mxcfb3 {
 	status = "okay";
 };
 
