@@ -176,6 +176,7 @@
 	status = "okay";
 };
 
+/* USB PHY for &usbotg3 */
 &usb3phynop1 {
 	status = "okay";
 };
@@ -196,6 +197,7 @@
         status = "okay";
 };
 
+/* USB PHY for &usbotg1 */
 &usbphy1 {
         status = "okay";
 };
