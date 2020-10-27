@@ -553,6 +553,7 @@
 	pmic: pfuze100@08 {
 		compatible = "fsl,pfuze100";
 		reg = <0x08>;
+		fsl,pmic-stby-poweroff;
 
 		regulators {
 			sw1a_reg: sw1ab {
