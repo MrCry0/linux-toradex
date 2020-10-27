@@ -1313,7 +1313,6 @@ void __init imx6q_pm_init(void)
 		imx6_pm_common_init(&imx6q_lpddr2_pm_data);
 	else
 		imx6_pm_common_init(&imx6q_pm_data);
-#ifndef CONFIG_POWER_RESET_GPIO
 	/*
 	 * if no specific power off function in board file, power off system by
 	 * stop mode
@@ -1321,14 +1320,12 @@ void __init imx6q_pm_init(void)
 	if (!pm_power_off)
 		if (of_machine_is_compatible("toradex,apalis_imx6q"))
 			pm_power_off = imx6_stop_mode_poweroff;
-#endif
 }
 
 void __init imx6dl_pm_init(void)
 {
 	imx6_pm_common_init(&imx6dl_pm_data);
 
-#ifndef CONFIG_POWER_RESET_GPIO
 	/*
 	 * if no specific power off function in board file, power off system by
 	 * stop mode
@@ -1336,7 +1333,6 @@ void __init imx6dl_pm_init(void)
 	if (!pm_power_off)
 		if (of_machine_is_compatible("toradex,colibri_imx6dl"))
 			pm_power_off = imx6_stop_mode_poweroff;
-#endif
 }
 
 void __init imx6sl_pm_init(void)
