@@ -12,6 +12,11 @@
 		stdout-path = &uart1;
 	};
 
+	aliases {
+		rtc0 = &rtc_i2c;
+		rtc1 = &snvs_rtc;
+	};
+
 	/* fixed clock dedicated to SPI CAN controller */
 	clk20m: oscillator {
 		compatible = "fixed-clock";
@@ -450,7 +455,7 @@
 		};
 	};
 
-	rtc: rtc@32 {
+	rtc_i2c: rtc@32 {
 		compatible = "epson,rx8130";
 		reg = <0x32>;
 	};
