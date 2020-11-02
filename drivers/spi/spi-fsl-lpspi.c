@@ -86,6 +86,8 @@
 #define TCR_RXMSK	BIT(19)
 #define TCR_TXMSK	BIT(18)
 
+static int clkdivs[] = {1, 2, 4, 8, 16, 32, 64, 128};
+
 struct lpspi_config {
 	u8 bpw;
 	u8 chip_select;
@@ -325,14 +327,15 @@ static int fsl_lpspi_set_bitrate(struct fsl_lpspi_data *fsl_lpspi)
 	}
 
 	for (prescale = 0; prescale < 8; prescale++) {
-		scldiv = perclk_rate / config.speed_hz / (1 << prescale) - 2;
+		scldiv = perclk_rate /
+			 (clkdivs[prescale] * config.speed_hz) - 2;
 		if (scldiv < 256) {
 			fsl_lpspi->config.prescale = prescale;
 			break;
 		}
 	}
 
-	if (scldiv >= 256)
+	if (prescale == 8 && scldiv >= 256)
 		return -EINVAL;
 
 	writel(scldiv | (scldiv << 8) | ((scldiv >> 1) << 16),
@@ -859,22 +862,6 @@ static int fsl_lpspi_probe(struct platform_device *pdev)
 
 	platform_set_drvdata(pdev, controller);
 
-	controller->bits_per_word_mask = SPI_BPW_RANGE_MASK(8, 32);
-	controller->transfer_one = fsl_lpspi_transfer_one;
-	controller->prepare_transfer_hardware = lpspi_prepare_xfer_hardware;
-	controller->unprepare_transfer_hardware = lpspi_unprepare_xfer_hardware;
-	controller->mode_bits = SPI_CPOL | SPI_CPHA | SPI_CS_HIGH;
-	controller->flags = SPI_MASTER_MUST_RX | SPI_MASTER_MUST_TX;
-	controller->dev.of_node = pdev->dev.of_node;
-	controller->bus_num = pdev->id;
-	controller->slave_abort = fsl_lpspi_slave_abort;
-
-	ret = devm_spi_register_controller(&pdev->dev, controller);
-	if (ret < 0) {
-		dev_err(&pdev->dev, "spi_register_controller error.\n");
-		goto out_controller_put;
-	}
-
 	ret = of_property_read_u32(np, "fsl,spi-num-chipselects", &num_cs);
 	if (ret < 0) {
 		if (lpspi_platform_info) {
@@ -891,14 +878,27 @@ static int fsl_lpspi_probe(struct platform_device *pdev)
 	fsl_lpspi->is_only_cs1 = of_property_read_bool((&pdev->dev)->of_node,
 						"fsl,spi-only-use-cs1-sel");
 
+	controller->bits_per_word_mask = SPI_BPW_RANGE_MASK(8, 32);
+	controller->transfer_one = fsl_lpspi_transfer_one;
+	controller->prepare_transfer_hardware = lpspi_prepare_xfer_hardware;
+	controller->unprepare_transfer_hardware = lpspi_unprepare_xfer_hardware;
+	controller->mode_bits = SPI_CPOL | SPI_CPHA | SPI_CS_HIGH;
+	controller->flags = SPI_MASTER_MUST_RX | SPI_MASTER_MUST_TX;
+	controller->dev.of_node = pdev->dev.of_node;
+	controller->bus_num = pdev->id;
+	controller->slave_abort = fsl_lpspi_slave_abort;
+
 	if (!fsl_lpspi->is_slave) {
 		controller->cs_gpios = devm_kzalloc(&controller->dev,
 			sizeof(int) * controller->num_chipselect, GFP_KERNEL);
 
 		for (i = 0; i < controller->num_chipselect; i++) {
 			int cs_gpio = of_get_named_gpio(np, "cs-gpios", i);
-			if (cs_gpio == -EPROBE_DEFER)
-				return -EPROBE_DEFER;
+
+			if (cs_gpio == -EPROBE_DEFER) {
+				ret = -EPROBE_DEFER;
+				goto out_controller_put;
+			}
 
 			if (!gpio_is_valid(cs_gpio) && lpspi_platform_info)
 				cs_gpio = lpspi_platform_info->chipselect[i];
@@ -970,12 +970,29 @@ static int fsl_lpspi_probe(struct platform_device *pdev)
 
 	ret = fsl_lpspi_dma_init(&pdev->dev, fsl_lpspi, controller);
 	if (ret == -EPROBE_DEFER)
-		goto out_controller_put;
-
+		goto err_disable_runtime_pm;
 	if (ret < 0)
 		dev_err(&pdev->dev, "dma setup error %d, use pio\n", ret);
+	else
+		/* disable LPSPI module IRQ when enable DMA mode successfully,
+		 * to prevent the unexpected LPSPI module IRQ events*/
+		disable_irq(irq);
+
+	ret = devm_spi_register_controller(&pdev->dev, controller);
+	if (ret < 0) {
+		dev_err(&pdev->dev, "spi_register_controller error.\n");
+		goto err_disable_runtime_pm;
+	}
+
+	pm_runtime_mark_last_busy(fsl_lpspi->dev);
+	pm_runtime_put_autosuspend(fsl_lpspi->dev);
 
 	return 0;
+
+err_disable_runtime_pm:
+	pm_runtime_dont_use_autosuspend(fsl_lpspi->dev);
+	pm_runtime_put_sync(fsl_lpspi->dev);
+	pm_runtime_disable(fsl_lpspi->dev);
 
 out_controller_put:
 	spi_controller_put(controller);
