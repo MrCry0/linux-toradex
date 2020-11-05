@@ -9,7 +9,7 @@
 #include "imx8-apalis-eval.dtsi"
 
 / {
-	model = "Toradex Apalis iMX8QM/QP V1.1 on Apalis Evaluation Board";
+	model = "Toradex Apalis iMX8QM V1.1 on Apalis Evaluation Board";
 	compatible = "toradex,apalis-imx8-v1.1-eval",
 		     "toradex,apalis-imx8-eval",
 		     "toradex,apalis-imx8",

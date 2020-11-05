@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+ OR X11
 /*
- * Copyright 2019 Toradex
+ * Copyright 2019-2020 Toradex
  */
 
 /dts-v1/;
@@ -9,7 +9,7 @@
 #include "imx8-apalis-ixora-v1.1.dtsi"
 
 / {
-	model = "Toradex Apalis iMX8QM/QP V1.1 on Apalis Ixora V1.1 Carrier Board";
+	model = "Toradex Apalis iMX8QM V1.1 on Apalis Ixora V1.1 Carrier Board";
 	compatible = "toradex,apalis-imx8-v1.1-ixora-v1.1",
 		     "toradex,apalis-imx8-v1.1-ixora",
 		     "toradex,apalis-imx8-v1.1",
