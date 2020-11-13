@@ -44,9 +44,9 @@ stages:
     THREADS=$(grep processor /proc/cpuinfo -c)
     # due to specific of the kernel build we need to use the latest configuration from the nightly builds. We are getting $Version dynamically , as a variable , based on parsing URL page with Nightly builds ID  
     rm -f index.html 
-    wget http://artifactory-horw.int.toradex.com/artifactory/list/torizoncore-oe-prerelease-horw/master/nightly/
+    wget http://artifactory-horw.int.toradex.com/artifactory/list/torizoncore-oe-prerelease-horw/dunfell-5.x.y/nightly/
     version=$( cat index.html| grep ^"<a" | sed -e 's/[<>="//]/ /g' | awk '{ print $3}' | sort -nrk1,1 | head -1)
-    wget http://artifactory-horw.int.toradex.com/artifactory/list/torizoncore-oe-prerelease-horw/master/nightly/$version/$KERNEL_FILE_PATH/oedeploy/kernel-config
+    wget http://artifactory-horw.int.toradex.com/artifactory/list/torizoncore-oe-prerelease-horw/dunfell-5.x.y/nightly/$version/$KERNEL_FILE_PATH/oedeploy/kernel-config
     mkdir -p $TEMP_BUILD_FOLDER
     cp kernel-config $TEMP_BUILD_FOLDER/$KERNEL_CONFIGURATION_FILE
     ##### 
@@ -68,5 +68,5 @@ build_default_defconfig :
   extends: .build_base
   variables:
     # Defining the path, which we will use to take a config file  to build a kernel 
-   KERNEL_FILE_PATH:  colibri-imx7/torizon/torizon-core-docker
+   KERNEL_FILE_PATH:  colibri-imx7/torizon-upstream/torizon-core-docker
   stage: build-product
