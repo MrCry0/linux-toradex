@@ -110,7 +110,7 @@
 #define FSL_SAI_CSR_FRDE	BIT(0)
 
 /* SAI Transmit and Receive Configuration 1 Register */
-#define FSL_SAI_CR1_RFW_MASK	0x1f
+#define FSL_SAI_CR1_RFW_MASK(x)	((x) - 1)
 
 /* SAI Transmit and Receive Configuration 2 Register */
 #define FSL_SAI_CR2_SYNC	BIT(30)
@@ -279,6 +279,8 @@ struct fsl_sai {
 	unsigned int slot_width;
 	unsigned int bitclk_ratio;
 
+	const struct fsl_sai_soc_data *soc_data;
+	struct snd_soc_dai_driver cpu_dai_drv;
 	struct snd_dmaengine_dai_dma_data dma_params_rx;
 	struct snd_dmaengine_dai_dma_data dma_params_tx;
 	const struct fsl_sai_soc_data *soc;
@@ -288,7 +290,6 @@ struct fsl_sai {
 
 	struct fsl_sai_verid verid;
 	struct fsl_sai_param param;
-	struct snd_soc_dai_driver cpu_dai_drv;
 };
 
 const struct attribute_group *fsl_sai_get_dev_attribute_group(bool monitor_spdif);
