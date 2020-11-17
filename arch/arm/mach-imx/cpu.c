@@ -1,14 +1,19 @@
 // SPDX-License-Identifier: GPL-2.0
 #include <linux/err.h>
+#include <linux/mfd/syscon.h>
 #include <linux/module.h>
 #include <linux/io.h>
 #include <linux/of.h>
 #include <linux/of_address.h>
+#include <linux/regmap.h>
 #include <linux/slab.h>
 #include <linux/sys_soc.h>
 
 #include "hardware.h"
 #include "common.h"
+
+#define OCOTP_UID_H	0x420
+#define OCOTP_UID_L	0x410
 
 unsigned int __mxc_cpu_type;
 static unsigned int imx_soc_revision;
@@ -120,9 +125,13 @@ put_node:
 struct device * __init imx_soc_device_init(void)
 {
 	struct soc_device_attribute *soc_dev_attr;
+	const char *ocotp_compat = NULL;
 	struct soc_device *soc_dev;
 	struct device_node *root;
+	struct regmap *ocotp = NULL;
 	const char *soc_id;
+	u64 soc_uid = 0;
+	u32 val;
 	int ret;
 
 	soc_dev_attr = kzalloc(sizeof(*soc_dev_attr), GFP_KERNEL);
@@ -163,41 +172,42 @@ struct device * __init imx_soc_device_init(void)
 		soc_id = "i.MX53";
 		break;
 	case MXC_CPU_IMX6SL:
-		soc_dev_attr->unique_id = kasprintf(GFP_KERNEL, "%llx", imx_get_soc_uid());
+		ocotp_compat = "fsl,imx6sl-ocotp";
 		soc_id = "i.MX6SL";
 		break;
 	case MXC_CPU_IMX6DL:
-		soc_dev_attr->unique_id = kasprintf(GFP_KERNEL, "%llx", imx_get_soc_uid());
+		ocotp_compat = "fsl,imx6q-ocotp";
 		soc_id = "i.MX6DL";
 		break;
 	case MXC_CPU_IMX6SX:
-		soc_dev_attr->unique_id = kasprintf(GFP_KERNEL, "%llx", imx_get_soc_uid());
+		ocotp_compat = "fsl,imx6sx-ocotp";
 		soc_id = "i.MX6SX";
 		break;
 	case MXC_CPU_IMX6Q:
-		soc_dev_attr->unique_id = kasprintf(GFP_KERNEL, "%llx", imx_get_soc_uid());
-
+		ocotp_compat = "fsl,imx6q-ocotp";
 		if (imx_get_soc_revision() >= IMX_CHIP_REVISION_2_0)
 			soc_id = "i.MX6QP";
 		else
 			soc_id = "i.MX6Q";
 		break;
 	case MXC_CPU_IMX6UL:
-		soc_dev_attr->unique_id = kasprintf(GFP_KERNEL, "%llx", imx_get_soc_uid());
+		ocotp_compat = "fsl,imx6ul-ocotp";
 		soc_id = "i.MX6UL";
 		break;
 	case MXC_CPU_IMX6ULL:
-		soc_dev_attr->unique_id = kasprintf(GFP_KERNEL, "%llx", imx_get_soc_uid());
+		ocotp_compat = "fsl,imx6ull-ocotp";
 		soc_id = "i.MX6ULL";
 		break;
 	case MXC_CPU_IMX6ULZ:
+		ocotp_compat = "fsl,imx6ull-ocotp";
 		soc_id = "i.MX6ULZ";
 		break;
 	case MXC_CPU_IMX6SLL:
+		ocotp_compat = "fsl,imx6sll-ocotp";
 		soc_id = "i.MX6SLL";
 		break;
 	case MXC_CPU_IMX7D:
-		soc_dev_attr->unique_id = kasprintf(GFP_KERNEL, "%llx", imx_get_soc_uid());
+		ocotp_compat = "fsl,imx7d-ocotp";
 		soc_id = "i.MX7D";
 		break;
 	case MXC_CPU_IMX7ULP:
@@ -208,18 +218,38 @@ struct device * __init imx_soc_device_init(void)
 	}
 	soc_dev_attr->soc_id = soc_id;
 
+	if (ocotp_compat) {
+		ocotp = syscon_regmap_lookup_by_compatible(ocotp_compat);
+		if (IS_ERR(ocotp))
+			pr_err("%s: failed to find %s regmap!\n", __func__, ocotp_compat);
+	}
+
+	if (!IS_ERR_OR_NULL(ocotp)) {
+		regmap_read(ocotp, OCOTP_UID_H, &val);
+		soc_uid = val;
+		regmap_read(ocotp, OCOTP_UID_L, &val);
+		soc_uid <<= 32;
+		soc_uid |= val;
+	}
+
 	soc_dev_attr->revision = kasprintf(GFP_KERNEL, "%d.%d",
 					   (imx_soc_revision >> 4) & 0xf,
 					   imx_soc_revision & 0xf);
 	if (!soc_dev_attr->revision)
 		goto free_soc;
 
+	soc_dev_attr->serial_number = kasprintf(GFP_KERNEL, "%016llX", soc_uid);
+	if (!soc_dev_attr->serial_number)
+		goto free_rev;
+
 	soc_dev = soc_device_register(soc_dev_attr);
 	if (IS_ERR(soc_dev))
-		goto free_rev;
+		goto free_serial_number;
 
 	return soc_device_to_device(soc_dev);
 
+free_serial_number:
+	kfree(soc_dev_attr->serial_number);
 free_rev:
 	kfree(soc_dev_attr->revision);
 free_soc:
