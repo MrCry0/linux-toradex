@@ -142,10 +142,29 @@
 			sound-dai = <&sai1>;
 		};
 	};
+
+	sound-hdmi {
+		compatible = "fsl,imx-audio-cdnhdmi";
+		model = "audio-hdmi";
+		audio-cpu = <&aud2htx>;
+		hdmi-out;
+		constraint-rate = <44100>,
+				<88200>,
+				<176400>,
+				<32000>,
+				<48000>,
+				<96000>,
+				<192000>;
+		status = "okay";
+	};
 };
 
 &A53_0 {
 	cpu-supply = <&buck2_reg>;
+};
+
+&aud2htx {
+	status = "okay";
 };
 
 /* compare with commit d0307f1e31c64 */
@@ -258,6 +277,34 @@
 
 &gpio5 {
 	gpio-line-names = "";
+};
+
+&gpu_2d {
+	status = "okay";
+};
+
+&gpu_3d {
+	status = "okay";
+};
+
+&hdmi {
+	status = "okay";
+};
+
+&hdmimix_clk {
+	status = "okay";
+};
+
+&hdmimix_reset {
+	status = "okay";
+};
+
+&hdmiphy {
+	status = "okay";
+};
+
+&hdmi_pavi {
+	status = "okay";
 };
 
 /* On-module I2C */
@@ -520,6 +567,23 @@
 		reg = <0x57>;
 		status = "disabled";
 	};
+};
+
+&irqsteer_hdmi {
+	status = "okay";
+};
+
+/* LCDIF to on-SoC Samsung HDMI PHY */
+&lcdif3 {
+	status = "okay";
+};
+
+&mix_gpu_ml {
+	status = "okay";
+};
+
+&ml_vipsi {
+	status = "okay";
 };
 
 &mu {
