@@ -60,7 +60,6 @@
 		off-on-delay = <500000>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_reg_eth>;
-		regulator-boot-on;
 		regulator-max-microvolt = <3300000>;
 		regulator-min-microvolt = <3300000>;
 		regulator-name = "V3.3_ETH";
@@ -166,9 +165,8 @@
 	phy-handle = <&ethphy0>;
 	phy-mode = "rgmii-id";
 	phy-supply = <&reg_ethphy>;
-	pinctrl-names = "default", "sleep";
+	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_eqos>;
-	pinctrl-1 = <&pinctrl_eqos_sleep>;
 
 	mdio {
 		compatible = "snps,dwmac-mdio";
@@ -737,26 +735,6 @@
 			MX8MP_IOMUXC_ENET_TX_CTL__ENET_QOS_RGMII_TX_CTL	0x1f
 			MX8MP_IOMUXC_ENET_TXC__CCM_ENET_QOS_CLOCK_GENERATE_TX_CLK	0x1f
 			MX8MP_IOMUXC_GPIO1_IO10__GPIO1_IO10		0x1c4
-		>;
-	};
-
-	pinctrl_eqos_sleep: eqossleepgrp {
-		fsl,pins = <
-			MX8MP_IOMUXC_ENET_MDC__ENET_QOS_MDC		0x3
-			MX8MP_IOMUXC_ENET_MDIO__ENET_QOS_MDIO		0x3
-			MX8MP_IOMUXC_ENET_RD0__ENET_QOS_RGMII_RD0	0x91
-			MX8MP_IOMUXC_ENET_RD1__ENET_QOS_RGMII_RD1	0x91
-			MX8MP_IOMUXC_ENET_RD2__ENET_QOS_RGMII_RD2	0x91
-			MX8MP_IOMUXC_ENET_RD3__ENET_QOS_RGMII_RD3	0x91
-			MX8MP_IOMUXC_ENET_RXC__CCM_ENET_QOS_CLOCK_GENERATE_RX_CLK	0x91
-			MX8MP_IOMUXC_ENET_RX_CTL__ENET_QOS_RGMII_RX_CTL	0x91
-			MX8MP_IOMUXC_ENET_TD0__GPIO1_IO21		0x1f
-			MX8MP_IOMUXC_ENET_TD1__GPIO1_IO20		0x1f
-			MX8MP_IOMUXC_ENET_TD2__GPIO1_IO19		0x1f
-			MX8MP_IOMUXC_ENET_TD3__GPIO1_IO18		0x1f
-			MX8MP_IOMUXC_ENET_TX_CTL__GPIO1_IO22		0x1f
-			MX8MP_IOMUXC_ENET_TXC__GPIO1_IO23 		0x1f
-			MX8MP_IOMUXC_GPIO1_IO10__GPIO1_IO10		0x184
 		>;
 	};
 
