@@ -27,6 +27,7 @@ Required properties:
 
 Optional properties:
 - intf_mode: is optional for imx8dxl platform.
+- phy-supply: regulator that powers the Ethernet PHY.
 - snps,rmii_refclk_ext: to select RMII reference clock from external.
 
 Example:

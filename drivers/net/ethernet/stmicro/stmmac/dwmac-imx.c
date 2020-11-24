@@ -19,6 +19,7 @@
 #include <linux/pm_runtime.h>
 #include <linux/pm_wakeirq.h>
 #include <linux/regmap.h>
+#include <linux/regulator/consumer.h>
 #include <linux/slab.h>
 #include <linux/stmmac.h>
 
@@ -50,6 +51,7 @@ struct imx_priv_data {
 	struct clk *clk_tx;
 	struct clk *clk_mem;
 	struct regmap *intf_regmap;
+	struct regulator *regulator;
 	u32 intf_reg_off;
 	bool rmii_refclk_ext;
 
@@ -176,6 +178,12 @@ static int imx_dwmac_init(struct platform_device *pdev, void *priv)
 			goto intf_mode_failed;
 	}
 
+	ret = regulator_enable(dwmac->regulator);
+	if (ret) {
+		dev_err(dwmac->dev, "fail to enable phy-supply\n");
+		goto intf_mode_failed;
+	}
+
 	return 0;
 
 intf_mode_failed:
@@ -205,6 +213,11 @@ static void imx_dwmac_exit(struct platform_device *pdev, void *priv)
 	if (dwmac->clk_tx)
 		clk_disable_unprepare(dwmac->clk_tx);
 	clk_disable_unprepare(dwmac->clk_mem);
+
+	ret = regulator_disable(dwmac->regulator);
+	if (ret)
+		dev_err(dwmac->dev, "fail to disable phy-supply\n");
+
 	pm_runtime_put(&pdev->dev);
 }
 
@@ -280,6 +293,15 @@ imx_dwmac_parse_dt(struct imx_priv_data *dwmac, struct device *dev)
 		}
 	}
 
+	dwmac->regulator = devm_regulator_get_optional(dev, "phy");
+	if (IS_ERR(dwmac->regulator)) {
+		if (PTR_ERR(dwmac->regulator) == -EPROBE_DEFER) {
+			return -EPROBE_DEFER;
+		}
+		dev_err(dev, "no regulator found\n");
+		dwmac->regulator = NULL;
+	}
+
 	return err;
 }
 
@@ -315,7 +337,8 @@ static int imx_dwmac_probe(struct platform_device *pdev)
 
 	ret = imx_dwmac_parse_dt(dwmac, &pdev->dev);
 	if (ret) {
-		dev_err(&pdev->dev, "failed to parse OF data\n");
+		if (ret != -EPROBE_DEFER)
+			dev_err(&pdev->dev, "failed to parse OF data\n");
 		goto err_parse_dt;
 	}
 
