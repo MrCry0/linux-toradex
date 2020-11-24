@@ -3,29 +3,26 @@
  * Copyright 2020 Toradex
  */
 
-/* Verdin SPI_1 */
-&ecspi1 {
-	status = "okay";
+#include "imx8mp-verdin-dahlia.dtsi"
 
-	spidev10: spidev@0 {
-		compatible = "toradex,evalspi";
-		reg = <0>;
-		spi-max-frequency = <10000000>;
+/ {
+	sound-hdmi {
+		compatible = "fsl,imx-audio-cdnhdmi";
+		model = "audio-hdmi";
+		audio-cpu = <&aud2htx>;
+		hdmi-out;
+		constraint-rate = <44100>,
+				<88200>,
+				<176400>,
+				<32000>,
+				<48000>,
+				<96000>,
+				<192000>;
 		status = "okay";
 	};
 };
 
-/* EEPROM on display adapter boards */
-&eeprom_display_adapter {
-	status = "okay";
-};
-
-/* EEPROM on Verdin Development board */
-&eeprom_carrier_board {
-	status = "okay";
-};
-
-&eqos {
+&aud2htx {
 	status = "okay";
 };
 
@@ -33,113 +30,62 @@
 	status = "okay";
 };
 
-&flexcan1 {
-	status = "okay";
-};
-
-&flexcan2 {
-	status = "okay";
-};
-
-/* Verdin QSPI_1 */
-&flexspi {
-	status = "okay";
-};
-
 &gpio_expander_21 {
 	status = "okay";
 };
 
-/* Current measurement into module VCC */
-&hwmon {
+&gpu_2d {
 	status = "okay";
 };
 
-&i2c3 {
+&gpu_3d {
 	status = "okay";
 };
 
-&i2c4 {
+&hdmi {
 	status = "okay";
 };
 
-/* Verdin PCIE_1 */
-&pcie {
+&hdmimix_clk {
 	status = "okay";
 };
 
-&pcie_phy{
+&hdmimix_reset {
 	status = "okay";
 };
 
-/* Verdin PWM_1 */
-&pwm1 {
+&hdmiphy {
 	status = "okay";
 };
 
-/* Verdin PWM_2 */
-&pwm2 {
+&hdmi_pavi {
 	status = "okay";
 };
 
-/* VERDIN I2S_1 */
-&sai1 {
+&irqsteer_hdmi {
 	status = "okay";
 };
 
-/* Verdin UART_1 */
-&uart1 {
+/* LCDIF to on-SoC Samsung HDMI PHY */
+&lcdif3 {
 	status = "okay";
 };
 
-/* Verdin UART_2 */
-&uart2 {
+&mix_gpu_ml {
 	status = "okay";
 };
 
-/* Verdin UART_3, used as the Linux Console */
-&uart3 {
+&ml_vipsi {
 	status = "okay";
 };
 
-/* Verdin UART_4 */
-/* Often used by the M7 and then should not be enabled here. */
-&uart4 {
-	status = "disabled";
-};
-
-/* Verdin USB_1 */
-&usb3_phy0 {
-	status = "okay";
-};
-
-&usb3_0 {
-	status = "okay";
-};
-
-&usb_dwc3_0 {
-	status = "okay";
-};
-
-/* Verdin USB_2 */
-&usb3_phy1 {
-	status = "okay";
-};
-
-&usb3_1 {
-	status = "okay";
-};
-
-&usb_dwc3_1 {
-	status = "okay";
-};
-
-/* Verdin SD_1 */
-&usdhc2 {
-	status = "okay";
-};
-
-/* Audio Codec */
-&wm8904_1a {
-	status = "okay";
+&sound_card {
+		simple-audio-card,routing =
+			"Headphone Jack", "HPOUTL",
+			"Headphone Jack", "HPOUTR",
+			"IN2L", "Line In Jack",
+			"IN2R", "Line In Jack",
+			"Microphone Jack", "MICBIAS",
+			"IN1L", "Microphone Jack",
+			"IN1R", "Microphone Jack";
 };
