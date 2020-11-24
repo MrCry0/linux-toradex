@@ -121,22 +121,6 @@
 	};
 };
 
-&hdmi_audio {
-	status = "okay";
-};
-
-&hdmi_cec {
-	status = "okay";
-};
-
-&hdmi_core {
-	status = "okay";
-};
-
-&hdmi_video {
-	status = "okay";
-};
-
 /* I2C1_SDA/SCL on MXM3 209/211 (e.g. RTC on carrier board) */
 &i2c1 {
 	status = "okay";
@@ -251,6 +235,7 @@
 	hdmi_ddc: edid@50 {
 		compatible = "fsl,imx6-hdmi-i2c";
 		reg = <0x50>;
+		status = "disabled";
 	};
 };
 
@@ -259,10 +244,6 @@
 	csi_id = <1>;
 	v_channel = <0>;
 	lanes = <2>;
-	status = "okay";
-};
-
-&mxcfb2 {
 	status = "okay";
 };
 
@@ -304,10 +285,6 @@
 };
 
 &sata {
-	status = "okay";
-};
-
-&sound_hdmi {
 	status = "okay";
 };
 

@@ -163,22 +163,6 @@
 	};
 };
 
-&hdmi_audio {
-	status = "okay";
-};
-
-&hdmi_cec {
-	status = "okay";
-};
-
-&hdmi_core {
-	status = "okay";
-};
-
-&hdmi_video {
-	status = "okay";
-};
-
 /* I2C1_SDA/SCL on MXM3 209/211 (e.g. RTC on carrier board) */
 &i2c1 {
 	status = "okay";
@@ -281,10 +265,6 @@
 	remote-endpoint = <&lcd_display_in>;
 };
 
-&mxcfb2 {
-	status = "okay";
-};
-
 &mxcfb4 {
 	status = "okay";
 };
@@ -322,10 +302,6 @@
 };
 
 &sata {
-	status = "okay";
-};
-
-&sound_hdmi {
 	status = "okay";
 };
 
