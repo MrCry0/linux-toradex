@@ -303,10 +303,6 @@
 	status = "okay";
 };
 
-&mxcfb4 {
-	status = "okay";
-};
-
 &ipu1_di1_disp1 {
 	remote-endpoint = <&lcd_display_in>;
 };

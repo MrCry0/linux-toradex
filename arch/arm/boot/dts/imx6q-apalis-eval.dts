@@ -234,10 +234,6 @@
 	status = "okay";
 };
 
-&mxcfb4 {
-	status = "okay";
-};
-
 &pcie {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_reset_moci>;
@@ -327,10 +323,6 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usdhc2 &pinctrl_sd_cd>;
 	cd-gpios = <&gpio6 14 GPIO_ACTIVE_LOW>;
-	status = "okay";
-};
-
-&vdac {
 	status = "okay";
 };
 
