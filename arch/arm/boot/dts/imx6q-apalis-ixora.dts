@@ -289,23 +289,7 @@
 	remote-endpoint = <&lcd_display_in>;
 };
 
-&lcd {
-	status = "okay";
-};
-
-&ldb {
-	status = "okay";
-};
-
-&mxcfb1 {
-	status = "okay";
-};
-
 &mxcfb2 {
-	status = "okay";
-};
-
-&mxcfb3 {
 	status = "okay";
 };
 

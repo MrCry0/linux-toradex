@@ -330,10 +330,6 @@
 	};
 };
 
-&lcd {
-	status = "okay";
-};
-
 &mipi_csi {
 	ipu_id = <0>;
 	csi_id = <1>;
@@ -342,15 +338,7 @@
 	status = "okay";
 };
 
-&mxcfb1 {
-	status = "okay";
-};
-
 &mxcfb2 {
-	status = "okay";
-};
-
-&mxcfb3 {
 	status = "okay";
 };
 
@@ -360,10 +348,6 @@
 
 &ipu1_di1_disp1 {
 	remote-endpoint = <&lcd_display_in>;
-};
-
-&ldb {
-	status = "okay";
 };
 
 &pcie {
