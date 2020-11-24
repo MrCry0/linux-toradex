@@ -249,18 +249,6 @@
 	};
 };
 
-/*
- * DDC_I2C: I2C2_SDA/SCL on MXM3 205/207
- */
-&i2cddc {
-	status = "okay";
-
-	hdmi_ddc: edid@50 {
-		compatible = "fsl,imx6-hdmi-i2c";
-		reg = <0x50>;
-	};
-};
-
 &ipu1_di1_disp1 {
 	remote-endpoint = <&lcd_display_in>;
 };
