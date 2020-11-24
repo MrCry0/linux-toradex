@@ -189,7 +189,6 @@
 	fsl,magic-packet;
 	phy-handle = <&ethphy1>;
 	phy-mode = "rgmii-id";
-	phy-supply = <&reg_ethphy>;
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&pinctrl_fec>;
 	pinctrl-1 = <&pinctrl_fec_sleep>;
