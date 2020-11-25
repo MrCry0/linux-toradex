@@ -17,6 +17,20 @@
 		rtc1 = &snvs_rtc;
 	};
 
+	backlight: backlight {
+		compatible = "pwm-backlight";
+		brightness-levels = <0 45 63 88 119 158 203 255>;
+		default-brightness-level = <4>;
+		/* Verdin MEZ_DSI_1_BKL_EN (SODIMM 21) */
+		enable-gpios = <&gpio4 28 GPIO_ACTIVE_HIGH>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_mez_dsi_1_bkl_en>;
+		power-supply = <&reg_3p3v>;
+		/* Verdin MEZ_PWM_3_DSI (SODIMM 19) */
+		pwms = <&pwm3 0 6666667 PWM_POLARITY_INVERTED>;
+		status = "disabled";
+	};
+
 	gpio-keys {
 		compatible = "gpio-keys";
 		pinctrl-names = "default";
@@ -502,6 +516,16 @@
 		vcc-supply = <&reg_3p3v>;
 	};
 
+	lvds_ti_sn65dsi83: bridge@2c {
+		compatible = "ti,sn65dsi83";
+		/* Verdin MEZ_GPIO_1 (SODIMM 206) */
+		enable-gpios = <&gpio1 0 GPIO_ACTIVE_HIGH>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_mez_gpio1>;
+		reg = <0x2c>;
+		status = "disabled";
+	};
+
 	/* Current measurement into module VCC */
 	hwmon: hwmon@40 {
 		compatible = "ti,ina219";
@@ -521,6 +545,19 @@
 		reg = <0x48>;
 		/* Verdin MEZ_GPIO_2 (SODIMM 208) */
 		reset-gpios = <&gpio1 1 GPIO_ACTIVE_LOW>;
+		status = "disabled";
+	};
+
+	atmel_maxtouch: touch@4a {
+		compatible = "atmel,maxtouch";
+		/* Verdin MEZ_DSI_1_INT# (SODIMM 17) */
+		interrupt-parent = <&gpio4>;
+		interrupts = <25 IRQ_TYPE_EDGE_FALLING>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_mez_dsi_1_int_n>, <&pinctrl_mez_gpio2>;
+		reg = <0x4a>;
+		/* Verdin MEZ_GPIO_2 (SODIMM 208) */
+		reset-gpios = <&gpio1 1 GPIO_ACTIVE_HIGH>;
 		status = "disabled";
 	};
 
@@ -581,6 +618,13 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pwm_2>;
 	#pwm-cells = <3>;
+};
+
+/* Verdin PWM_3_DSI */
+&pwm3 {
+	#pwm-cells = <3>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pwm_3>;
 };
 
 /* VERDIN I2S_1 */

@@ -74,6 +74,11 @@
 	status = "okay";
 };
 
+/* Verdin PWM_3_DSI */
+&pwm3 {
+	status = "okay";
+};
+
 /* VERDIN I2S_1 */
 &sai1 {
 	status = "okay";
