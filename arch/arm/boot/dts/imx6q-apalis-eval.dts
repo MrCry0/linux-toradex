@@ -182,10 +182,6 @@
 				 <&clks IMX6QDL_CLK_PLL2_PFD2_396M>;
 };
 
-&hdmi {
-	status = "okay";
-};
-
 /* I2C1_SDA/SCL on MXM3 209/211 (e.g. RTC on carrier board) */
 &i2c1 {
 	status = "okay";
