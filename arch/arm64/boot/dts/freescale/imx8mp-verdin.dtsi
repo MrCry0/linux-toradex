@@ -451,6 +451,14 @@
 	};
 };
 
+/* Verdin I2C_2_DSI */
+&i2c2 {
+	clock-frequency = <10000>;
+	pinctrl-names = "default", "gpio";
+	pinctrl-0 = <&pinctrl_i2c2>;
+	pinctrl-1 = <&pinctrl_i2c2_gpio>;
+};
+
 /* Verdin I2C_4_CSI */
 &i2c3 {
 	clock-frequency = <400000>;
@@ -499,6 +507,20 @@
 		compatible = "ti,ina219";
 		reg = <0x40>;
 		shunt-resistor = <10000>;
+		status = "disabled";
+	};
+
+	hdmi_lontium_lt8912: hdmi@48 {
+		compatible = "lontium,lt8912";
+		ddc-i2c-bus = <&i2c2>;
+		/* Verdin MEZ_DSI_1_INT HPD (SODIMM 17) shared with MEZ_GPIO_1 (SODIMM 206) */
+		hpd-gpios = <&gpio4 25 GPIO_ACTIVE_HIGH>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_mez_dsi_1_int_hpd>, <&pinctrl_mez_gpio1>,
+			    <&pinctrl_mez_gpio2>;
+		reg = <0x48>;
+		/* Verdin MEZ_GPIO_2 (SODIMM 208) */
+		reset-gpios = <&gpio1 1 GPIO_ACTIVE_LOW>;
 		status = "disabled";
 	};
 
