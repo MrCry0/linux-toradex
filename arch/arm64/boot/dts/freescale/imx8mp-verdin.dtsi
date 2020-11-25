@@ -525,6 +525,7 @@
 
 /* Verdin PCIE_1 */
 &pcie {
+	bus-range = <0x00 0xff>;
 	clocks = <&clk IMX8MP_CLK_HSIO_AXI_DIV>,
 		 <&clk IMX8MP_CLK_PCIE_AUX>,
 		 <&clk IMX8MP_CLK_PCIE_PHY>,
@@ -540,6 +541,10 @@
 	pinctrl-0 = <&pinctrl_pcie>;
 	reserved-region = <&rpmsg_reserved>;
 	reset-gpio = <&gpio4 19 GPIO_ACTIVE_LOW>;
+};
+
+&pcie_phy {
+	ext_osc = <0>;
 };
 
 /* Verdin PWM_1 */
