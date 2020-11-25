@@ -191,10 +191,19 @@
 		status = "disabled";
 	};
 
+	vgaconnector: vga {
+		compatible = "vga-connector";
+		status = "disabled";
+
+		port {
+			vga_con_in: endpoint {
+				remote-endpoint = <&vga_bridge_out>;
+			};
+		};
+	};
+
 	vgabridge: bridge {
 		compatible = "dumb-vga-dac";
-		#address-cells = <1>;
-		#size-cells = <0>;
 		de-active = <0>;
 		status = "disabled";
 
@@ -207,6 +216,14 @@
 
 				vga_bridge_in: endpoint {
 					remote-endpoint = <&vga_display_out>;
+				};
+			};
+
+			port@1 {
+				reg = <1>;
+
+				vga_bridge_out: endpoint {
+					remote-endpoint = <&vga_con_in>;
 				};
 			};
 		};
