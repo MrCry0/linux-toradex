@@ -178,10 +178,12 @@ static int imx_dwmac_init(struct platform_device *pdev, void *priv)
 			goto intf_mode_failed;
 	}
 
-	ret = regulator_enable(dwmac->regulator);
-	if (ret) {
-		dev_err(dwmac->dev, "fail to enable phy-supply\n");
-		goto intf_mode_failed;
+	if (dwmac->regulator) {
+		ret = regulator_enable(dwmac->regulator);
+		if (ret) {
+			dev_err(dwmac->dev, "fail to enable phy-supply\n");
+			goto intf_mode_failed;
+		}
 	}
 
 	return 0;
@@ -214,9 +216,11 @@ static void imx_dwmac_exit(struct platform_device *pdev, void *priv)
 		clk_disable_unprepare(dwmac->clk_tx);
 	clk_disable_unprepare(dwmac->clk_mem);
 
-	ret = regulator_disable(dwmac->regulator);
-	if (ret)
-		dev_err(dwmac->dev, "fail to disable phy-supply\n");
+	if (dwmac->regulator) {
+		ret = regulator_disable(dwmac->regulator);
+		if (ret)
+			dev_err(dwmac->dev, "fail to disable phy-supply\n");
+	}
 
 	pm_runtime_put(&pdev->dev);
 }
@@ -293,6 +297,7 @@ imx_dwmac_parse_dt(struct imx_priv_data *dwmac, struct device *dev)
 		}
 	}
 
+	/* Optional regulator for PHY */
 	dwmac->regulator = devm_regulator_get_optional(dev, "phy");
 	if (IS_ERR(dwmac->regulator)) {
 		if (PTR_ERR(dwmac->regulator) == -EPROBE_DEFER) {
