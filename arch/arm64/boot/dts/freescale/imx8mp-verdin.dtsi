@@ -209,12 +209,12 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 
-		ethphy1: ethernet-phy@3 {
+		ethphy1: ethernet-phy@7 {
 			compatible = "ethernet-phy-ieee802.3-c22";
 			interrupt-parent = <&gpio4>;
 			interrupts = <18 IRQ_TYPE_LEVEL_LOW>;
 			micrel,led-mode = <0>;
-			reg = <3>;
+			reg = <7>;
 		};
 	};
 };
