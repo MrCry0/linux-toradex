@@ -74,6 +74,8 @@
 		off-on-delay = <500000>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_reg_eth>;
+		regulator-always-on;
+		regulator-boot-on;
 		regulator-max-microvolt = <3300000>;
 		regulator-min-microvolt = <3300000>;
 		regulator-name = "V3.3_ETH";
@@ -178,7 +180,7 @@
 &eqos {
 	phy-handle = <&ethphy0>;
 	phy-mode = "rgmii-id";
-	phy-supply = <&reg_ethphy>;
+//	phy-supply = <&reg_ethphy>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_eqos>;
 
@@ -189,10 +191,10 @@
 
 		ethphy0: ethernet-phy@7 {
 			compatible = "ethernet-phy-ieee802.3-c22";
-			interrupt-parent = <&gpio1>;
-			interrupts = <10 IRQ_TYPE_LEVEL_LOW>;
-			reg = <7>;
+//			interrupt-parent = <&gpio1>;
+//			interrupts = <10 IRQ_TYPE_LEVEL_LOW>;
 			micrel,led-mode = <0>;
+			reg = <7>;
 		};
 	};
 };
@@ -211,8 +213,8 @@
 
 		ethphy1: ethernet-phy@7 {
 			compatible = "ethernet-phy-ieee802.3-c22";
-			interrupt-parent = <&gpio4>;
-			interrupts = <18 IRQ_TYPE_LEVEL_LOW>;
+//			interrupt-parent = <&gpio4>;
+//			interrupts = <18 IRQ_TYPE_LEVEL_LOW>;
 			micrel,led-mode = <0>;
 			reg = <7>;
 		};
