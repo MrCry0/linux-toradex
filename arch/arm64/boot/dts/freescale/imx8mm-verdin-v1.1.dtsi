@@ -623,6 +623,13 @@
 	reset-gpio = <&gpio3 19 GPIO_ACTIVE_LOW>;
 };
 
+/* Verdin PWM_3_DSI */
+&pwm1 {
+	#pwm-cells = <3>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pwm_1>;
+};
+
 /* Verdin PWM_1 */
 &pwm2 {
 	pinctrl-names = "default";
