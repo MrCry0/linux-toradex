@@ -466,7 +466,7 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_dap1_gpios>, <&pinctrl_gpio3>, <&pinctrl_gpio4>,
 		    <&pinctrl_mmc1_gpios>, <&pinctrl_qspi0a_gpios>, <&pinctrl_sata1_act>,
-		    <&pinctrl_usbo1oc>, <&pinctrl_wifi_sclk>;
+		    <&pinctrl_usbh_oc_n>, <&pinctrl_usbo1oc>, <&pinctrl_wifi_sclk>;
 
 	apalis-imx8qxp {
 		/* Apalis AN1_ADC */
@@ -832,7 +832,7 @@
 		};
 
 		/* Apalis USBH_OC# */
-		pinctrl_gpio_usbh_oc_n: gpiousbhocn {
+		pinctrl_usbh_oc_n: gpiousbhocn {
 			fsl,pins = <
 				IMX8QXP_QSPI0A_DATA0_LSIO_GPIO3_IO09		0x04000020	/* MXM3 96 */
 			>;
