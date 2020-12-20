@@ -1325,7 +1325,7 @@
 
 /*
  * Apalis USB 3.0 Host. Serves USB 3.0 4-port hub on module and
- * USB 3.0 ports on-board
+ * Apalis USBH2-4 ports on-board.
  */
 &usbotg3 {
 	dr_mode = "host";
