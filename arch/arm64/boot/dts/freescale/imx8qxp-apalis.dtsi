@@ -1320,7 +1320,6 @@
 /* Manage on-module USB WiFi */
 &usb3phynop1 {
 	status = "okay";
-	reset-on-resume;
 };
 
 /*
