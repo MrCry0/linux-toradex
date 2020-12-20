@@ -850,7 +850,7 @@
 		pinctrl_usbo1oc: usbo1oc {
 			fsl,pins = <
 				/* Apalis USBO1_OC# */
-				IMX8QXP_USB_SS3_TC2_LSIO_GPIO4_IO05		0x04000020	/* MXM3 262 */
+				IMX8QXP_USB_SS3_TC2_CONN_USB_OTG1_OC		0x04000020	/* MXM3 262 */
 			>;
 		};
 
