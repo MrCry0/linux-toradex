@@ -230,8 +230,8 @@
 		simple-audio-card,name = "imx8qxp-sgtl5000";
 
 		dailink_master: simple-audio-card,codec {
-			sound-dai = <&sgtl5000_a>;
 			clocks = <&mclkout0_lpcg 0>;
+			sound-dai = <&sgtl5000>;
 		};
 
 		simple-audio-card,cpu {
@@ -422,20 +422,22 @@
 		vcc-supply = <&reg_module_3v3>;
 	};
 
-	sgtl5000_a: sgtl5000@a {
+	sgtl5000: codec@a {
 		compatible = "fsl,sgtl5000";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_sgtl5000>;
 		#sound-dai-cells = <0>;
 		assigned-clocks = <&clk IMX_SC_R_AUDIO_PLL_0 IMX_SC_PM_CLK_PLL>,
-				  <&aud_pll_div0_lpcg 0>,
-				  <&aud_rec0_lpcg 0>,
-				  <&mclkout0_lpcg 0>;
+				<&clk IMX_SC_R_AUDIO_PLL_0 IMX_SC_PM_CLK_SLV_BUS>,
+				<&clk IMX_SC_R_AUDIO_PLL_0 IMX_SC_PM_CLK_MST_BUS>,
+				<&mclkout0_lpcg 0>;
 		assigned-clock-rates = <786432000>, <49152000>, <12288000>, <12288000>;
 		clocks = <&mclkout0_lpcg 0>;
 		clock-names = "mclk";
-		reg = <0xa>;
+		reg = <0x0a>;
 		VDDA-supply = <&reg_module_3v3_avdd>;
-		VDDIO-supply = <&reg_module_3v3>;
 		VDDD-supply = <&reg_module_vref_1v8>;
+		VDDIO-supply = <&reg_module_3v3>;
 	};
 };
 
