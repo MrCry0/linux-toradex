@@ -366,6 +366,14 @@
         status = "okay";
 };
 
+&hsio_refa_clk {
+	status = "disabled";
+};
+
+&hsio_refb_clk {
+	status = "disabled";
+};
+
 /* On-module I2C */
 &i2c0 {
         #address-cells = <1>;
