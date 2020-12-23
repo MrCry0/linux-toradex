@@ -1525,12 +1525,20 @@ static int fsl_spdif_probe(struct platform_device *pdev)
 					      &spdif_priv->cpu_dai_drv, 1);
 	if (ret) {
 		dev_err(&pdev->dev, "failed to register DAI: %d\n", ret);
-		return ret;
+		goto disable_pm_runtime;
 	}
 
 	ret = imx_pcm_dma_init(pdev, IMX_SPDIF_DMABUF_SIZE);
-	if (ret && ret != -EPROBE_DEFER)
-		dev_err(&pdev->dev, "imx_pcm_dma_init failed: %d\n", ret);
+	if (ret) {
+		if (ret != -EPROBE_DEFER)
+			dev_err(&pdev->dev, "imx_pcm_dma_init failed: %d\n", ret);
+		goto disable_pm_runtime;
+	}
+
+	return 0;
+
+disable_pm_runtime:
+	pm_runtime_disable(&pdev->dev);
 
 	return ret;
 }
