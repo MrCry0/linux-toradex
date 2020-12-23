@@ -2431,6 +2431,7 @@ static int imx6_pcie_resume_noirq(struct device *dev)
 		 */
 		regmap_update_bits(imx6_pcie->iomuxc_gpr, IOMUXC_GPR1,
 				IMX6Q_GPR1_PCIE_TEST_PD, 0);
+		msleep(10);
 	} else {
 		imx6_pcie_assert_core_reset(imx6_pcie);
 		imx6_pcie_init_phy(imx6_pcie);
