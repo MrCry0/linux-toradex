@@ -1163,14 +1163,14 @@
 			  "MXM3_158",
 			  "MXM3_198",
 			  "MXM3_274",
-			  "MXM3_11",
-			  "MXM3_13",
-			  "MXM3_15",
-			  "MXM3_17",
-			  "MXM3_1",
-			  "MXM3_3",
-			  "MXM3_5",
-			  "MXM3_7";
+			  "MXM3_11/GPIO5",
+			  "MXM3_13/GPIO6",
+			  "MXM3_15/GPIO7",
+			  "MXM3_17/GPIO8",
+			  "MXM3_1/GPIO1",
+			  "MXM3_3/GPIO2",
+			  "MXM3_5/GPIO3",
+			  "MXM3_7/GPIO4";
 };
 
 &lsio_gpio4 {
