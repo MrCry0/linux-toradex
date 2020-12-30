@@ -25,11 +25,16 @@
 	};
 };
 
-&backlight {
-	brightness-levels = <0 45 63 88 119 158 203 255>;
-	default-brightness-level = <4>;
-	pwms = <&pwm3 0 6666667 PWM_POLARITY_INVERTED>;
+/* Colibri SSP */
+&ecspi4 {
 	status = "okay";
+
+	spidev0: spidev@0 {
+		compatible = "toradex,evalspi";
+		reg = <0>;
+		spi-max-frequency = <23000000>;
+		status = "okay";
+	};
 };
 
 /*
@@ -56,10 +61,6 @@
 		compatible = "st,m41t0";
 		reg = <0x68>;
 	};
-};
-
-&lcd {
-	status = "okay";
 };
 
 &mxcfb1 {

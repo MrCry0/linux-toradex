@@ -242,10 +242,6 @@
 	};
 };
 
-&lcd {
-	status = "okay";
-};
-
 &mxcfb1 {
 	status = "okay";
 };

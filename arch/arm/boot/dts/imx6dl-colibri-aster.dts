@@ -69,13 +69,6 @@
 	status = "okay";
 };
 
-&backlight {
-	brightness-levels = <0 45 63 88 119 158 203 255>;
-	default-brightness-level = <4>;
-	pwms = <&pwm3 0 6666667 PWM_POLARITY_INVERTED>;
-	status = "okay";
-};
-
 &ecspi4 {
 	fsl,spi-num-chipselects = <2>;
 	cs-gpios = <
@@ -155,10 +148,6 @@
 			>;
 		};
 	};
-};
-
-&lcd {
-	status = "okay";
 };
 
 &mxcfb1 {
