@@ -32,18 +32,6 @@
 	status = "okay";
 };
 
-/* Colibri SSP */
-&ecspi4 {
-	status = "okay";
-
-	spidev0: spidev@0 {
-		compatible = "toradex,evalspi";
-		reg = <0>;
-		spi-max-frequency = <23000000>;
-		status = "okay";
-	};
-};
-
 /*
  * I2C: I2C3_SDA/SCL on SODIMM 194/196 (e.g. RTC on carrier
  * board)

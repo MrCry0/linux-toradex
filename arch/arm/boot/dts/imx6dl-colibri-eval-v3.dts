@@ -88,8 +88,6 @@
 
 /* Colibri SSP */
 &ecspi4 {
-	status = "okay";
-
 	mcp251x0: mcp251x@0 {
 		compatible = "microchip,mcp2515";
 		reg = <0>;
@@ -99,10 +97,11 @@
 		spi-max-frequency = <10000000>;
 		status = "okay";
 	};
+	/* To keep the CAN controller enabled by default,
+	 * disable conflicting spidev. This spidev device
+	 * enables with the devicetree overlay.
+	 */
 	spidev0: spidev@0 {
-		compatible = "toradex,evalspi";
-		reg = <0>;
-		spi-max-frequency = <23000000>;
 		status = "disabled";
 	};
 };
