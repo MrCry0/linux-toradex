@@ -2159,10 +2159,15 @@ lpuart32_serial_setbrg(struct lpuart_port *sport, unsigned int baudrate)
 	sbr = 0;
 
 	for (tmp_osr = 4; tmp_osr <= 32; tmp_osr++) {
-		/* calculate the temporary sbr value  */
+		/*
+		 * calculate the temporary sbr value, sbr must be in 1..8191,
+		 * limit to 8190, as the loop checks for sbr and sbr + 1
+		 */
 		tmp_sbr = (clk / (baudrate * tmp_osr));
 		if (tmp_sbr == 0)
 			tmp_sbr = 1;
+		if (tmp_sbr > 8190)
+			tmp_sbr = 8190;
 
 		/*
 		 * calculate the baud rate difference based on the temporary
