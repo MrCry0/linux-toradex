@@ -943,12 +943,16 @@
 
 /* Colibri SPI */
 &lpspi2 {
-        #address-cells = <1>;
-        #size-cells = <0>;
-        fsl,spi-num-chipselects = <1>;
-        pinctrl-names = "default";
-        pinctrl-0 = <&pinctrl_lpspi2>;
-        cs-gpios = <&lsio_gpio1 0 GPIO_ACTIVE_LOW>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_lpspi2>;
+	cs-gpios = <&lsio_gpio1 0 GPIO_ACTIVE_LOW>;
+	status = "okay";
+
+	spidev0: spidev@0 {
+		compatible = "toradex,evalspi";
+		reg = <0>;
+		spi-max-frequency = <10000000>;
+	};
 };
 
 /* Colibri UART_B */
