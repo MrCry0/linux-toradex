@@ -1714,7 +1714,8 @@ static void lpuart32_setup_watermark(struct lpuart_port *sport)
 	val |= UARTFIFO_TXFE | UARTFIFO_RXFE;
 	val |= UARTFIFO_TXFLUSH | UARTFIFO_RXFLUSH;
 	val &= ~(UARTFIFO_RXIDEN_MASK << UARTFIFO_RXIDEN_OFF);
-	rxiden_cnt = sport->dma_eeop ? 0 : UARTFIFO_RXIDEN_RDRF;
+	rxiden_cnt = (sport->dma_eeop && sport->lpuart_dma_rx_use) ?
+		     0 : UARTFIFO_RXIDEN_RDRF;
 	val |= ((rxiden_cnt & UARTFIFO_RXIDEN_MASK) <<
 		UARTFIFO_RXIDEN_OFF);
 	lpuart32_write(&sport->port, val, UARTFIFO);
