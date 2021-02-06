@@ -370,7 +370,7 @@
 		VDDD-supply = <&reg_DCDC3>;
 	};
 
-	ad7879@2c {
+	ad7879_ts: touchscreen@2c {
 		compatible = "adi,ad7879-1";
 		reg = <0x2c>;
 		interrupt-parent = <&gpio1>;
@@ -382,6 +382,7 @@
 		adi,median-filter-size = /bits/ 8 <2>;
 		adi,averaging = /bits/ 8 <1>;
 		adi,conversion-interval = /bits/ 8 <255>;
+		status = "disabled";
 	};
 
 	pmic@33 {
