@@ -1170,15 +1170,16 @@
 		/* On-module USB HSIC HUB (idle) */
 		pinctrl_usb_hsic_idle: usbh1_1 {
 			fsl,pins = <
-				SC_P_USB_HSIC0_DATA_CONN_USB_HSIC0_DATA		0xc60000c5
-				SC_P_USB_HSIC0_STROBE_CONN_USB_HSIC0_STROBE	0xc60000c5
+				SC_P_USB_HSIC0_DATA_CONN_USB_HSIC0_DATA		0x000000cf
+				SC_P_USB_HSIC0_STROBE_CONN_USB_HSIC0_STROBE	0x000000cf
 			>;
 		};
 
 		/* On-module USB HSIC HUB (active) */
 		pinctrl_usb_hsic_active: usbh1_2 {
 			fsl,pins = <
-				SC_P_USB_HSIC0_STROBE_CONN_USB_HSIC0_STROBE	0xc60000d5
+				SC_P_USB_HSIC0_DATA_CONN_USB_HSIC0_DATA		0x000000cf
+				SC_P_USB_HSIC0_STROBE_CONN_USB_HSIC0_STROBE	0x000000ff
 			>;
 		};
 
