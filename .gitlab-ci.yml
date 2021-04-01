@@ -1,9 +1,9 @@
 image: $CI_IMAGE
 
 variables:
-# uncomment for the pipeline debug purpose 
+# uncomment for the pipeline debug purpose
 # CI_DEBUG_TRACE: "true"
-  
+
 # Please choose possible 32/64 builder image and appropriate compiler
   CI_IMAGE: gitlab.int.toradex.com:4567/yuiry.erofeev/linux-toradex/ci-kernel-builder:latest
   #CI_IMAGE: gitlab.int.toradex.com:4567/yuiry.erofeev/linux-toradex/ci-kernel-builder:aarch64
@@ -11,16 +11,16 @@ variables:
   DOCKER_HOST: tcp://docker:2375
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: ""
-  
-# Kernel Configuration Section 
-# Supplementary Tool Section 
- # Artifacts configuring section  
+
+# Kernel Configuration Section
+# Supplementary Tool Section
+ # Artifacts configuring section
   KERNEL_CONFIG_BUILD_LOG_FILE_NAME: build_config.log
   KERNEL_BUILD_LOG_FILE_NAME: build.log
   KERNEL_CONFIGURATION_FILE: .config
 # Defining temporary build folder to do outside of the box builds.  Absolute path
   TEMP_BUILD_FOLDER: /builds/temp-builds
-  
+
 stages:
   - build-product
 
@@ -30,11 +30,11 @@ stages:
    GIT_STRATEGY: fetch
 #  we are only using 3 latest commits to speed up the fetch process, as we are running pipeline each time we do a commit or a MR  https://docs.gitlab.com/ee/ci/large_repositories/index.html#shallow-cloning
    GIT_DEPTH: "3"
-#  To run just on merge request 
+#  To run just on merge request
 #  only:
 #     - merge_requests
 #  when: manual
-  script: | 
+  script: |
     #set -o xtrace
     cd $CI_PROJECT_DIR
     echo -e "Compiler used to build binaries is"
@@ -42,18 +42,19 @@ stages:
     ${CROSS_COMPILE}gcc --version
     echo -e "Arch is \e[36m$ARCH\e[39m"
     THREADS=$(grep processor /proc/cpuinfo -c)
-    # due to specific of the kernel build we need to use the latest configuration from the nightly builds. We are getting $Version dynamically , as a variable , based on parsing URL page with Nightly builds ID  
-    rm -f index.html 
-    wget http://artifactory-horw.int.toradex.com/artifactory/list/torizoncore-oe-prerelease-horw/dunfell-5.x.y/nightly/
-    version=$( cat index.html| grep ^"<a" | sed -e 's/[<>="//]/ /g' | awk '{ print $3}' | sort -nrk1,1 | head -1)
-    wget http://artifactory-horw.int.toradex.com/artifactory/list/torizoncore-oe-prerelease-horw/dunfell-5.x.y/nightly/$version/$KERNEL_FILE_PATH/oedeploy/kernel-config
+    # due to specific of the kernel build we need to use the latest
+    # configuration from the nightly builds. We are getting $Version
+    # dynamically, as a variable, based on parsing URL page with
+    # Nightly builds ID
+    version=$( wget -q -O - http://artifactory-horw.int.toradex.com/artifactory/list/torizoncore-oe-prerelease-horw/dunfell-5.x.y/nightly/ | grep -E "^<a href=\"[0-9]" | sed -E 's/.*\"(.+)\/\".*/\1/' | sort -n | tail -n 1 )
+    kernel_config=$( wget -q -O - http://artifactory-horw.int.toradex.com/artifactory/list/torizoncore-oe-prerelease-horw/dunfell-5.x.y/nightly/$version/$KERNEL_FILE_PATH/oedeploy/ | grep -E "^<a href=\"kernel-config--\S+[0-9]{4,6}<" | sed -E 's/.*\"(.+)\".*/\1/' )
     mkdir -p $TEMP_BUILD_FOLDER
-    cp kernel-config $TEMP_BUILD_FOLDER/$KERNEL_CONFIGURATION_FILE
-    ##### 
+    wget -O $TEMP_BUILD_FOLDER/$KERNEL_CONFIGURATION_FILE http://artifactory-horw.int.toradex.com/artifactory/list/torizoncore-oe-prerelease-horw/dunfell-5.x.y/nightly/$version/$KERNEL_FILE_PATH/oedeploy/$kernel_config
+    #####
     make O=$TEMP_BUILD_FOLDER -j $THREADS 2>&1 | tee $KERNEL_BUILD_LOG_FILE_NAME
   artifacts:
     when: always
-    name: "$CI_COMMIT_REF_NAME" 
+    name: "$CI_COMMIT_REF_NAME"
     paths:
       - $KERNEL_BUILD_LOG_FILE_NAME
       #As we do not generate config for 5.x and use generated one,  we have just kernel config and kernel build log
@@ -63,10 +64,10 @@ stages:
     - set -o xtrace
     - rm -rf $TEMP_BUILD_FOLDER
 
-      # If you need additional products build just copy-paste build_******_product section with new config name 
+      # If you need additional products build just copy-paste build_******_product section with new config name
 build_default_defconfig :
   extends: .build_base
   variables:
-    # Defining the path, which we will use to take a config file  to build a kernel 
+    # Defining the path, which we will use to take a config file  to build a kernel
    KERNEL_FILE_PATH:  colibri-imx7/torizon-upstream/torizon-core-docker
   stage: build-product
