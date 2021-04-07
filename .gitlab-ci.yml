@@ -17,6 +17,7 @@ variables:
   TEMP_BUILD_FOLDER: /builds/temp-builds
 
 stages:
+  - check-patch
   - build-product
 
 .build_base:
@@ -58,6 +59,14 @@ stages:
   after_script:
     - set -o xtrace
     - rm -rf $TEMP_BUILD_FOLDER
+
+check_patch:
+  stage: check-patch
+  script: .gitlab-ci.d/check-patch.py
+  variables:
+    GIT_STRATEGY: fetch
+    GIT_DEPTH: 1000
+  allow_failure: true
 
       # If you need additional products build just copy-paste build_******_product section with new config name
 build_default_defconfig :
