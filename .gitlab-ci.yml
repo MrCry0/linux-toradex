@@ -66,3 +66,35 @@ build_default_defconfig :
     # Defining the path, which we will use to take a config file  to build a kernel
    KERNEL_FILE_PATH:  colibri-imx7/torizon-upstream/torizon-core-docker
   stage: build-product
+
+build_bsp_defconfig:
+  stage: build-product
+  variables:
+    DEFCONFIG: "toradex-imx_v6_v7_defconfig"
+    # Choose max kernel size that `ubinfo /dev/ubi0_0` reports
+    MAX_KERNEL_SIZE_B: 8507392
+    GIT_STRATEGY: fetch
+    GIT_DEPTH: "1"
+  script: |
+    #set -o xtrace
+    cd $CI_PROJECT_DIR
+    echo -e "Compiler used to build binaries is"
+    which ${CROSS_COMPILE}gcc
+    ${CROSS_COMPILE}gcc --version
+    echo -e "Arch is \e[36m$ARCH\e[39m"
+    THREADS=$(grep processor /proc/cpuinfo -c)
+    make $DEFCONFIG
+    make -j $THREADS 2>&1 | tee $KERNEL_BUILD_LOG_FILE_NAME
+    KERNEL_SIZE=$(ls -la arch/arm/boot/zImage | awk '{print $5}')
+    echo "Kernel size is ${KERNEL_SIZE} bytes"
+    if [ $KERNEL_SIZE -ge $MAX_KERNEL_SIZE_B ];
+    then
+      echo "❌ Kernel exceeds the max size of ${MAX_KERNEL_SIZE_B}, failing CI pipeline";
+      exit 1
+    fi
+  artifacts:
+    when: always
+    name: "$CI_COMMIT_REF_NAME"
+    paths:
+      - $KERNEL_BUILD_LOG_FILE_NAME
+      - kernel-config
