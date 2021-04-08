@@ -1,13 +1,8 @@
-image: $CI_IMAGE
+image: gitlab.int.toradex.com:4567/rd/linux-bsp/ci-toolchain-container:linux-toradex_aarch32_arm_builder-bb6f84e
 
 variables:
 # uncomment for the pipeline debug purpose
 # CI_DEBUG_TRACE: "true"
-
-# Please choose possible 32/64 builder image and appropriate compiler
-  CI_IMAGE: gitlab.int.toradex.com:4567/yuiry.erofeev/linux-toradex/ci-kernel-builder:latest
-  #CI_IMAGE: gitlab.int.toradex.com:4567/yuiry.erofeev/linux-toradex/ci-kernel-builder:aarch64
-  #CI_IMAGE: gitlab.int.toradex.com:4567/yuiry.erofeev/linux-toradex/ci-kernel-builder:aarch64-linaro
   DOCKER_HOST: tcp://docker:2375
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: ""
