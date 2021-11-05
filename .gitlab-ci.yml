@@ -81,7 +81,7 @@ build_bsp_defconfig:
   variables:
     DEFCONFIG: "toradex-imx_v6_v7_defconfig"
     # Choose max kernel size that `ubinfo /dev/ubi0_0` reports
-    MAX_KERNEL_SIZE_B: 8507392
+    MAX_KERNEL_SIZE_B: 12570624
     GIT_STRATEGY: fetch
     GIT_DEPTH: "1"
   script: |
